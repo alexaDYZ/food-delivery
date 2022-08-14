@@ -20,13 +20,13 @@ class Order():
     def getOrderStatus(self):
         return Order.status[self.status]
 
-    def assignRider(self,riderID):
-        self.rider = riderID
+    def foundRider(self):
         self.status = 2
-        print("------ Order #" , self.index, "is assigned to Rider #", self.rider , "order is ", self.getOrderStatus() )
+        print("------ Order #" , self.index, "is assigned to Rider #", self.rider.index , "order is ", self.getOrderStatus() )
     
     def delivered(self):
         self.status = 3
+        self.rider.totalOrderDelivered += 1
         print("------ Order #" , self.index, "is", self.getOrderStatus())
     
     def print(self):

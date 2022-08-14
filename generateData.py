@@ -20,7 +20,8 @@ allocation algorithm. Data generated includes:
 
 # generate locations for restaurants, customers and riders
 restaurant_loc = np.random.randint(0, args["gridSize"], size=(args["numRestaurants"],2))
-restaurant_list = [Restaurant(i, restaurant_loc[i],args) for i in range(args["numRestaurants"])]
+food_prep_time = [random.expovariate(1/args["avgFoodPrepTime"]) for i in range(args["numRestaurants"])]
+restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) for i in range(args["numRestaurants"])]
 
 rider_loc = np.random.randint(0,args["gridSize"], size=(args["numRiders"],2))
 rider_list = [Rider(i, rider_loc[i],args) for i in range(args["numRiders"])]
@@ -29,8 +30,11 @@ customer_loc = np.random.randint(0,args["gridSize"], size=(args["numCustomers"],
 customer_list = [Customer(customer_loc[i],args) for i in range(args["numCustomers"])]
 
 # generate list of orders, with index, time, customer, restaurant
-order_time = [random.expovariate(2/args["timePeriod"]) for i in range(args["numOrders"])]
+order_time = [random.expovariate(1/args["avgOrderTime"]) for i in range(args["numOrders"])]
 order_time.sort()
+
+
+
 
 order_list = [] # store all the orders generated
 

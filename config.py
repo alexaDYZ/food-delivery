@@ -5,11 +5,12 @@ from utils import dotdict
 # set key args
 args = dotdict({
     "gridSize": 10,
-   "numRiders": 2,
+   "numRiders": 3,
    "numRestaurants": 5,
    "numCustomers": 10,
     "numOrders":10,
-    "timePeriod": 30, # seconds
+    "avgOrderTime": 60, # order appear time
+    "avgFoodPrepTime": 7, 
     "riderSpeed":1,
-    "riderSelectionThreshold": 9
+    "riderSelectionThreshold": 8
 })
