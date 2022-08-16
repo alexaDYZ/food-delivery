@@ -27,12 +27,13 @@ class Order():
     def delivered(self):
         self.status = 3
         self.rider.totalOrderDelivered += 1
-        print("------ Order #" , self.index, "is", self.getOrderStatus())
+        print("------ Order #" , self.index, "is", self.getOrderStatus(), "by Rider #", self.rider.index)
     
     def print(self):
         print("------ Order #" , self.index, "is ", self.getOrderStatus(), "\n Customer:", self.customer.loc, "Restaurant:", self.restaurant.loc)
 
-
+    def __lt__(self, other):
+        return self.t < other.t
 # o = Order()
 # o.getOrderStatus()
 

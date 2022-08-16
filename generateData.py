@@ -7,6 +7,7 @@ from Order import Order
 from Restaurant import Restaurant
 from Customer import Customer
 from Rider import Rider
+import copy
 
 '''
 This file generate data needed for the simulation. Data generated is saved to perform simulations of different 
@@ -39,8 +40,9 @@ order_time.sort()
 order_list = [] # store all the orders generated
 
 def generateOrders():
-    customer_list_copy = customer_list.copy()
-    order_time_copy = order_time.copy()
+    customer_list_copy = copy.deepcopy(customer_list)
+    order_time_copy = copy.deepcopy(order_time)
+    order_time_copy.sort(reverse=True)
     for i in range(args["numOrders"]):
         c = customer_list_copy.pop()
         r_index = random.randint(0,args["numRestaurants"]-1)
