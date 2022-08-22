@@ -40,7 +40,6 @@ class ProposedMethod(AssignmentMethod):
             return dist
         
         free_candidates = [r for r in self.rider_list if getExpectedStatus(r) == "FREE"]
-        print("free candidates: ", len(free_candidates))
         eligible_candidates = [r for r in free_candidates  if getExpectedDistance(r) < args["riderSelectionThreshold"] ]
         return eligible_candidates
 
@@ -53,7 +52,7 @@ class ProposedMethod(AssignmentMethod):
         # update order status
         self.order.rider = bestRider
         self.order.foundRider()
-        print("best rider found")
+        # print("best rider found")
         return bestRider
 
 
@@ -62,10 +61,11 @@ class ProposedMethod(AssignmentMethod):
     
         # check if there is eligible rider:
         if len(eligible_candidates) == 0:
-            print("Order #", self.order.index, ": unable to find a rider")
+            pass
+            # print("Order #", self.order.index, ": unable to find a rider")
     
         # select the nearest rider(to restaurant)
         else:
             bestRider = self.find_best_rider(eligible_candidates)
-            print("order assigned")
+            # print("order assigned")
             return bestRider

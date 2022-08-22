@@ -19,50 +19,52 @@ allocation algorithm. Data generated includes:
 5) order_list
 '''
 
-# generate locations for restaurants, customers and riders
-restaurant_loc = np.random.randint(0, args["gridSize"], size=(args["numRestaurants"],2))
-food_prep_time = [random.expovariate(1/args["avgFoodPrepTime"]) for i in range(args["numRestaurants"])]
-restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) for i in range(args["numRestaurants"])]
+def dataGeneration():
 
-rider_loc = np.random.randint(0,args["gridSize"], size=(args["numRiders"],2))
-rider_list = [Rider(i, rider_loc[i],args) for i in range(args["numRiders"])]
+    # generate locations for restaurants, customers and riders
+    restaurant_loc = np.random.randint(0, args["gridSize"], size=(args["numRestaurants"],2))
+    food_prep_time = [random.expovariate(1/args["avgFoodPrepTime"]) for i in range(args["numRestaurants"])]
+    restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) for i in range(args["numRestaurants"])]
 
-customer_loc = np.random.randint(0,args["gridSize"], size=(args["numCustomers"],2))
-customer_list = [Customer(customer_loc[i],args) for i in range(args["numCustomers"])]
+    rider_loc = np.random.randint(0,args["gridSize"], size=(args["numRiders"],2))
+    rider_list = [Rider(i, rider_loc[i],args) for i in range(args["numRiders"])]
 
-# generate list of orders, with index, time, customer, restaurant
-order_time = [random.expovariate(1/args["avgOrderTime"]) for i in range(args["numOrders"])]
-order_time.sort()
+    customer_loc = np.random.randint(0,args["gridSize"], size=(args["numCustomers"],2))
+    customer_list = [Customer(customer_loc[i],args) for i in range(args["numCustomers"])]
+
+    # generate list of orders, with index, time, customer, restaurant
+    order_time = [random.expovariate(1/args["avgOrderTime"]) for i in range(args["numOrders"])]
+    order_time.sort()
+
+    order_list = [] # store all the orders generated
+
+    def generateOrders():
+        customer_list_copy = copy.deepcopy(customer_list)
+        order_time_copy = copy.deepcopy(order_time)
+        order_time_copy.sort(reverse=True)
+        for i in range(args["numOrders"]):
+            c = customer_list_copy.pop()
+            r_index = random.randint(0,args["numRestaurants"]-1)
+            r = restaurant_list[r_index]
+            t = order_time_copy.pop()
+            o = Order(i, t,c,r)
+            order_list.append(o)
+
+    generateOrders() # update 'orders' list
 
 
+    # save data
+    import pickle
+    data = dotdict({
+        'restaurant list': restaurant_list, 
+        "rider list":rider_list, 
+        "order list":order_list, 
+        "customer list": customer_list,
+        "order time" : order_time,
+    })
+    # data_dictionary = {'restaurant list': restaurant_list, "rider list":rider_list, "order list":order_list, "customer list": customer_list}
+    with open('data.dict', 'wb') as data_file:
+        pickle.dump(data, data_file)
 
 
-order_list = [] # store all the orders generated
-
-def generateOrders():
-    customer_list_copy = copy.deepcopy(customer_list)
-    order_time_copy = copy.deepcopy(order_time)
-    order_time_copy.sort(reverse=True)
-    for i in range(args["numOrders"]):
-        c = customer_list_copy.pop()
-        r_index = random.randint(0,args["numRestaurants"]-1)
-        r = restaurant_list[r_index]
-        t = order_time_copy.pop()
-        o = Order(i, t,c,r)
-        order_list.append(o)
-
-generateOrders() # update 'orders' list
-
-
-# save data
-import pickle
-data = dotdict({
-    'restaurant list': restaurant_list, 
-    "rider list":rider_list, 
-    "order list":order_list, 
-    "customer list": customer_list,
-    "order time" : order_time,
-})
-# data_dictionary = {'restaurant list': restaurant_list, "rider list":rider_list, "order list":order_list, "customer list": customer_list}
-with open('data.dict', 'wb') as data_file:
-    pickle.dump(data, data_file)
+dataGeneration()

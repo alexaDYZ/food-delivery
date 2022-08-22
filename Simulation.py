@@ -30,6 +30,7 @@ class Simulation():
         self.customer_list = customer_list
         self.order_time = order_time
         self.method = method
+        self.numDelivered = 0
 
     def simulate(self):
         self.method.addRiderList(self.rider_list)
@@ -42,10 +43,7 @@ class Simulation():
             e = Event(o.t, 1, o)
             checkpoint.put(e)
     
-        # def updateAllStatus(currTime):
-        #     for r in self.rider_list:
-        #         r.updateStatus(currTime)
-    
+
         #initialize status for all
         # updateAllStatus(0)
         counter = 0
@@ -56,11 +54,14 @@ class Simulation():
 
             # currEvent.print()
             currTime = currEvent.time
-            print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
+            # print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
 
             # check Event category, if it's a new order, tell it how to assign rider
             if currEvent.getCategory() == 'New Order':
                 currEvent.addAssignmentMethod(self.method)
+
+            if currEvent.getCategory() == 'Order Delivered':
+                self.numDelivered += 1
 
             # execute current event:
             triggedEvent = currEvent.executeEvent(currTime)
@@ -92,7 +93,8 @@ class Simulation():
             # Situation 2 and 3: order is delivered
             
             counter += 1
-        self.printResult()
+        # self.printResult()
+        return self.numDelivered
 
     def printResult(self):
         print("\n ****************** \n ", self.method.__class__.__name__, "\n ****************** \n ")
@@ -119,5 +121,5 @@ class Simulation():
             df = pd.DataFrame.from_dict(dict, orient='index',
                             columns=[ '# orders delivered', 'total waiting time', 'waiting time per order'])
             print(df)
-        print_all_order_status(self.order_list)
-        print_all_rider_waiting_time(self.rider_list)
+        # print_all_order_status(self.order_list)
+        # print_all_rider_waiting_time(self.rider_list)

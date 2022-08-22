@@ -16,7 +16,7 @@ class Event():
         3: 'Rider Arrived at Restaurant',
     }
     def __init__(self, time, cat:int, order:Order):
-        self.time = time
+        self.time = time # time when the order comes in
         self.cat = cat
         self.order = order
         self.method = None
@@ -35,6 +35,7 @@ class Event():
         # case 1: new order comes in 
         if self.getCategory() ==  'New Order':
             curr_order = self.order
+            curr_order.cust.order(currTime) # customer makes order at time currTime
             assignment_method = self.method
             assignment_method.addOrder(curr_order)
             assignment_method.addCurrTime(currTime)
@@ -54,7 +55,7 @@ class Event():
         # case 2: an order is delivered
         if self.cat == 2:
             # update order status
-            self.order.delivered()
+            self.order.delivered(currTime)
             orderIndex = self.order.index
             # update rider
             rider = self.order.rider

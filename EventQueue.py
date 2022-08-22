@@ -15,22 +15,22 @@ class EventQueue(PriorityQueue):
     def _get_priority(self, item): 
         return item.time
 
-r = Rider(1, [0,0], args)
-rest = Restaurant(1, [5,0], 10,args)
-cust = Customer([10,0],args )
-o = Order(1, 100, cust, rest)
-e_1 = Event(100, 1, o)
-e_2 = Event(110, 3, o)
-e_3 = Event(125, 2, o)
-e_100 = Event(10000, 2, o)
+# r = Rider(1, [0,0], args)
+# rest = Restaurant(1, [5,0], 10,args)
+# cust = Customer([10,0],args )
+# o = Order(1, 100, cust, rest)
+# e_1 = Event(100, 1, o)
+# e_2 = Event(110, 3, o)
+# e_3 = Event(125, 2, o)
+# e_100 = Event(10000, 2, o)
 
 
-# c = EventQueue() 
-events = [e_100,e_3,e_1,e_2]
-events.sort()
+# # c = EventQueue() 
+# events = [e_100,e_3,e_1,e_2]
+# events.sort()
 
-for e in events:
-    e.print()
+# for e in events:
+#     e.print()
 
 # c.get().print()
 # c.get().print()

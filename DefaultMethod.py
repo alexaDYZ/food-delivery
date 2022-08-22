@@ -41,7 +41,8 @@ class DefaultMethod(AssignmentMethod):
     
         # check if there is eligible rider:
         if len(eligible_candidates) == 0:
-            print("Order #", self.order.index, ": unable to find a rider")
+            pass
+            # print("Order #", self.order.index, ": unable to find a rider")
     
         # select the nearest rider(to restaurant)
         else:

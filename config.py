@@ -4,11 +4,13 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
+    "numEpisode":1000,
+
     "gridSize": 10,
-    "numOrders":30,
+    "numOrders":30, # same as num customers
     "numCustomers": 30,
-   "numRiders": 3,
-   "numRestaurants": 5,
+    "numRiders": 3,
+    "numRestaurants": 5,
     "avgOrderTime": 60, # order appear time
     "avgFoodPrepTime": 7, 
     "riderSpeed":1,
