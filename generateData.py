@@ -23,8 +23,13 @@ def dataGeneration():
 
     # generate locations for restaurants, customers and riders
     restaurant_loc = np.random.randint(0, args["gridSize"], size=(args["numRestaurants"],2))
-    food_prep_time = [random.expovariate(1/args["avgFoodPrepTime"]) for i in range(args["numRestaurants"])]
-    restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) for i in range(args["numRestaurants"])]
+    # food preptime: normal distribution
+    fpt_mean = args["FPT_avg"]
+    fpt_sd = args["FPT_sd"]
+    food_prep_time = np.random.normal(fpt_mean, fpt_sd, args["numRestaurants"]).tolist()
+    # uniform distribution in 2d space
+    restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) 
+                       for i in range(args["numRestaurants"])]
 
     rider_loc = np.random.randint(0,args["gridSize"], size=(args["numRiders"],2))
     rider_list = [Rider(i, rider_loc[i],args) for i in range(args["numRiders"])]

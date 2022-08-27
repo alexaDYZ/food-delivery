@@ -4,15 +4,16 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numEpisode":1000,
-
+    "numEpisode":100, # for averaging 
+    
     "gridSize": 10,
     "numOrders":30, # same as num customers
     "numCustomers": 30,
     "numRiders": 3,
     "numRestaurants": 5,
     "avgOrderTime": 60, # order appear time
-    "avgFoodPrepTime": 7, 
+    "FPT_avg": 15, 
+    "FPT_sd":5,
     "riderSpeed":1,
 
     "riderSelectionThreshold": 100000,
