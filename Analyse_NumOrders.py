@@ -113,47 +113,49 @@ def AnalyseNumOrders():
         avg[num].append(avg_default)
         avg[num].append(avg_anticipation)
 
-    def generatePlot(x_data, y_data):
-        
-        df = pd.DataFrame.from_dict(x_data, orient='index',
-                                columns=['avg_default', 'avg_anticipation'])
-        print(df)
+
+    '''
+    plot  
+    '''    
+    
+    df = pd.DataFrame.from_dict(avg, orient='index',
+                            columns=['avg_default', 'avg_anticipation'])
+    print(df)
 
 
-        ''' plot  '''
-        x_axis = y_data
-        y_1 = [i[0] for i in x_data.values()]
-        y_2 = [i[1] for i in x_data.values()]
-        plt.plot(x_axis,y_1, label = "Default")
-        plt.plot(x_axis, y_2, label = "Anticipation")
-        
-        plt.legend()
-        title = "Average percentage of orders delivered \n #Simulation = " + str(numEpisode)
-        plt.title(title)
+    
+    x_axis = numOrder
+    y_1 = [i[0] for i in avg.values()]
+    y_2 = [i[1] for i in avg.values()]
+    plt.plot(x_axis,y_1, label = "Default")
+    plt.plot(x_axis, y_2, label = "Anticipation")
+    
+    plt.legend()
+    title = "Average percentage of orders delivered \n #Simulation = " + str(numEpisode)
+    plt.title(title)
 
-        for x,y in zip(x_axis,y_1):
+    for x,y in zip(x_axis,y_1):
 
-            label = "{:.2f}".format(y)
+        label = "{:.2f}".format(y)
 
-            plt.annotate(label, # this is the text
-                        (x,y), # these are the coordinates to position the label
-                        textcoords="offset points", # how to position the text
-                        xytext=(0,10), # distance from text to points (x,y)
-                        ha='center')
-        
-        for x,y in zip(x_axis,y_2):
+        plt.annotate(label, # this is the text
+                    (x,y), # these are the coordinates to position the label
+                    textcoords="offset points", # how to position the text
+                    xytext=(0,10), # distance from text to points (x,y)
+                    ha='center')
+    
+    for x,y in zip(x_axis,y_2):
 
-            label = "{:.2f}".format(y)
+        label = "{:.2f}".format(y)
 
-            plt.annotate(label, # this is the text
-                        (x,y), # these are the coordinates to position the label
-                        textcoords="offset points", # how to position the text
-                        xytext=(0,10), # distance from text to points (x,y)
-                        ha='center')
+        plt.annotate(label, # this is the text
+                    (x,y), # these are the coordinates to position the label
+                    textcoords="offset points", # how to position the text
+                    xytext=(0,10), # distance from text to points (x,y)
+                    ha='center')
 
-        plt.show()
-        
-    generatePlot(numOrder, avg)
+    plt.show()
+    
 
 
     

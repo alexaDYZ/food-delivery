@@ -1,4 +1,6 @@
 import numpy as np
-mu, sigma = 0, 0.1 # mean and standard deviation
-s = np.random.normal(mu, sigma, 100)
-print(type(s))
+loc = np.random.randint(0,10,size=(40,2)).tolist()
+print(loc)
+print(loc[1][0])
+print(loc[1][1])
+

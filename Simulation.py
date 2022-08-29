@@ -1,4 +1,5 @@
 
+from cmath import inf
 from AssignmentMethod import AssignmentMethod
 from itertools import count
 import logging
@@ -31,18 +32,36 @@ class Simulation():
         self.order_time = order_time
         self.method = method
         self.numDelivered = 0 # total number of orders delivered within this simulation
-
+        self.status_check_dict = {} # %of busy riders, checked at regular intervals
+        self.end = -1
+        
     def simulate(self):
         self.method.addRiderList(self.rider_list)
         # create event checkpoints
-        checkpoint = EventQueue()      
+        checkpoint = EventQueue()   
+        
+        '''Initialize regular check point'''
+        initial_check = Event(0, 4, None)
+        checkpoint.put(initial_check)
+        
+        '''Put in new orders event'''
         order_time_dict = {}
         self.order_list.sort()
+        print("simulation: number of orders",len(self.order_list) )
         for o in self.order_list:
             order_time_dict[o.t] = o
             e = Event(o.t, 1, o)
             checkpoint.put(e)
-    
+            # get program end time. 
+            # Note: self.end < actual ending time of the program, 
+            # since it ends at "order appear time" of the last order, instaed
+            # of "delivered time" of the last order. 
+            # but it desent matter if we wish to know % riders occupied
+            
+        self.end = max(order_time_dict.keys())
+        print(self.end)
+        
+ 
 
         #initialize status for all
         # updateAllStatus(0)
@@ -60,8 +79,14 @@ class Simulation():
             if currEvent.getCategory() == 'New Order':
                 currEvent.addAssignmentMethod(self.method)
 
-            if currEvent.getCategory() == 'Order Delivered':
+            elif currEvent.getCategory() == 'Order Delivered':
                 self.numDelivered += 1
+                
+            elif currEvent.getCategory() == 'Regular Check':
+                currEvent.addRiderList(self.rider_list) 
+                currEvent.addStatusCheckDict(self.status_check_dict)
+                currEvent.addProgramEndTime(self.end)
+                # print("Status check at", currTime, ":", self.status_check_dict.keys())
 
             # execute current event:
             triggedEvent = currEvent.executeEvent(currTime)
@@ -69,7 +94,7 @@ class Simulation():
             if triggedEvent: 
                 for e in triggedEvent:
                     checkpoint.put(e)
- 
+
             counter += 1
         # self.printResult()
         return self

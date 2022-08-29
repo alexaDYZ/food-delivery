@@ -27,7 +27,6 @@ class Rider():
         return math.dist(self.loc, another_loc)
     
     def getStatus(self):
-        
         return Rider.status[self.status]
 
     def deliver(self, order:Order, currTime:float):

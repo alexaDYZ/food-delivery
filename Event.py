@@ -1,6 +1,7 @@
 
 
 
+from tkinter.messagebox import NO
 from AssignmentMethod import AssignmentMethod
 from Order import Order
 from Rider import Rider
@@ -14,12 +15,16 @@ class Event():
         1: 'New Order',
         2: 'Order Delivered',
         3: 'Rider Arrived at Restaurant',
+        4: 'Regular Check', # for rider saturation rate
     }
     def __init__(self, time, cat:int, order:Order):
         self.time = time # time when the order comes in
         self.cat = cat
         self.order = order
         self.method = None
+        self.rider_list = None # this is for event 4 only. To check status for all riders
+        self.status_check_dict = None
+        self.programEndTime = -1
     
     def getCategory(self) : #returns a string
         return Event.category[self.cat]
@@ -53,7 +58,7 @@ class Event():
                 triggeredEvent.append(e_finish)
             
         # case 2: an order is delivered
-        if self.cat == 2:
+        elif self.cat == 2:
             # update order status
             self.order.delivered(currTime)
             orderIndex = self.order.index
@@ -66,17 +71,44 @@ class Event():
                 rider.totalCurrOrder -= 1 
             elif rider is None: print("Error: Order delivered but cannot find its rider")
         # case 3: rider arrives at restaurant
-        if self.cat == 3:
+        elif self.cat == 3:
             #update rider location
             rest_loc = self.order.rest.loc
             rider = self.order.rider
             if rider:
                 rider.loc = rest_loc
             elif rider is None: print("Error: Rider arrives at resturant but cannot find its rider")
+        
+        # case 4: check % riders occupied, at regular time interval
+        elif self.cat == 4:
+            # check if thats the 'end' of the program
+            if currTime >= self.programEndTime+args["statusCheckInterval"]:
+                return []
+            
+            else:
+                # compute %
+                numOccupiedRiders = 0
+                for r in self.rider_list:
+                    if r.getStatus() == "BUSY":
+                        numOccupiedRiders += 1
+                ratio = round(numOccupiedRiders / args["numRiders"],2)
+                # record
+                self.status_check_dict[currTime] = ratio
+                
+                # trigger next regular check event
+                next_check = Event(currTime+args["statusCheckInterval"], 4, None)
+                triggeredEvent.append(next_check)
+       
         return triggeredEvent # a list of events to be added to the checkpoints EventQueue
 
     def addAssignmentMethod(self, method: AssignmentMethod):
         self.method = method      
+    def addRiderList(self, ls):
+        self.rider_list = ls
+    def addStatusCheckDict(self, dict):
+        self.status_check_dict = dict
+    def addProgramEndTime(self, t):
+        self.programEndTime = t
 
 r = Rider(1, [0,0], args)
 rest = Restaurant(1, [5,0], 10,args)

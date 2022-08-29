@@ -53,75 +53,60 @@ def runEpisode():
     '''
     # start timer:
     # start_time = time.time()
+    print("run episode------")
+    print("number of orders",len(order_list) )
 
     # Method 1: default method, greedy
     greedy = DefaultMethod()
     sim1 = Simulation(greedy,restaurant_list, rider_list, order_list, customer_list, order_time)
-    numDeliveredDefault=sim1.simulate().numDelivered
+    res_default=sim1.simulate().status_check_dict
 
     # Method 2: proposed method, expectation + greedy
     expectation = ProposedMethod()
     sim2 = Simulation(expectation,restaurant_list, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
-    numDeliveredExpectation = sim2.simulate().numDelivered
+    res_anti = sim2.simulate().status_check_dict
 
-    return numDeliveredDefault,numDeliveredExpectation
+    return res_default,res_anti
 
 
-def main():
+def AnalyseRider():
     
     start_time = time.time()
-    
-    'Change 1'
-    numOrder = args["numOrders"]
-    
-    avg = {} # record avg % of ordered delivered for each iteration
-    # higher = {} # record % of better performance 
 
-    numEpisode = args["numEpisode"]
-
-    for num in numOrder:
-        args["numOrders"] = num
-        args["numCustomers"] = num
+    dataGeneration()
+    res_default,res_anti = runEpisode() # 2 dictionaries
+        
+    # averaging: omitted
+        
+    '''
+    generate big dict:
+        key -> time interval
+        value -> [ratio_default, ratio_anti]
+    '''
+    res = {}
+    for t in res_default.keys():
+        res[t] = []
+        res[t].append(res_default[t])
+        res[t].append(res_anti[t])
+            
         
 
-        # keep track of #orders delivered for each episode for the two method
-        num_delivered_list_default = []
-        num_delivered_list_anticipation = []
-
-        for i in range(numEpisode):
-            dataGeneration()
-            numDeliveredDefault,numDeliveredExpectation = runEpisode()
-            num_delivered_list_default.append(numDeliveredDefault)
-            num_delivered_list_anticipation.append(numDeliveredExpectation)
-        
-        # averaging
-        avg_default = round(sum(num_delivered_list_default)/num/numEpisode,3)
-        avg_anticipation = round(sum(num_delivered_list_anticipation)/num/numEpisode,3)
-        # print("delivery record(default):", num_delivered_list_default)
-        # print("delivery record:", num_delivered_list_anticipation)
-        # print("diff:" , [i-j for (i,j) in zip(num_delivered_list_default, num_delivered_list_anticipation)])
-        
-        if num not in avg.keys():
-            avg[num] = []
-        
-        avg[num].append(avg_default)
-        avg[num].append(avg_anticipation)
 
     
-    df = pd.DataFrame.from_dict(avg, orient='index',
-                            columns=['avg_default', 'avg_anticipation'])
+    df = pd.DataFrame.from_dict(res, orient='index',
+                            columns=['ratio_default', 'ratio_anticipation'])
     print(df)
 
 
     ''' plot  '''
-    x_axis = numOrder
-    y_1 = [i[0] for i in avg.values()]
-    y_2 = [i[1] for i in avg.values()]
-    plt.plot(x_axis,y_1, label = "Default")
-    plt.plot(x_axis, y_2, label = "Anticipation")
+    x_axis = res_default.keys()
+    y_1 = [i[0] for i in res.values()]
+    y_2 = [i[1] for i in res.values()]
+    plt.plot(x_axis,y_1, '--', label = "Default", )
+    plt.plot(x_axis, y_2,'-+',label = "Anticipation")
     
     plt.legend()
-    title = "Average percentage of orders delivered \n #Simulation = " + str(numEpisode)
+    title = "Percentage of Occupied Riders" 
     plt.title(title)
 
     for x,y in zip(x_axis,y_1):
@@ -152,12 +137,3 @@ def main():
     print("total time taken:", time.time() - start_time)
     
 
-
-    
-    
-
-
-
-
-if __name__ == "__main__":
-   main()

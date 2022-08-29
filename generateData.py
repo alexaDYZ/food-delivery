@@ -34,12 +34,24 @@ def dataGeneration():
     rider_loc = np.random.randint(0,args["gridSize"], size=(args["numRiders"],2))
     rider_list = [Rider(i, rider_loc[i],args) for i in range(args["numRiders"])]
 
-    customer_loc = np.random.randint(0,args["gridSize"], size=(args["numCustomers"],2))
-    customer_list = [Customer(customer_loc[i],args) for i in range(args["numCustomers"])]
+    start_time = 0
+    customer_loc, customer_list, order_time=[],[],[]
+    for window in range(args["numRepeatedWindow"]):
+        loc = np.random.randint(0, args["gridSize"], size=(args["numCustomers"],2)).tolist()
+        customer_list += [Customer(loc[i],args) 
+                          for i in range(args["numCustomers"])]
+        customer_loc += loc
 
-    # generate list of orders, with index, time, customer, restaurant
-    order_time = [random.expovariate(1/args["avgOrderTime"]) for i in range(args["numOrders"])]
-    order_time.sort()
+
+        # generate list of orders, with index, time, customer, restaurant
+        order_time += [start_time + random.expovariate(1/args["avgOrderTime"]) 
+                       for i in range(args["numOrders"])]
+        start_time += args["avgOrderTime"]
+        
+    order_time.sort() # small to large
+    print("number of orders:" ,len(order_time))
+    # print(order_time)
+
 
     order_list = [] # store all the orders generated
 
@@ -47,7 +59,7 @@ def dataGeneration():
         customer_list_copy = copy.deepcopy(customer_list)
         order_time_copy = copy.deepcopy(order_time)
         order_time_copy.sort(reverse=True)
-        for i in range(args["numOrders"]):
+        for i in range(len(order_time)):
             c = customer_list_copy.pop()
             r_index = random.randint(0,args["numRestaurants"]-1)
             r = restaurant_list[r_index]
@@ -72,4 +84,3 @@ def dataGeneration():
         pickle.dump(data, data_file)
 
 
-dataGeneration()
