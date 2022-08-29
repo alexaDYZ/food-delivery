@@ -30,7 +30,7 @@ class Simulation():
         self.customer_list = customer_list
         self.order_time = order_time
         self.method = method
-        self.numDelivered = 0
+        self.numDelivered = 0 # total number of orders delivered within this simulation
 
     def simulate(self):
         self.method.addRiderList(self.rider_list)
@@ -69,32 +69,10 @@ class Simulation():
             if triggedEvent: 
                 for e in triggedEvent:
                     checkpoint.put(e)
-                    
-            
-            
-            # # Situation 1: new order comes in
-            # if currEvent.getCategory() ==  'New Order':
-            #     curr_order = order_time_dict[currTime]
-            #     self.method.addOrder(curr_order)
-            #     self.method.addCurrTime(currTime)
-            #     bestRider = self.method.assign()
-                
-            #     # if best rider can be found:
-            #     if bestRider:
-            #         # create "arrive at restaturant" event
-            #         rest_arrival_time = bestRider.getRestArrivalTime(curr_order.index)
-            #         e_arrival = Event(rest_arrival_time, 3, curr_order)
-            #         checkpoint.put(e_arrival)
-            #         # create "order delivered" event
-            #         finishTime = bestRider.getOrderCompleteTime(curr_order.index)
-            #         e_finish = Event(finishTime, 2, curr_order)
-            #         checkpoint.put(e_finish)
-            
-            # Situation 2 and 3: order is delivered
-            
+ 
             counter += 1
         # self.printResult()
-        return self.numDelivered
+        return self
 
     def printResult(self):
         print("\n ****************** \n ", self.method.__class__.__name__, "\n ****************** \n ")

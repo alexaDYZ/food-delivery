@@ -7,11 +7,11 @@ args = dotdict({
     "numEpisode":100, # for averaging 
     
     "gridSize": 10,
-    "numOrders":30, # same as num customers
-    "numCustomers": 30,
+    "numOrders":150, # same as num customers
+    "numCustomers": 150,
     "numRiders": 3,
     "numRestaurants": 5,
-    "avgOrderTime": 60, # order appear time
+    "avgOrderTime": 300, # order appear time # originally 60
     "FPT_avg": 15, 
     "FPT_sd":5,
     "riderSpeed":1,
