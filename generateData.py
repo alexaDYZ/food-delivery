@@ -34,22 +34,22 @@ def dataGeneration():
     rider_loc = np.random.randint(0,args["gridSize"], size=(args["numRiders"],2))
     rider_list = [Rider(i, rider_loc[i],args) for i in range(args["numRiders"])]
 
-    start_time = 0
+    
     customer_loc, customer_list, order_time=[],[],[]
-    for window in range(args["numRepeatedWindow"]):
+    for peiord in range(1, args["numRepeatedWindow"]+1):
         loc = np.random.randint(0, args["gridSize"], size=(args["numCustomers"],2)).tolist()
         customer_list += [Customer(loc[i],args) 
                           for i in range(args["numCustomers"])]
         customer_loc += loc
 
-
         # generate list of orders, with index, time, customer, restaurant
-        order_time += [start_time + random.expovariate(1/args["avgOrderTime"]) 
-                       for i in range(args["numOrders"])]
-        start_time += args["avgOrderTime"]
+        
+        time = np.random.poisson(lam = args["avgOrderTime"], size = args["numOrders"]).tolist()
+        order_time += [t + peiord*2*args["avgOrderTime"] for t in time]
+        
         
     order_time.sort() # small to large
-    print("number of orders:" ,len(order_time))
+    # print("number of orders:" ,len(order_time))
     # print(order_time)
 
 

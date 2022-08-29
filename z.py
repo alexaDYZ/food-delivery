@@ -1,6 +1,16 @@
+from random import random
+from unittest import TestProgram
 import numpy as np
-loc = np.random.randint(0,10,size=(40,2)).tolist()
-print(loc)
-print(loc[1][0])
-print(loc[1][1])
+# ls = []
+# numOrder = 10
+# lamda = 5
+# interval = lamda * 2
 
+# for i in range(4):
+#     temp= np.random.poisson(lam = lamda, size = numOrder).tolist()
+#     ls += [t + interval*i for t in temp]
+#     print(ls)
+#     print(sum(temp)/len(temp))
+
+ditc ={1:10, 2:20}
+print(list(ditc.values()))

@@ -1,6 +1,8 @@
 
+from ast import arg
 import copy
 from mailbox import MaildirMessage
+from turtle import color
 from typing import Counter, Dict
 from unittest import result
 import numpy as np
@@ -53,8 +55,7 @@ def runEpisode():
     '''
     # start timer:
     # start_time = time.time()
-    print("run episode------")
-    print("number of orders",len(order_list) )
+
 
     # Method 1: default method, greedy
     greedy = DefaultMethod()
@@ -89,51 +90,87 @@ def AnalyseRider():
         res[t].append(res_default[t])
         res[t].append(res_anti[t])
             
-        
-
+    
 
     
-    df = pd.DataFrame.from_dict(res, orient='index',
-                            columns=['ratio_default', 'ratio_anticipation'])
-    print(df)
+    # df = pd.DataFrame.from_dict(res, orient='index',
+    #                         columns=['ratio_default', 'ratio_anticipation'])
+    # # print(df)
 
 
-    ''' plot  '''
+    ''' individual plot  '''
     x_axis = res_default.keys()
     y_1 = [i[0] for i in res.values()]
     y_2 = [i[1] for i in res.values()]
     plt.plot(x_axis,y_1, '--', label = "Default", )
     plt.plot(x_axis, y_2,'-+',label = "Anticipation")
     
-    plt.legend()
-    title = "Percentage of Occupied Riders" 
-    plt.title(title)
-
-    for x,y in zip(x_axis,y_1):
-
-        label = "{:.2f}".format(y)
-
-        plt.annotate(label, # this is the text
-                    (x,y), # these are the coordinates to position the label
-                    textcoords="offset points", # how to position the text
-                    xytext=(0,10), # distance from text to points (x,y)
-                    ha='center')
+    plt.axhline(y=np.nanmean(y_1), color='C0', label = "mean="+str(round(np.nanmean(y_1),3)))
+    plt.axhline(y=np.nanmean(y_2), color= 'C1', label = "mean="+str(round(np.nanmean(y_2),3)))
     
-    for x,y in zip(x_axis,y_2):
+    plt.legend()
+    title = "Percentage of Riders Occupied\nlambda :" + str(args["avgOrderTime"])+"\n#Orders per period:"+ str(args["numOrders"]) +"\n NUmber of Riders:" + str(args["numRiders"])
+    subtitle = 'Difference in mean='+str(round(abs(np.nanmean(y_1)-np.nanmean(y_2)),3))
+    plt.title(title+"\n"+subtitle)
+    
+    
+    markPoint = False
+    if markPoint:
+        
+        for x,y in zip(x_axis,y_1):
 
-        label = "{:.2f}".format(y)
+            label = "{:.2f}".format(y)
 
-        plt.annotate(label, # this is the text
-                    (x,y), # these are the coordinates to position the label
-                    textcoords="offset points", # how to position the text
-                    xytext=(0,10), # distance from text to points (x,y)
-                    ha='center')
+            plt.annotate(label, # this is the text
+                        (x,y), # these are the coordinates to position the label
+                        textcoords="offset points", # how to position the text
+                        xytext=(0,10), # distance from text to points (x,y)
+                        ha='center')
+        
+        for x,y in zip(x_axis,y_2):
 
+            label = "{:.2f}".format(y)
+
+            plt.annotate(label, # this is the text
+                        (x,y), # these are the coordinates to position the label
+                        textcoords="offset points", # how to position the text
+                        xytext=(0,10), # distance from text to points (x,y)
+                        ha='center')
+
+    
     plt.show()
 
 
+    '''average percentage plot '''
     
-
+    numOrders =  [10,20,30,40,50,60,70,80] # x-axis
+    diff_list = [] # y-axis
+    
+    for num in numOrders:
+        args["numOrders"] = num
+        args["numCustomers"] = num
+        
+        repeat = 30
+        ls = []
+        for i in range(repeat):
+            dataGeneration()
+            
+            res_default,res_anti = runEpisode() # 2 dictionaries
+            default = list(res_default.values())
+            anti = list(res_anti.values())
+            diff = np.nanmean(default) - np.nanmean(anti)
+            ls.append(diff)
+        avg_diff = sum(ls)/len(ls)
+        diff_list.append(avg_diff)
+    print(diff_list)
+    plt.plot(numOrders,diff_list, '--', label = "Difference in mean")
+    plt.xlabel("number of orders / period ")
+    plt.ylabel("difference in mean ratio: default - anticipation ")
+    plt.axhline(y=0, color='black')
+    plt.show()
+    
+    
+    
     print("total time taken:", time.time() - start_time)
     
 

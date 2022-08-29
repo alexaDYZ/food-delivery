@@ -8,16 +8,15 @@ args = dotdict({
     
     "gridSize": 10,
     
-    # per time window
-    "numOrders":20, # same as num customers
-    "numCustomers": 40,
+    # for each time window
+    "numOrders":10, # same as num customers
+    "numCustomers": 10,
     
+    "avgOrderTime": 10, # 
+    "numRepeatedWindow":10, # 100 min
     
-    "numRiders": 10,
+    "numRiders": 50,
     "numRestaurants": 5,
-    
-    "avgOrderTime": 50, # order appear time # originally 60
-    "numRepeatedWindow":10, # n umber of repeated window across the same tiemline
     
     
     "FPT_avg": 15, 
@@ -28,4 +27,6 @@ args = dotdict({
     "forwardLookingTime": 5,
     
     "statusCheckInterval":10, # interval for regularly checking rider status
+    
+    
 })

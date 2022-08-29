@@ -47,7 +47,6 @@ class Simulation():
         '''Put in new orders event'''
         order_time_dict = {}
         self.order_list.sort()
-        print("simulation: number of orders",len(self.order_list) )
         for o in self.order_list:
             order_time_dict[o.t] = o
             e = Event(o.t, 1, o)
@@ -59,7 +58,6 @@ class Simulation():
             # but it desent matter if we wish to know % riders occupied
             
         self.end = max(order_time_dict.keys())
-        print(self.end)
         
  
 
