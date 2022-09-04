@@ -82,7 +82,7 @@ class Simulation():
 
             # currEvent.print()
             currTime = currEvent.time
-            # print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
+            print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
 
             # check Event category, if it's a new order, tell it how to assign rider
             if currEvent.getCategory() == 'New Order':
