@@ -1,8 +1,6 @@
 
-from cmath import inf
 from AssignmentMethod import AssignmentMethod
 from itertools import count
-import logging
 from tabnanny import check
 import time
 import random
@@ -10,7 +8,6 @@ from typing import Counter, Dict
 import numpy as np
 from utils import dotdict
 from datetime import datetime, timedelta
-import threading
 from Order import Order
 from Restaurant import Restaurant
 from Customer import Customer
@@ -31,12 +28,14 @@ class Simulation():
         self.customer_list = customer_list
         self.order_time = order_time
         self.method = method
-        # Analysis - orders
+        # Analysis: orders
         self.numDelivered = 0 # total number of orders delivered within this simulation
-        # Analysis - ridrs
+        # Analysis: ridrs
         self.rider_status_check_dict = {} # %of busy riders, checked at regular intervals
-        # Analysis - waiting time
+        # Analysis: waiting time
         self.wt_ls = [] # a list of waiting time, each element is the waiting time of an order
+        
+        # end of simulation
         self.end = -1
 
         
@@ -68,7 +67,7 @@ class Simulation():
             # since it ends at "order appear time" of the last order, instaed
             # of "delivered time" of the last order. 
             # but it desent matter if we wish to know % riders occupied
-            
+        
         self.end = max(order_time_dict.keys())
         
  
@@ -92,6 +91,7 @@ class Simulation():
             elif currEvent.getCategory() == 'Regular Check':
                 currEvent.addRiderList(self.rider_list) 
                 currEvent.addStatusCheckDict(self.rider_status_check_dict)
+                currEvent.passCurrQSize(checkpoint.qsize())
                 currEvent.addProgramEndTime(self.end)
                 # print("Status check at", currTime, ":", self.status_check_dict.keys())
 
@@ -100,11 +100,13 @@ class Simulation():
 
 
             if currEvent.getCategory() == 'Order Delivered':
+                
                 self.numDelivered += 1
                 # get total waiting time
                 currOrder = currEvent.order
                 wt = currOrder.wt
                 self.wt_ls.append(wt)
+
 
             # if there is/are new events triggered, add to checkpoint
             if triggedEvent: 
@@ -113,6 +115,14 @@ class Simulation():
 
             counter += 1
         # self.printResult()
+        
+        # reset all order status
+        for o in self.order_list:
+            o.reset()
+        # reset all rider locatiions
+        
+
+
         return self
 
     def printResult(self):

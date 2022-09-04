@@ -46,6 +46,11 @@ class Order():
 
     def __lt__(self, other):
         return self.t < other.t
-# o = Order()
-# o.getOrderStatus()
+
+    def reset(self):
+        self.rider = None
+        self.status = 1
+        self.t_delivered = -1
+        self.wt = -1
+
 

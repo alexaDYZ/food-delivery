@@ -44,11 +44,13 @@ def runEpisode():
         customer_list = dict["customer list"]
         order_time = dict["order time"]
 
-        
+        restaurant_list_copy = copy.deepcopy(restaurant_list)
         rider_list_copy = copy.deepcopy(rider_list)
         order_list_copy = copy.deepcopy(order_list)
         customer_list_copy = copy.deepcopy(customer_list )
         order_time_copy = copy.deepcopy(order_time)
+
+
 
     '''
     Start Simulation
@@ -60,14 +62,14 @@ def runEpisode():
     # Method 1: default method, greedy
     greedy = DefaultMethod()
     sim1 = Simulation(greedy,restaurant_list, rider_list, order_list, customer_list, order_time)
-    simulation_default = sim1.simulate()
+    default = sim1.simulate()
 
     # Method 2: proposed method, expectation + greedy
     expectation = ProposedMethod()
-    sim2 = Simulation(expectation,restaurant_list, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
-    simulation_anti = sim2.simulate()
+    sim2 = Simulation(expectation,restaurant_list_copy, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
+    anti = sim2.simulate()
 
-    return simulation_default,simulation_anti
+    return default, anti
 
 
 def AnalyseRider():

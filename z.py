@@ -1,16 +1,16 @@
-from random import random
-from unittest import TestProgram
-import numpy as np
-# ls = []
-# numOrder = 10
-# lamda = 5
-# interval = lamda * 2
+import copy
 
-# for i in range(4):
-#     temp= np.random.poisson(lam = lamda, size = numOrder).tolist()
-#     ls += [t + interval*i for t in temp]
-#     print(ls)
-#     print(sum(temp)/len(temp))
 
-ditc ={1:10, 2:20}
-print(list(ditc.values()))
+class O():
+    def __init__(self, index) -> None:
+        self.id = index
+
+
+ls = [O(1),O(2),O(3),O(4)]
+ls_copy = copy.deepcopy(ls)
+
+ls_copy.append(O(1000))
+ls_copy[0] = O(-100)
+
+print([e.id for e in ls])
+print([e.id for e in ls_copy])

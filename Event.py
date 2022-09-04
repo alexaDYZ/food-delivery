@@ -18,13 +18,14 @@ class Event():
         4: 'Regular Check', # for rider saturation rate
     }
     def __init__(self, time, cat:int, order:Order):
-        self.time = time # time when the order comes in
+        self.time = time # time when the event is executed
         self.cat = cat
         self.order = order
         self.method = None
         self.rider_list = None # this is for event 4 only. To check status for all riders
         self.status_check_dict = None
         self.programEndTime = -1
+        self.qsize = -1 # for 'Regular Check event'. to know if this is the end
     
     def getCategory(self) : #returns a string
         return Event.category[self.cat]
@@ -57,6 +58,13 @@ class Event():
                 e_finish = Event(finishTime, 2, curr_order)
                 triggeredEvent.append(e_finish)
             
+            #This part allows unassigned order to be reassigned later:
+                #attempt to reassign every 1 min.
+            else:
+                e_reassign = Event(self.time + args["reassignTime"], 1, curr_order)
+                triggeredEvent.append(e_reassign)
+
+            
         # case 2: an order is delivered
         elif self.cat == 2:
             # update order status
@@ -84,7 +92,9 @@ class Event():
         # case 4: check % riders occupied, at regular time interval
         elif self.cat == 4:
             # check if thats the 'end' of the program
-            if currTime >= self.programEndTime+args["statusCheckInterval"]:
+            # if currTime >= self.programEndTime+args["statusCheckInterval"]:
+            #     return []
+            if self.qsize <= 1:
                 return []
             
             else:
@@ -111,6 +121,12 @@ class Event():
         self.status_check_dict = dict
     def addProgramEndTime(self, t):
         self.programEndTime = t
+    def passCurrQSize(self, qsize):
+        # for 'Regular Check Event'
+        if self.cat == 4:
+            self.qsize = qsize
+        else:
+            print("Error: Event.py, wrong event type")
 
 r = Rider(1, [0,0], args)
 rest = Restaurant(1, [5,0], 10,args)

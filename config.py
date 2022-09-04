@@ -6,16 +6,16 @@ from utils import dotdict
 args = dotdict({
     "numEpisode":100, # for averaging 
     
-    "gridSize": 10,
+    "gridSize": 100, # 10
     
     # for each time window
-    "numOrders": 40, # same as num customers
-    "numCustomers": 40,
+    "numOrders": 50, # same as num customers
+    "numCustomers": 50,
     
-    "avgOrderTime": 10, # 
-    "numRepeatedWindow":10, # 100 min
-    
-    "numRiders": 50,
+    "avgOrderTime": 5, # 10
+    "numRepeatedWindow":10, 
+
+    "numRiders": 20,
     "numRestaurants": 5,
     
     
@@ -25,8 +25,11 @@ args = dotdict({
 
     "riderSelectionThreshold": 100000,
     "forwardLookingTime": 5,
+    "reassignTime": 1, 
     
     "statusCheckInterval":10, # interval for regularly checking rider status
     
+    # boolean variables:
+
     
 })
