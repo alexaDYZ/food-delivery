@@ -9,8 +9,8 @@ args = dotdict({
     "gridSize": 10,
     
     # for each time window
-    "numOrders":10, # same as num customers
-    "numCustomers": 10,
+    "numOrders": 40, # same as num customers
+    "numCustomers": 40,
     
     "avgOrderTime": 10, # 
     "numRepeatedWindow":10, # 100 min

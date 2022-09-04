@@ -60,14 +60,14 @@ def runEpisode():
     # Method 1: default method, greedy
     greedy = DefaultMethod()
     sim1 = Simulation(greedy,restaurant_list, rider_list, order_list, customer_list, order_time)
-    res_default=sim1.simulate().status_check_dict
+    simulation_default = sim1.simulate()
 
     # Method 2: proposed method, expectation + greedy
     expectation = ProposedMethod()
     sim2 = Simulation(expectation,restaurant_list, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
-    res_anti = sim2.simulate().status_check_dict
+    simulation_anti = sim2.simulate()
 
-    return res_default,res_anti
+    return simulation_default,simulation_anti
 
 
 def AnalyseRider():
@@ -75,8 +75,8 @@ def AnalyseRider():
     start_time = time.time()
 
     dataGeneration()
-    res_default,res_anti = runEpisode() # 2 dictionaries
-        
+    simulation_default,simulation_anti = runEpisode() # 2 dictionaries
+    res_default,res_anti = simulation_default.rider_status_check_dict, simulation_anti.rider_status_check_dict
     # averaging: omitted
         
     '''
@@ -102,7 +102,7 @@ def AnalyseRider():
     x_axis = res_default.keys()
     y_1 = [i[0] for i in res.values()]
     y_2 = [i[1] for i in res.values()]
-    plt.plot(x_axis,y_1, '--', label = "Default", )
+    plt.plot(x_axis,y_1, '--', label = "Default")
     plt.plot(x_axis, y_2,'-+',label = "Anticipation")
     
     plt.axhline(y=np.nanmean(y_1), color='C0', label = "mean="+str(round(np.nanmean(y_1),3)))
@@ -143,31 +143,31 @@ def AnalyseRider():
 
     '''average percentage plot '''
     
-    numOrders =  [10,20,30,40,50,60,70,80] # x-axis
-    diff_list = [] # y-axis
+    # numOrders =  [10,20,30,40,50,60,70,80] # x-axis
+    # diff_list = [] # y-axis
     
-    for num in numOrders:
-        args["numOrders"] = num
-        args["numCustomers"] = num
+    # for num in numOrders:
+    #     args["numOrders"] = num
+    #     args["numCustomers"] = num
         
-        repeat = 30
-        ls = []
-        for i in range(repeat):
-            dataGeneration()
+    #     repeat = 30
+    #     ls = []
+    #     for i in range(repeat):
+    #         dataGeneration()
             
-            res_default,res_anti = runEpisode() # 2 dictionaries
-            default = list(res_default.values())
-            anti = list(res_anti.values())
-            diff = np.nanmean(default) - np.nanmean(anti)
-            ls.append(diff)
-        avg_diff = sum(ls)/len(ls)
-        diff_list.append(avg_diff)
-    print(diff_list)
-    plt.plot(numOrders,diff_list, '--', label = "Difference in mean")
-    plt.xlabel("number of orders / period ")
-    plt.ylabel("difference in mean ratio: default - anticipation ")
-    plt.axhline(y=0, color='black')
-    plt.show()
+    #         res_default,res_anti = runEpisode() # 2 dictionaries
+    #         default = list(res_default.values())
+    #         anti = list(res_anti.values())
+    #         diff = np.nanmean(default) - np.nanmean(anti)
+    #         ls.append(diff)
+    #     avg_diff = sum(ls)/len(ls)
+    #     diff_list.append(avg_diff)
+    # print(diff_list)
+    # plt.plot(numOrders,diff_list, '--', label = "Difference in mean")
+    # plt.xlabel("number of orders / period ")
+    # plt.ylabel("difference in mean ratio: default - anticipation ")
+    # plt.axhline(y=0, color='black')
+    # plt.show()
     
     
     

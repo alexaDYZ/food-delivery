@@ -70,6 +70,8 @@ class Event():
                 rider.status = 0 if len(rider.orderDict) == 0 else 1
                 rider.totalCurrOrder -= 1 
             elif rider is None: print("Error: Order delivered but cannot find its rider")
+            
+        
         # case 3: rider arrives at restaurant
         elif self.cat == 3:
             #update rider location

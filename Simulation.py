@@ -31,11 +31,23 @@ class Simulation():
         self.customer_list = customer_list
         self.order_time = order_time
         self.method = method
+        # Analysis - orders
         self.numDelivered = 0 # total number of orders delivered within this simulation
-        self.status_check_dict = {} # %of busy riders, checked at regular intervals
+        # Analysis - ridrs
+        self.rider_status_check_dict = {} # %of busy riders, checked at regular intervals
+        # Analysis - waiting time
+        self.wt_ls = [] # a list of waiting time, each element is the waiting time of an order
         self.end = -1
+
         
     def simulate(self):
+
+        '''
+        This funtion performs 1 simulation, using 1 set of data
+        consisting of rider list, restaurant list, customer list 
+        and order list.
+        '''
+
         self.method.addRiderList(self.rider_list)
         # create event checkpoints
         checkpoint = EventQueue()   
@@ -76,18 +88,24 @@ class Simulation():
             # check Event category, if it's a new order, tell it how to assign rider
             if currEvent.getCategory() == 'New Order':
                 currEvent.addAssignmentMethod(self.method)
-
-            elif currEvent.getCategory() == 'Order Delivered':
-                self.numDelivered += 1
                 
             elif currEvent.getCategory() == 'Regular Check':
                 currEvent.addRiderList(self.rider_list) 
-                currEvent.addStatusCheckDict(self.status_check_dict)
+                currEvent.addStatusCheckDict(self.rider_status_check_dict)
                 currEvent.addProgramEndTime(self.end)
                 # print("Status check at", currTime, ":", self.status_check_dict.keys())
 
             # execute current event:
             triggedEvent = currEvent.executeEvent(currTime)
+
+
+            if currEvent.getCategory() == 'Order Delivered':
+                self.numDelivered += 1
+                # get total waiting time
+                currOrder = currEvent.order
+                wt = currOrder.wt
+                self.wt_ls.append(wt)
+
             # if there is/are new events triggered, add to checkpoint
             if triggedEvent: 
                 for e in triggedEvent:
