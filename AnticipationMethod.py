@@ -8,7 +8,7 @@ from Customer import Customer
 from config import args
 import math
 
-class ProposedMethod(AssignmentMethod):
+class AnticipationMethod(AssignmentMethod):
     def __init__(self) -> None:
         super().__init__()
 

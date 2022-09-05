@@ -1,4 +1,5 @@
 
+from tkinter import font
 from AssignmentMethod import AssignmentMethod
 from itertools import count
 from tabnanny import check
@@ -19,6 +20,7 @@ import pandas as pd
 from EventQueue import EventQueue
 from Event import Event
 from DefaultMethod import DefaultMethod
+import matplotlib.pyplot as plt
 
 class Simulation():
     def __init__(self, method: AssignmentMethod,restaurant_list, rider_list, order_list, customer_list, order_time) -> None:
@@ -73,8 +75,9 @@ class Simulation():
  
 
         #initialize status for all
-        # updateAllStatus(0)
+        
         counter = 0
+        
         #simulation starts
         while not checkpoint.empty():
             # see event type, update status
@@ -82,7 +85,9 @@ class Simulation():
 
             # currEvent.print()
             currTime = currEvent.time
-            print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
+            
+            if args["printCheckPt"] and currEvent.cat != 4:
+                print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
 
             # check Event category, if it's a new order, tell it how to assign rider
             if currEvent.getCategory() == 'New Order':
@@ -116,10 +121,15 @@ class Simulation():
             counter += 1
         # self.printResult()
         
+        if args["showEventPlot"]:
+            self.plotTimeHorizon()
+        
         # reset all order status
         for o in self.order_list:
             o.reset()
-        # reset all rider locatiions
+        
+        
+        
         
 
 
@@ -152,3 +162,18 @@ class Simulation():
             print(df)
         # print_all_order_status(self.order_list)
         # print_all_rider_waiting_time(self.rider_list)
+    
+    def plotTimeHorizon(self):
+        events = [(o.t, o.t_delivered) for o in self.order_list]
+        plt.eventplot(events,linelengths = 1, 
+                      colors=['C{}'.format(i) for i in range(len(events))],
+                     )
+        plt.ylabel("OrderNumber")
+        plt.xlabel("Time")
+        plt.title("Events acorss time \n Method:" + self.method.name +
+                  "\n #Orders" + str(args["numOrders"]) +
+                  "  #Riders:" + str(args["numRiders"]) +
+                  "  Gridsize:" + str(args["gridSize"]) +
+                  "  lambda:" + str(args["orderLambda"]), fontsize = 10)
+        
+        plt.show()

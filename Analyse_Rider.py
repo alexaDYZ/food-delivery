@@ -6,7 +6,7 @@ from turtle import color
 from typing import Counter, Dict
 from unittest import result
 import numpy as np
-from ProposedMethod import ProposedMethod
+from AnticipationMethod import AnticipationMethod
 from utils import dotdict
 from datetime import datetime, timedelta
 from Order import Order
@@ -49,7 +49,16 @@ def runEpisode():
         order_list_copy = copy.deepcopy(order_list)
         customer_list_copy = copy.deepcopy(customer_list )
         order_time_copy = copy.deepcopy(order_time)
-
+        
+        
+    def getOrderDist(orderls):
+        timels = [o.t for o in orderls]
+        plt.hist(timels, bins=[i for i in range(min(timels), max(timels)+1)])
+        plt.show()
+        pass
+    
+    if args["showOrderTimeDist"]:
+        getOrderDist(order_list)
 
 
     '''
@@ -65,7 +74,7 @@ def runEpisode():
     default = sim1.simulate()
 
     # Method 2: proposed method, expectation + greedy
-    expectation = ProposedMethod()
+    expectation = AnticipationMethod()
     sim2 = Simulation(expectation,restaurant_list_copy, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
     anti = sim2.simulate()
 
@@ -111,7 +120,7 @@ def AnalyseRider():
     plt.axhline(y=np.nanmean(y_2), color= 'C1', label = "mean="+str(round(np.nanmean(y_2),3)))
     
     plt.legend()
-    title = "Percentage of Riders Occupied\nlambda :" + str(args["avgOrderTime"])+"\n#Orders per period:"+ str(args["numOrders"]) +"\n NUmber of Riders:" + str(args["numRiders"])
+    title = "Percentage of Riders Occupied\nlambda :" + str(args["orderLambda"])+"\n#Orders per period:"+ str(args["numOrders"]) +"\n NUmber of Riders:" + str(args["numRiders"])
     subtitle = 'Difference in mean='+str(round(abs(np.nanmean(y_1)-np.nanmean(y_2)),3))
     plt.title(title+"\n"+subtitle)
     

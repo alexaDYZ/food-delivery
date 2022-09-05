@@ -4,7 +4,7 @@ from mailbox import MaildirMessage
 from typing import Counter, Dict
 from unittest import result
 import numpy as np
-from ProposedMethod import ProposedMethod
+from AnticipationMethod import AnticipationMethod
 from utils import dotdict
 from datetime import datetime, timedelta
 from Order import Order
@@ -64,7 +64,7 @@ def runEpisode():
     res_default=sim1.simulate()
 
     # Method 2: proposed method, expectation + greedy
-    expectation = ProposedMethod()
+    expectation = AnticipationMethod()
     sim2 = Simulation(expectation,restaurant_list, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
     res_anti = sim2.simulate()
 

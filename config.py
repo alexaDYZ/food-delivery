@@ -6,13 +6,13 @@ from utils import dotdict
 args = dotdict({
     "numEpisode":100, # for averaging 
     
-    "gridSize": 100, # 10
+    "gridSize": 50, # 10
     
     # for each time window
-    "numOrders": 8, # same as num customers
-    "numCustomers": 8,
+    "numOrders": 10, # same as num customers
+    "numCustomers": 10,
     
-    "avgOrderTime": 5, # 10
+    "orderLambda": 10, # 10
     "numRepeatedWindow":1, 
 
     "numRiders": 2,
@@ -25,11 +25,23 @@ args = dotdict({
 
     "riderSelectionThreshold": 100000,
     "forwardLookingTime": 5,
-    "reassignTime": 1, 
+    "reassignTime": 2, 
     
-    "statusCheckInterval":10, # interval for regularly checking rider status
+    "statusCheckInterval":5, # interval for regularly checking rider status
     
     # boolean variables:
-
+    "showOrderTimeDist": 0,
+    "printCheckPt": 0,
+    'regularcheck':0,
+    
+    "showWTplot": 0, # waiting time
+    "showEventPlot": 1, #  waiting time
+    
+    
+    # list of colors for plot
+    "colorls": ['lightcoral', 'gold', 'forestgreen', 'royalblue',
+                'indigo', 'black', 'darkgrey', 'orange', 'cyan',
+                'red', 'olive']
+    
     
 })

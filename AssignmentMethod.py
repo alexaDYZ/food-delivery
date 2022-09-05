@@ -4,6 +4,7 @@ class AssignmentMethod():
         self.order = None
         self.rider_list = None
         self.currTime = None
+        self.name = self.__class__.__name__
     def addOrder(self, newOrder):
         self.order = newOrder
     def addRiderList(self, rider_list):

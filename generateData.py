@@ -47,17 +47,25 @@ def dataGeneration():
     
     customer_loc, customer_list, order_time=[],[],[]
     
-    for peiord in range(1, args["numRepeatedWindow"]+1):
-        loc = np.random.randint(0, args["gridSize"], size=(args["numCustomers"],2)).tolist()
-        customer_list += [Customer(loc[i],args) 
-                          for i in range(args["numCustomers"])]
-        customer_loc += loc
+    # for peiord in range(1, args["numRepeatedWindow"]+1):
+    #     loc = np.random.randint(0, args["gridSize"], size=(args["numCustomers"],2)).tolist()
+    #     customer_list += [Customer(loc[i],args) 
+    #                       for i in range(args["numCustomers"])]
+    #     customer_loc += loc
 
-        # generate list of orders, with index, time, customer, restaurant
+    #     # generate list of orders, with index, time, customer, restaurant
         
-        time = np.random.poisson(lam = args["avgOrderTime"], size = args["numOrders"]).tolist()
-        order_time += [t + peiord*2*args["avgOrderTime"] for t in time]
-        
+    #     time = np.random.poisson(lam = args["orderLambda"], size = args["numOrders"]).tolist()
+    #     order_time += [t + peiord*2*args["orderLambda"] for t in time]
+    
+    loc = np.random.randint(0, args["gridSize"], size=(args["numCustomers"],2)).tolist()
+    customer_list += [Customer(loc[i],args) 
+                        for i in range(args["numCustomers"])]
+    customer_loc += loc
+
+    # generate list of orders, with index, time, customer, restaurant
+    
+    order_time = np.random.poisson(lam = args["orderLambda"], size = args["numOrders"]).tolist()
         
     order_time.sort() # small to large
     # print("number of orders:" ,len(order_time))
