@@ -9,22 +9,22 @@ args = dotdict({
     "gridSize": 50, # 10
     
     # for each time window
-    "numOrders": 10, # same as num customers
-    "numCustomers": 10,
+    "numOrders": 60, # same as num customers
+    "numCustomers": 60,
     
     "orderLambda": 10, # 10
     "numRepeatedWindow":1, 
 
-    "numRiders": 2,
+    "numRiders": 500,
     "numRestaurants": 5,
     
     
     "FPT_avg": 15, 
-    "FPT_sd":5,
+    "FPT_sd":0,
     "riderSpeed":1,
 
     "riderSelectionThreshold": 100000,
-    "forwardLookingTime": 5,
+    "forwardLookingTime": 15,
     "reassignTime": 2, 
     
     "statusCheckInterval":5, # interval for regularly checking rider status
@@ -34,8 +34,8 @@ args = dotdict({
     "printCheckPt": 0,
     'regularcheck':0,
     
-    "showWTplot": 0, # waiting time
-    "showEventPlot": 1, #  waiting time
+    "showWTplot": 1, # waiting time
+    "showEventPlot": 0, #  waiting time
     
     
     # list of colors for plot

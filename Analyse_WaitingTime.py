@@ -70,7 +70,7 @@ def AnalyseWaitingTime():
     
     def multipleAnalysis():
         '''Experiment with different num orders and lambda'''
-        numOrders = [ 10*i for i in range(1, 11)]
+        numOrders = [ 50*i for i in range(8, 14)]
         lams = [ 10*i for i in range(1, 6)]
         dfls = []
         
