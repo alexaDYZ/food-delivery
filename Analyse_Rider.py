@@ -68,6 +68,7 @@ def runEpisode():
     # start_time = time.time()
 
 
+
     # Method 1: default method, greedy
     greedy = DefaultMethod()
     sim1 = Simulation(greedy,restaurant_list, rider_list, order_list, customer_list, order_time)

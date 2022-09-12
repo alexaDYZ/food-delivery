@@ -9,7 +9,7 @@ from config import args
 import math
 
 class AnticipationMethod(AssignmentMethod):
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
 
     def addOrder(self, newOrder):

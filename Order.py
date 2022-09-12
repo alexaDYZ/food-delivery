@@ -41,8 +41,8 @@ class Order():
         # print("------ Order #" , self.index, "is", self.getOrderStatus(), "by Rider #", self.rider.index)
     
     def print(self):
-        pass
-        print("------ Order #" , self.index, "is ", self.getOrderStatus(), "\n Customer:", self.customer.loc, "Restaurant:", self.restaurant.loc)
+        print("------ Order #" , self.index, "comes in at ", self.t, " and delivered at", self.t_delivered)
+        # print("------ Order #" , self.index, "is ", self.getOrderStatus(), "\n Customer:", self.customer.loc, "Restaurant:", self.restaurant.loc)
 
     def __lt__(self, other):
         return self.t < other.t

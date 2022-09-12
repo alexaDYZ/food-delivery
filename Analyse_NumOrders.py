@@ -1,7 +1,6 @@
 
 import copy
 from mailbox import MaildirMessage
-from typing import Counter, Dict
 from unittest import result
 import numpy as np
 from AnticipationMethod import AnticipationMethod

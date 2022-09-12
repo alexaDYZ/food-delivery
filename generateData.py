@@ -37,6 +37,7 @@ def dataGeneration():
     restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) 
                        for i in range(args["numRestaurants"])]
         
+    
     # riders
     # location
     rider_loc = np.random.randint(0,args["gridSize"], 
@@ -44,28 +45,30 @@ def dataGeneration():
     rider_list = [Rider(i, rider_loc[i],args) 
                     for i in range(args["numRiders"])]
 
-    
-    customer_loc, customer_list, order_time=[],[],[]
-    
-    # for peiord in range(1, args["numRepeatedWindow"]+1):
-    #     loc = np.random.randint(0, args["gridSize"], size=(args["numCustomers"],2)).tolist()
-    #     customer_list += [Customer(loc[i],args) 
-    #                       for i in range(args["numCustomers"])]
-    #     customer_loc += loc
 
-    #     # generate list of orders, with index, time, customer, restaurant
-        
-    #     time = np.random.poisson(lam = args["orderLambda"], size = args["numOrders"]).tolist()
-    #     order_time += [t + peiord*2*args["orderLambda"] for t in time]
-    
+
+    '''Initialize Orders and customers'''
+    customer_loc, customer_list, order_time=[],[],[]
+
+    order_time = []
+    for i in range(args["totalTime"]):
+        numOrderPerUnit = np.random.poisson(lam = args["orderLambda"])
+        for n in range(numOrderPerUnit):
+            order_time.append(i)
+    args["numOrders"] = len(order_time)
+    args["numCustomers"] = len(order_time)
+
+    # Customer:
+
     loc = np.random.randint(0, args["gridSize"], size=(args["numCustomers"],2)).tolist()
     customer_list += [Customer(loc[i],args) 
                         for i in range(args["numCustomers"])]
     customer_loc += loc
 
+
+
     # generate list of orders, with index, time, customer, restaurant
-    
-    order_time = np.random.poisson(lam = args["orderLambda"], size = args["numOrders"]).tolist()
+    # order_time = np.random.poisson(lam = args["orderLambda"], size = args["numOrders"]).tolist()
         
     order_time.sort() # small to large
     # print("number of orders:" ,len(order_time))

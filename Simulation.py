@@ -70,7 +70,7 @@ class Simulation():
             # of "delivered time" of the last order. 
             # but it desent matter if we wish to know % riders occupied
         
-        self.end = max(order_time_dict.keys())
+        # self.end = max(order_time_dict.keys())
         
  
 
@@ -119,19 +119,13 @@ class Simulation():
                     checkpoint.put(e)
 
             counter += 1
-        # self.printResult()
         
         if args["showEventPlot"]:
             self.plotTimeHorizon()
         
-        # reset all order status
-        for o in self.order_list:
-            o.reset()
-        
-        
-        
-        
-
+        # # reset all order status
+        # for o in self.order_list:
+        #     o.reset()
 
         return self
 
@@ -164,16 +158,17 @@ class Simulation():
         # print_all_rider_waiting_time(self.rider_list)
     
     def plotTimeHorizon(self):
-        events = [(o.t, o.t_delivered) for o in self.order_list]
-        plt.eventplot(events,linelengths = 1, 
-                      colors=['C{}'.format(i) for i in range(len(events))],
-                     )
-        plt.ylabel("OrderNumber")
-        plt.xlabel("Time")
-        plt.title("Events acorss time \n Method:" + self.method.name +
-                  "\n #Orders" + str(args["numOrders"]) +
-                  "  #Riders:" + str(args["numRiders"]) +
-                  "  Gridsize:" + str(args["gridSize"]) +
-                  "  lambda:" + str(args["orderLambda"]), fontsize = 10)
+        pass
+        # events = [(o.t, o.t_delivered) for o in self.order_list]
+        # plt.eventplot(events,linelengths = 1, 
+        #               colors=['C{}'.format(i) for i in range(len(events))],
+        #              )
+        # plt.ylabel("OrderNumber")
+        # plt.xlabel("Time")
+        # plt.title("Events acorss time \n Method:" + self.method.name +
+        #           "\n #Orders" + str(args["numOrders"]) +
+        #           "  #Riders:" + str(args["numRiders"]) +
+        #           "  Gridsize:" + str(args["gridSize"]) +
+        #           "  lambda:" + str(args["orderLambda"]), fontsize = 10)
         
-        plt.show()
+        # plt.show()
