@@ -72,9 +72,14 @@ class AnalyseWaitingTime():
 
     def multipleAnalysis(self):
         '''Experiment with different num orders and lambda'''
+<<<<<<< HEAD
         numOrders = [ 10*i for i in range(30, 50)]
         lams = [1]
         # lams = [ 10*i for i in range(1, 6)]
+=======
+        numOrders = [ 50*i for i in range(8, 14)]
+        lams = [ 10*i for i in range(1, 6)]
+>>>>>>> ae9a79b6e8975f4bbf328d12fe3a09fbf1c3aed8
         dfls = []
         
         colorcounter = 0
