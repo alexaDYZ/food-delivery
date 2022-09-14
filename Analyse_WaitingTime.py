@@ -70,16 +70,14 @@ class AnalyseWaitingTime():
 
         return [args["numOrders"], args["orderLambda"], avg_wt_default, avg_wt_anti, diff]   
 
+
     def multipleAnalysis(self):
         '''Experiment with different num orders and lambda'''
-<<<<<<< HEAD
+        '''week 5 plot'''
         numOrders = [ 10*i for i in range(30, 50)]
         lams = [1]
         # lams = [ 10*i for i in range(1, 6)]
-=======
-        numOrders = [ 50*i for i in range(8, 14)]
-        lams = [ 10*i for i in range(1, 6)]
->>>>>>> ae9a79b6e8975f4bbf328d12fe3a09fbf1c3aed8
+        
         dfls = []
         
         colorcounter = 0
@@ -133,6 +131,8 @@ class AnalyseWaitingTime():
 
         df = pd.DataFrame(zip(order_in_time_d, wt_d, order_in_time_a, wt_a), 
             columns = [ "time ",'WT_default', 'time', 'WT_anticipation'])
+
+
         '''Moving Average Plot'''
 
         # get moving average for every 'MA_batchsize' number of orders
@@ -174,15 +174,10 @@ class AnalyseWaitingTime():
         plt.show()
 
 
-
-
     def showEventPlot(self):
         
         delivered_time_d = [(o.t, o.t_delivered) for o in self.default.order_list]
         delivered_time_a = [(o.t, o.t_delivered) for o in self.anti.order_list]
-        # plt.eventplot(events_d,linelengths = 1, 
-        #                 colors=['C{}'.format(i) for i in range(len(events_d))],
-        #                 )
         plt.eventplot(delivered_time_d,linelengths = 1, 
                         colors=['C{}'.format(1) for i in range(len(delivered_time_d))],
                         label='Default',
