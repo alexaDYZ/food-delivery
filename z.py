@@ -24,8 +24,20 @@
 #     print(id[i:i+3])
 import numpy as np
 
-s = np.random.poisson(lam=2, size=100)
 import matplotlib.pyplot as plt
-count, bins, ignored = plt.hist(s, 10, density=True)
-print(s)
-plt.show()
+
+ls = []
+for i in range(10):
+    interval = np.random.poisson(30)
+    ls.append(interval)
+    # if len(ls) != 0:
+    #     next_t = ls[-1] + interval
+    # else:
+    #     next_t = 0 + interval
+    # ls.append(next_t)
+print(ls)
+
+# plt.plot(ls, np.zeros_like(ls), "-o")
+# for i in ls:
+#     plt.annotate(str(i), (i, 0))
+# plt.show()

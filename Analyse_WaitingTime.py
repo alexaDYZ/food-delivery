@@ -1,4 +1,5 @@
 
+from audioop import avg
 from cProfile import label
 import copy
 from ctypes.wintypes import PINT
@@ -7,6 +8,7 @@ from tkinter.tix import COLUMN
 from turtle import color
 from typing import Tuple
 import numpy as np
+from torch import lt
 from AnticipationMethod import AnticipationMethod
 from utils import dotdict
 from Order import Order
@@ -26,12 +28,18 @@ from generateData import dataGeneration
 import matplotlib.pyplot as plt
 import time
 from Analyse_Rider import runEpisode
+import datetime
+import os
 
 
 class AnalyseWaitingTime():
     def __init__(self) -> None:
         self.default = None
         self.anti = None
+        self.avg_d = -1 # average waiting time for default method, unit = s
+        self.avg_a = -1 # average waiting time for anticipation method, unit = s
+        self.wt_df = None # waiting time data frame. ["wt_defauly", "wt_anticipation"]
+
     
     def analyseOnce(self):
         '''
@@ -49,33 +57,33 @@ class AnalyseWaitingTime():
         default,anti = runEpisode() # 2 simulation results
         self.default = default
         self.anti = anti
+        df = pd.DataFrame(zip( self.default.wt_ls, self.anti.wt_ls), 
+            columns = ['WT_default',  'WT_anticipation'])
+        self.wt_df = df
+
+
     
     def basicAnalysis(self):
         ''' printing result for analysis'''
-        # get avg waiting time per order
-        def compute_avg(ls):
-            if ls:
-                return sum(ls)/len(ls)
-            else:
-                print("empty list")
+        print(self.wt_df.mean())
+        print(self.wt_df.std())
         
-        avg_wt_default = compute_avg(self.default.wt_ls)
-        avg_wt_anti = compute_avg(self.anti.wt_ls)
 
-        print("Default Method: #order finished", len(self.default.wt_ls))
-        print("Anticipation Method: #order finished", len(self.anti.wt_ls))
-        print("Average Waiting Time: \n",avg_wt_default, avg_wt_anti)
-        diff = avg_wt_default-avg_wt_anti
+        # print("Default Method: #order finished", len(self.default.wt_ls))
+        # print("Anticipation Method: #order finished", len(self.anti.wt_ls))
+        # print("Average Waiting Time: \n",avg_wt_default, avg_wt_anti)
+        
+        diff = self.wt_df['WT_default'].mean()-self.wt_df['WT_anticipation'].mean() # wt_default - wt_anti
         print(diff)
 
-        return [args["numOrders"], args["orderLambda"], avg_wt_default, avg_wt_anti, diff]   
+        return [args["numOrders"], args["orderLambda"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
 
 
     def multipleAnalysis(self):
         '''Experiment with different num orders and lambda'''
         '''week 5 plot'''
-        numOrders = [ 10*i for i in range(30, 50)]
-        lams = [1]
+        numOrders = [ 100*i for i in range(1, 11)]
+        lams = [30]
         # lams = [ 10*i for i in range(1, 6)]
         
         dfls = []
@@ -121,55 +129,78 @@ class AnalyseWaitingTime():
         plt.legend()
         plt.show()
 
-    def movingAverageAnalysis(self):
+    def multipleExperiments(self, n): # n sets of experiment 
+        '''
+        This fucntion will the multiple sets of data with same config to compute the 
+        Average waiting time for each experiment
+        '''
+        avg_wt_d = []
+        avg_wt_a = []
+        diff = []
+        for i in range(n):
+            self.analyseOnce()
+            avg_wt_d.append(self.wt_df["WT_default"].mean())
+            avg_wt_a.append(self.wt_df["WT_anticipation"].mean())
+            diff.append(self.wt_df["WT_default"].mean() - self.wt_df["WT_anticipation"].mean())
+        ifbetter = [1 if diff[i]> 0 else 0 for i in range(len(diff)) ]
+        df = pd.DataFrame(zip(avg_wt_d, avg_wt_a, diff, ifbetter), 
+            columns = ['Average Waiting Time_Default(s)',  
+                        'Average Waiting Time_Anticipation(s)',
+                        'Difference(s)', 
+                        'if Anticipation is better'])
+        df.loc[-1] = [sum(df['Average Waiting Time_Default(s)'])/n, 
+                    sum(df['Average Waiting Time_Anticipation(s)'])/n,
+                    sum(df['Difference(s)'])/n,
+                    round(sum(df['if Anticipation is better'])/n,2)
+                    ]
+
+        path = os.path.join("./week8/", str(datetime.datetime.now())) 
+        os.mkdir(path)
+        df.to_csv(path + "_AverageWaitingTime_" + str(args["numOrders"])+ "orders" + 
+                "_numRider"+str(args['numRiders'])+
+                "_gridSize" + str(args['gridSize']) +
+                ".csv",index=False)
+        
+
+
+    def AverageAnalysis(self):
         '''This function compute and plot the moving average of the waiting time'''
-        # get waiting time
-        order_in_time_d = [o.t for o in self.default.order_list]
-        order_in_time_a = [o.t for o in self.anti.order_list]
-        wt_d = [o.wt for o in self.default.order_list]
-        wt_a = [o.wt for o in self.anti.order_list]
 
-        df = pd.DataFrame(zip(order_in_time_d, wt_d, order_in_time_a, wt_a), 
-            columns = [ "time ",'WT_default', 'time', 'WT_anticipation'])
+        df = self.wt_df
+        
+        '''Average Plot'''
 
-
-        '''Moving Average Plot'''
-
-        # get moving average for every 'MA_batchsize' number of orders
-        d_avg  = df["WT_default"].rolling(window=args['MA_batchsize']).mean()
-        a_avg  = df["WT_anticipation"].rolling(window=args['MA_batchsize']).mean()
+        # get average till t for every 'MA_batchsize' number of orders
+        
+        # helper function
+        def getAverage(waitingTimeLs):
+            avgLs = []
+            for i in range(len(waitingTimeLs)):
+                curr_avg = sum(waitingTimeLs[:i+1]) / (i+1)
+                avgLs.append(curr_avg)
+            return avgLs
+        
+        d_avg = getAverage(list(df["WT_default"]))
+        a_avg = getAverage(list(df["WT_anticipation"]))
 
         # plot
-        fig, axs = plt.subplots(2, figsize=(15, 7.5))
-        fig.suptitle('Waiting Time')
-        axs[0].plot(df["WT_default"], 'k-', label='Original')
-        axs[0].plot(d_avg, 'r-', label='Running average')
-        axs[0].grid(linestyle=':')
-        # plt.fill_between(t_average.index, 0, t_average, color='r', alpha=0.1)
-        axs[0].set_title('Default')
-        axs[0].legend(loc='upper left')
+        # plt.plot(df["WT_default"], '-', color = 'blue', label='Waiting Time (Default)', linewidth = 0.2)
+        # plt.plot(df["WT_anticipation"], '-', color = 'orange', label='Waiting Time (Anticipation)', linewidth = 0.2)
+        plt.plot(d_avg, ':', color = 'blue', label='Average (Default)', linewidth = 2)
+        plt.plot(a_avg, ':', color = 'orange',label='Average (Anticipation)', linewidth = 2)
+        plt.title('Waiting Time Plot\n avg_d = '+ 
+                    str(d_avg[-1])+" \n avg_a = "+ 
+                    str(a_avg[-1]) +"diff = " + str(d_avg[-1] - a_avg[-1]))
+        plt.xlabel('Number of Orders')
+        plt.ylabel('Waiting Time/s')
+        plt.legend()
+        
 
-        axs[1].plot(df["WT_anticipation"], 'k-', label='Original')
-        axs[1].plot(a_avg, 'r-', label='Running average')
-
-        axs[1].grid(linestyle=':')
-        # plt.fill_between(t_average.index, 0, t_average, color='r', alpha=0.1)
-        axs[1].legend(loc='upper left')
-
-        for ax in axs.flat:
-            ax.set(xlabel='Number of Orders', ylabel='Waiting Time')
-            
-        # plt.savefig("./week6/"+
-        #             "_time" + str(args["totalTime"]) +
-        #             "_numRider"+str(args['numRiders'])+
-        #             "_grid"+ str(args['gridSize'])+
-        #             "WaitingTime" + 
-        #             ".svg", format='svg', dpi=2000)
-        plt.savefig("./week6/"+
-            "time" + str(args["totalTime"]) + 
+        plt.savefig("./post_intro_talk/"+str(datetime.datetime.now())+ "_WaitingTimePlot"+
+            "_numOrders" + str(args["numOrders"]) + 
             "_lambda" + str(args["orderLambda"]) +
             "_numRider"+str(args['numRiders'])+
-            "WaitingTime" + 
+            "_gridSize" + str(args['gridSize']) + 
             ".svg", format='svg', dpi=2000)
         plt.show()
 
@@ -237,13 +268,14 @@ class AnalyseWaitingTime():
         #             "_time" + str(args["totalTime"]) +
         #             "_numRider"+str(args['numRiders'])+
         #             "_grid"+ str(args['gridSize'])+
-        #             "delivered_time" + 
-        #             ".svg", format='svg', dpi=2000)
-        plt.savefig("./week6/"+
-            "time" + str(args["totalTime"]) + 
+        #             "delivered_time" +      ".svg", format='svg', dpi=2000)
+        
+        plt.savefig("./week8/"+ 
+            "delivered_time" + 
+            "_numOrders" + str(args["numOrders"]) + 
             "_lambda" + str(args["orderLambda"]) +
             "_numRider"+str(args['numRiders'])+
-            "delivered_time" + 
+            "_gridSize" + str(args['gridSize']) + 
             ".svg", format='svg', dpi=2000)
         plt.show()
         
@@ -254,6 +286,8 @@ analysis = AnalyseWaitingTime()
 
 if args["showWTplot"]: 
     analysis.multipleAnalysis()
+elif args["doMultipleExperiments"]:
+    analysis.multipleExperiments(args["numEpisode"])
 else:
     analysis.analyseOnce()
     analysis.basicAnalysis()
@@ -261,9 +295,9 @@ else:
     if args["showEventPlot"]:
         # analysis.showEventPlot()
         analysis.plotBFL()
+    if args["showAvgWT"]: 
+        analysis.AverageAnalysis()
 
-    if args["movingAvegrageAnalysis"]: 
-        analysis.movingAverageAnalysis()
 
     
     

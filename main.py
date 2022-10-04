@@ -5,7 +5,7 @@ from Analyse_WaitingTime import AnalyseWaitingTime
 
 def main():
    # AnalyseNumOrders()
-   # AnalyseRider()
+   AnalyseRider()
    AnalyseWaitingTime()
    pass
 

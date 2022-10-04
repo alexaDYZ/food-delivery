@@ -2,6 +2,7 @@ from config import args
 from utils import dotdict
 import random
 import numpy as np
+from scipy.stats import poisson
 
 from Order import Order
 from Restaurant import Restaurant
@@ -51,12 +52,17 @@ def dataGeneration():
     customer_loc, customer_list, order_time=[],[],[]
 
     order_time = []
-    for i in range(args["totalTime"]):
-        numOrderPerUnit = np.random.poisson(lam = args["orderLambda"])
-        for n in range(numOrderPerUnit):
-            order_time.append(i)
-    args["numOrders"] = len(order_time)
-    args["numCustomers"] = len(order_time)
+    lam = args["orderLambda"]
+    
+    
+    for i in range(args["numOrders"]):
+        interval = np.random.poisson(lam)
+        if len(order_time) != 0:
+            next_t = order_time[-1] + interval
+        else:
+            next_t = 0 + interval
+        order_time.append(next_t)
+    
 
     # Customer:
 
