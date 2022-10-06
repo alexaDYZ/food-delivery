@@ -57,7 +57,7 @@ class Rider():
         order.t_delivered = max(riderFreeTime, order.t) + WT
         print("Order ", order.index, ": rider_start_t, order.t, R2R, DT, WT, reach_rest, delivered :\n",
                      [riderFreeTime, order.t, R2R, DT, WT, order.t_riderReachedRestaurant, order.t_delivered])
-        order.wt = order.t_delivered - order.t
+        order.wt = order.t_delivered - order.t # the actual waiting time: WT + lagtime, where WT = max(FPT, R2R) + DT 
         # order.wt = WT + max((riderFreeTime - order.t),0) # when the assigned rider is busy, the waiting time also includes 
         
 

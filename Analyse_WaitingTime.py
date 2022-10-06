@@ -151,6 +151,7 @@ class AnalyseWaitingTime():
         df.to_csv(args["path"] + "_AverageWaitingTime_" + str(args["numOrders"])+ "orders" + 
                 "_numRider"+str(args['numRiders'])+
                 "_gridSize" + str(args['gridSize']) +
+                "_FPT" + str(args["FPT_avg"])+
                 ".csv",index=False)
         
 
@@ -193,7 +194,7 @@ class AnalyseWaitingTime():
             "_lambda" + str(args["orderLambda"]) +
             "_numRider"+str(args['numRiders'])+
             "_gridSize" + str(args['gridSize']) + 
-            ".svg", format='svg', dpi=2000)
+            "_FPT" + str(args["FPT_avg"])+".svg", format='svg', dpi=2000)
         plt.show()
 
 
@@ -219,6 +220,7 @@ class AnalyseWaitingTime():
         plt.savefig("./week6/EventPlot"+"numRider"+str(args['numRiders'])
                     +"grid"+ str(args['gridSize'])
                     +"lambda" + str(args['orderLambda'])
+                    + "_FPT" + str(args["FPT_avg"])+
                     +".svg", format='svg', dpi=2000)
         plt.show()
 
@@ -268,6 +270,7 @@ class AnalyseWaitingTime():
             "_lambda" + str(args["orderLambda"]) +
             "_numRider"+str(args['numRiders'])+
             "_gridSize" + str(args['gridSize']) + 
+            "_FPT" + str(args["FPT_avg"])+
             ".svg", format='svg', dpi=2000)
         plt.show()
         

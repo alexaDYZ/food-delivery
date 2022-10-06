@@ -10,16 +10,16 @@ args = dotdict({
     
     # for each time window
     # "totalTime": 1000,
-    "numOrders":100, # same as num customers, initiliazed with -1. Assigned in generateData.py
-    "numCustomers": 100, 
+    "numOrders":1000, # same as num customers, initiliazed with -1. Assigned in generateData.py
+    "numCustomers": 1000, 
 
     "orderLambda": 30, # unit: s # second # miu of the poisson process, mean of time interval between 2 orders
 
-    "numRiders": 35,
-    "numRestaurants": 100,
+    "numRiders": 50,
+    "numRestaurants": 20,
     
     
-    "FPT_avg": 0, 
+    "FPT_avg": 300, 
     "FPT_sd":0,
     "riderSpeed":1, # unit m/s
 
@@ -41,7 +41,7 @@ args = dotdict({
     "showWTplot": 0, # waiting time, see Analyse_WaitingTime.py
     "showEventPlot": 0, #  waiting time, see Simulation.py
     
-    "showAvgWT": 0,
+    "showAvgWT": 1,
     "doMultipleExperiments":0, # generate a csv for numEpisode number of experiments
     
     
