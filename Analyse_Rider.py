@@ -97,24 +97,6 @@ def AnalyseRider():
         key -> time interval
         value -> [ratio_default, ratio_anti]
     '''
-    # res_d = {}
-    # res_a = {}
-    # # for t in list(res_default.keys())[:-2]:
-    # #     res[t] = []
-    # #     res[t].append(res_default[t])
-    # #     res[t].append(res_anti[t])
-
-    # for t in list(res_default.keys()):
-    #     res_d[t] = 
-        
-            
-    
-
-    
-    # df = pd.DataFrame.from_dict(res, orient='index',
-    #                         columns=['ratio_default', 'ratio_anticipation'])
-    # # print(df)
-
 
     ''' individual plot  '''
     x_axis_d = list(res_default.keys())
@@ -156,7 +138,7 @@ def AnalyseRider():
     #                     textcoords="offset points", # how to position the text
     #                     xytext=(0,10), # distance from text to points (x,y)
     #                     ha='center')
-
+ 
     
     
     plt.savefig("./post_intro_talk/"+str(datetime.datetime.now())+ "_RiderOccupancyRate"+

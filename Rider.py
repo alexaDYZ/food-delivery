@@ -16,81 +16,95 @@ class Rider():
         self.index = index
         self.loc = loc
         self.status = 0
-        self.nextFreeTime = 0 # time when he will finish deliver all orders
+        self.nextAvailableTime = 0 # time when he will finish deliver all orders
+        self.lastStop = None # last order's customer loc
         self.orderCompleteTimeList = [] # This keeps track of the completion time of all orders this rider is delivering
-        self.orderDict= {} # order dictionary. key: order index, value: order object
+        self.orderDict= {} # order dictionary. key: order index, value: order object. of All orders the rider has served/is serving
+        self.activeOrderDict = {} # order dictionary. key: order index, value: order object. of All orders the rider has served/is serving
         self.totalWaitingTime = 0
         self.totalOrderDelivered = 0
         self.totalCurrOrder= 0 # total number of orders assigned, and delivering
     
+    def __lt__(self, other):
+        return self.index < other.index
+
+
     def distance_to(self, another_loc): # place is a list of two elements, [x, y]
         return math.dist(self.loc, another_loc)
     
     def getStatus(self):
         return Rider.status[self.status]
 
-    def deliver(self, order:Order, currTime:float):
+    def deliver(self, order:Order, riderFreeTime:float):
+
         self.totalCurrOrder += 1
         self.status = 1
         self.orderDict[order.index] = order
+        self.activeOrderDict[order.index] = order
+
         # calculate delivery time
         rest_loc = order.rest.loc
         cust_loc = order.cust.loc
-        rest_prep_time = order.rest.prepTime
-        fmtime = self.distance_to(rest_loc)/args["riderSpeed"]
-        lmtime = math.dist(rest_loc, cust_loc)/args["riderSpeed"]
-        self.nextFreeTime = currTime+ lmtime + max(rest_prep_time, fmtime) 
-        self.orderCompleteTimeList.append(self.nextFreeTime)
-        # calculate waiting time
-        waiting_time = fmtime - rest_prep_time if rest_prep_time<fmtime else 0
-        # print("------ Order #" , order.index, " waiting time is" ,waiting_time, "\n Finish Time: ", self.nextFreeTime)
-        self.totalWaitingTime+= waiting_time
+        FPT = order.rest.prepTime
 
-    # def updateStatus(self, currTime:float):
-    #     # finish all current orders
-    #     if currTime > self.nextFreeTime or currTime == self.nextFreeTime:  
-    #         self.status = 0 
-    #         if self.orderList:
-    #             self.orderList.delivered()
-    #             self.loc = self.orderList.rest.loc
-    #             self.orderList = None
-    #             self.totalCurrOrder -= 1 
-    #         self.nextFreeTime = currTime
-    #     # # finish one of the current orders
-    #     # elif currTime in self.orderCompleteTimeList:
+        R2R = math.dist(rest_loc, self.lastStop if self.lastStop else self.loc)/args["riderSpeed"]
+        DT = math.dist(rest_loc, cust_loc)/args["riderSpeed"]
+        WT = max(FPT, R2R) + DT
+
+        # order 
+        order.rider = self
+        order.t_riderReachedRestaurant = max(riderFreeTime, order.t) + R2R
+        order.t_delivered = max(riderFreeTime, order.t) + WT
+        print("Order ", order.index, ": rider_start_t, order.t, R2R, DT, WT, reach_rest, delivered :\n",
+                     [riderFreeTime, order.t, R2R, DT, WT, order.t_riderReachedRestaurant, order.t_delivered])
+        order.wt = order.t_delivered - order.t
+        # order.wt = WT + max((riderFreeTime - order.t),0) # when the assigned rider is busy, the waiting time also includes 
+        
+
+        # rider
+        self.nextAvailableTime = riderFreeTime + WT # the same as the order delivered time. 
+        self.lastStop = order.cust.loc
+        self.orderCompleteTimeList.append(self.nextAvailableTime)
+        
+
+        
+        
+
+        
+        
+        
+        
+        
+
+       
+        
+        # calculate waiting time for rider
+        riderWT = R2R - FPT if FPT<R2R else 0
+        # print("------ Order #" , order.index, " waiting time is" ,waiting_time, "\n Finish Time: ", self.nextFreeTime)
+        self.totalWaitingTime+= riderWT
+
             
 
-    def predictStatus(self, currTime, predTime): # output is string
-        #Predict rider status after 'predTime' minute
-        predStatus = -1 # initialize
-        if self.status == 1: # if busy
-            predStatus = 0 if self.nextFreeTime < currTime+predTime else 1
-        elif self.status == 0:
-            predStatus = self.status
-        else:
-            print("Error: Rider status error.")
-        return Rider.status[predStatus]
+    # def predictStatus(self, currTime, predTime): # output is string
+    #     #Predict rider status after 'predTime' minute
+    #     predStatus = -1 # initialize
+    #     if self.status == 1: # if busy
+    #         predStatus = 0 if self.nextAvailableTime < currTime+predTime else 1
+    #     elif self.status == 0:
+    #         predStatus = self.status
+    #     else:
+    #         print("Error: Rider status error.")
+    #     return Rider.status[predStatus]
 
     def getFoodReadyTime(self, orderIndex): # given an order, returns when the food is ready on the timeline
         order = self.orderDict[orderIndex]
-        # check if order is taken???
         orderInTime = order.t
         foodPrepTime = order.rest.prepTime
         return foodPrepTime + orderInTime
 
-    def getRestArrivalTime(self, orderIndex): # given an order, returns when therider will arrive at the restaurant of the order
-        order = self.orderDict[orderIndex]
-        orderInTime = order.t
-        fmtime = self.distance_to(order.rest.loc)/args["riderSpeed"]
-        arrival_time = orderInTime + fmtime
-        return arrival_time
     
-    def getOrderCompleteTime(self, orderIndex):# given an order, returns when the rider will complete the delivery for the order
-        order = self.orderDict[orderIndex]
-        arrival_time = self.getRestArrivalTime(orderIndex) # specific time
-        foodReadyTime = self.getFoodReadyTime(orderIndex) # specific time
-        lmtime = math.dist(order.rest.loc, order.cust.loc)/args["riderSpeed"] # length of time 
-        return max(arrival_time, foodReadyTime) + lmtime
+    # def getOrderDeliveredTime(self):# given an order, returns when the rider will complete the delivery for the order
+    #     return self.nextAvailableTime
 
 
 

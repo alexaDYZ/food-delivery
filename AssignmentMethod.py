@@ -5,13 +5,14 @@ class AssignmentMethod():
         self.rider_list = None
         self.currTime = None
         self.name = self.__class__.__name__
+        
     def addOrder(self, newOrder):
         self.order = newOrder
     def addRiderList(self, rider_list):
         self.rider_list = rider_list
     def addCurrTime(self, currTime):
         self.currTime = currTime
-    def find_eligible_candidates(self):
+    def find_idle_candidates(self):
         '''
         Input: a list of all riders
         Output: a list of eligible riders, eligibility is defined accordingly
@@ -23,15 +24,4 @@ class AssignmentMethod():
         Output: the best rider, Rider Object
         '''
         pass
-    # def generate_order_arrival_event(self):
-    #     fmtime = self.order.rider.distance_to(self.order.rest.loc)/args["riderSpeed"]
-    #     arrival_time = self.currTime + fmtime
-    #     arrivalEvent = Event(arrival_time, 3, self.order)
-    #     return arrivalEvent
 
-    def assign(self):
-        '''
-        Input: a list of eligible riders
-        Output: the best rider, Rider Object
-        '''
-        pass

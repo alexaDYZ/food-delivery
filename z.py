@@ -1,11 +1,19 @@
-# from Order import Order
-# from Customer import Customer
-# from Restaurant import Restaurant
-# from config import args
+from Order import Order
+from Customer import Customer
+from Restaurant import Restaurant
+from config import args
+from Rider import Rider
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 
-
+rider_loc = np.random.randint(0,args["gridSize"], 
+                                    size=(args["numRiders"],2))
+rider_list = [Rider(i, rider_loc[i],args) 
+                for i in range(args["numRiders"])]
+rider_list.sort()
+print([r.index for r in rider_list])
 # # c = Customer((10,1), args)
 # # r = Restaurant(1, (10,10), 10, args)
 # id = [1,2,3,4,5]
@@ -22,22 +30,3 @@
 
 # for i in range(len(id) - 3 + 1):
 #     print(id[i:i+3])
-import numpy as np
-
-import matplotlib.pyplot as plt
-
-ls = []
-for i in range(10):
-    interval = np.random.poisson(30)
-    ls.append(interval)
-    # if len(ls) != 0:
-    #     next_t = ls[-1] + interval
-    # else:
-    #     next_t = 0 + interval
-    # ls.append(next_t)
-print(ls)
-
-# plt.plot(ls, np.zeros_like(ls), "-o")
-# for i in ls:
-#     plt.annotate(str(i), (i, 0))
-# plt.show()

@@ -50,6 +50,7 @@ class Simulation():
         '''
 
         self.method.addRiderList(self.rider_list)
+        
         # create event checkpoints
         checkpoint = EventQueue()   
         

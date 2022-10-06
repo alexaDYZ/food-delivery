@@ -1,14 +1,7 @@
 
-from audioop import avg
-from cProfile import label
+
 import copy
-from ctypes.wintypes import PINT
-from glob import escape
-from tkinter.tix import COLUMN
-from turtle import color
-from typing import Tuple
 import numpy as np
-from torch import lt
 from AnticipationMethod import AnticipationMethod
 from utils import dotdict
 from Order import Order
@@ -28,6 +21,7 @@ from generateData import dataGeneration
 import matplotlib.pyplot as plt
 import time
 from Analyse_Rider import runEpisode
+from Analyse_Orders import AnalyseOrders
 import datetime
 import os
 
@@ -41,7 +35,7 @@ class AnalyseWaitingTime():
         self.wt_df = None # waiting time data frame. ["wt_defauly", "wt_anticipation"]
 
     
-    def analyseOnce(self):
+    def simulateOnce(self):
         '''
         This function performs 1 analysis using the given set of parameters.
         Output: [number of Orders, 
@@ -51,7 +45,6 @@ class AnalyseWaitingTime():
                 difference between the waiting time per order,
                 ]
         '''
-        start_time = time.time()
 
         dataGeneration()
         default,anti = runEpisode() # 2 simulation results
@@ -66,7 +59,7 @@ class AnalyseWaitingTime():
     def basicAnalysis(self):
         ''' printing result for analysis'''
         print(self.wt_df.mean())
-        print(self.wt_df.std())
+        # print(self.wt_df.std())
         
 
         # print("Default Method: #order finished", len(self.default.wt_ls))
@@ -74,7 +67,7 @@ class AnalyseWaitingTime():
         # print("Average Waiting Time: \n",avg_wt_default, avg_wt_anti)
         
         diff = self.wt_df['WT_default'].mean()-self.wt_df['WT_anticipation'].mean() # wt_default - wt_anti
-        print(diff)
+        print("Difference in Average WT = ", diff)
 
         return [args["numOrders"], args["orderLambda"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
 
@@ -99,7 +92,7 @@ class AnalyseWaitingTime():
                 args["numOrders"] = j
                 args["numCustomers"] = j
                 args["orderLambda"] = l
-                self.analyseOnce()
+                self.simulateOnce()
                 res = self.basicAnalysis()
                 dfls.append(res)
                 y_d.append(res[2])
@@ -138,7 +131,7 @@ class AnalyseWaitingTime():
         avg_wt_a = []
         diff = []
         for i in range(n):
-            self.analyseOnce()
+            self.simulateOnce()
             avg_wt_d.append(self.wt_df["WT_default"].mean())
             avg_wt_a.append(self.wt_df["WT_anticipation"].mean())
             diff.append(self.wt_df["WT_default"].mean() - self.wt_df["WT_anticipation"].mean())
@@ -154,9 +147,8 @@ class AnalyseWaitingTime():
                     round(sum(df['if Anticipation is better'])/n,2)
                     ]
 
-        path = os.path.join("./week8/", str(datetime.datetime.now())) 
-        os.mkdir(path)
-        df.to_csv(path + "_AverageWaitingTime_" + str(args["numOrders"])+ "orders" + 
+       
+        df.to_csv(args["path"] + "_AverageWaitingTime_" + str(args["numOrders"])+ "orders" + 
                 "_numRider"+str(args['numRiders'])+
                 "_gridSize" + str(args['gridSize']) +
                 ".csv",index=False)
@@ -196,7 +188,7 @@ class AnalyseWaitingTime():
         plt.legend()
         
 
-        plt.savefig("./post_intro_talk/"+str(datetime.datetime.now())+ "_WaitingTimePlot"+
+        plt.savefig(args["path"] + str(datetime.datetime.now())+ "_WaitingTimePlot"+
             "_numOrders" + str(args["numOrders"]) + 
             "_lambda" + str(args["orderLambda"]) +
             "_numRider"+str(args['numRiders'])+
@@ -270,7 +262,7 @@ class AnalyseWaitingTime():
         #             "_grid"+ str(args['gridSize'])+
         #             "delivered_time" +      ".svg", format='svg', dpi=2000)
         
-        plt.savefig("./week8/"+ 
+        plt.savefig(args["path"]+ 
             "delivered_time" + 
             "_numOrders" + str(args["numOrders"]) + 
             "_lambda" + str(args["orderLambda"]) +
@@ -280,23 +272,29 @@ class AnalyseWaitingTime():
         plt.show()
         
 
-
+    def printOrderHistorr(self):
+        a = AnalyseOrders(self.default, self.anti) # pass in the result for 1 simulation object each
+        a.printHistory()
 
 analysis = AnalyseWaitingTime()
 
 if args["showWTplot"]: 
     analysis.multipleAnalysis()
-elif args["doMultipleExperiments"]:
+if args["doMultipleExperiments"]:
     analysis.multipleExperiments(args["numEpisode"])
-else:
-    analysis.analyseOnce()
-    analysis.basicAnalysis()
 
-    if args["showEventPlot"]:
-        # analysis.showEventPlot()
-        analysis.plotBFL()
-    if args["showAvgWT"]: 
-        analysis.AverageAnalysis()
+analysis.simulateOnce()
+analysis.basicAnalysis()
+
+if args["showEventPlot"]:
+    # analysis.showEventPlot()
+    analysis.plotBFL()
+if args["showAvgWT"]: 
+    analysis.AverageAnalysis()
+
+if args["saveAssignmentHistory"]:
+    analysis.printOrderHistorr()
+
 
 
     
