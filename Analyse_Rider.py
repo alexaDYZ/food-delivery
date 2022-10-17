@@ -141,7 +141,7 @@ def AnalyseRider():
  
     
     
-    plt.savefig("./post_intro_talk/"+str(datetime.datetime.now())+ "_RiderOccupancyRate"+
+    plt.savefig(args["path"]+str(datetime.datetime.now())+ "_RiderOccupancyRate"+
             "_numOrders" + str(args["numOrders"]) + 
             "_lambda" + str(args["orderLambda"]) +
             "_numRider"+str(args['numRiders'])+

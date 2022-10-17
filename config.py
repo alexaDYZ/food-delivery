@@ -4,22 +4,22 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numEpisode":100, # for averaging 
+    "numRepeat":30, # for averaging 
     
     "gridSize": 1000, # unit: m
     
     # for each time window
     # "totalTime": 1000,
-    "numOrders":1000, # same as num customers, initiliazed with -1. Assigned in generateData.py
-    "numCustomers": 1000, 
+    "numOrders":100, # same as num customers, initiliazed with -1. Assigned in generateData.py
+    "numCustomers": 100, 
 
     "orderLambda": 30, # unit: s # second # miu of the poisson process, mean of time interval between 2 orders
 
-    "numRiders": 50,
+    "numRiders": 100,
     "numRestaurants": 20,
     
     
-    "FPT_avg": 300, 
+    "FPT_avg": 0, 
     "FPT_sd":0,
     "riderSpeed":1, # unit m/s
 
@@ -42,7 +42,7 @@ args = dotdict({
     "showEventPlot": 0, #  waiting time, see Simulation.py
     
     "showAvgWT": 1,
-    "doMultipleExperiments":0, # generate a csv for numEpisode number of experiments
+    "doMultipleExperiments":1, # generate a csv for numEpisode number of experiments
     
     
     
@@ -51,7 +51,7 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./week8_newVersion/",
+    "path": "./week8_newVersion/ForMeeting/",
     
     
 })

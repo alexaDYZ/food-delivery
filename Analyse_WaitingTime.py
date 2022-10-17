@@ -284,7 +284,7 @@ analysis = AnalyseWaitingTime()
 if args["showWTplot"]: 
     analysis.multipleAnalysis()
 if args["doMultipleExperiments"]:
-    analysis.multipleExperiments(args["numEpisode"])
+    analysis.multipleExperiments(args["numRepeat"])
 
 analysis.simulateOnce()
 analysis.basicAnalysis()
