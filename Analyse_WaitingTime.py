@@ -23,7 +23,7 @@ import time
 from Analyse_Rider import runEpisode
 from Analyse_Orders import AnalyseOrders
 import datetime
-import os
+import math
 
 
 class AnalyseWaitingTime():
@@ -155,7 +155,6 @@ class AnalyseWaitingTime():
                 ".csv",index=False)
         
 
-
     def AverageAnalysis(self):
         '''This function compute and plot the moving average of the waiting time'''
 
@@ -274,29 +273,74 @@ class AnalyseWaitingTime():
             ".svg", format='svg', dpi=2000)
         plt.show()
         
-
     def printOrderHistorr(self):
         a = AnalyseOrders(self.default, self.anti) # pass in the result for 1 simulation object each
         a.printHistory()
 
+    def findOptimalAverageWaitingTime(self,order_list):
+        '''
+        This function finds the LOWER BOUND of the optimal average waiting time for the default and anticipation
+        '''
+        minWaitingTimeLs = [] # min waiting time = distance(customer, restaurant)/speed
+        for o in order_list:
+            minWaitingTime = math.dist(o.cust.loc, o.rest.loc)/args["riderSpeed"]
+            minWaitingTimeLs.append(minWaitingTime)
+        return sum(minWaitingTimeLs)/len(minWaitingTimeLs)
+    
+    def multipleExperimentOnCompetitiveRatio(self):
+        '''
+        This function runs multiple experiments to find the competitive ratio of the anticipation algorithm
+        '''
+        numExperiment = args["numRepeat"]
+        df_ls = []
+        for i in range(numExperiment):
+            print("Experiment", i)
+            self.simulateOnce() # run the simulation once
+            minAverageWaitingTime = self.findOptimalAverageWaitingTime(self.anti.order_list)
+            competitiveRatio = round(self.wt_df['WT_anticipation'].mean() / minAverageWaitingTime , 3)
+            row = [self.wt_df['WT_anticipation'].mean(), minAverageWaitingTime, competitiveRatio]
+            df_ls.append(row)
+        df = pd.DataFrame(df_ls, columns = ['Average WT, anticipation', 'WT_minimum', 'Ratio'])
+        if args['saveCRhistory']:
+            df.to_csv(args["path"] + "CR" + str(datetime.datetime.now())+
+                    "Riders" + str(args["numRiders"]) +
+                    "FPT" + str(args["FPT_avg"]) + ".csv")
+        return round(df['Ratio'].mean(),5)
+        
+
+
+        
 analysis = AnalyseWaitingTime()
 
-if args["showWTplot"]: 
-    analysis.multipleAnalysis()
+# if args["showWTplot"]: 
+#     analysis.multipleAnalysis()
 if args["doMultipleExperiments"]:
     analysis.multipleExperiments(args["numRepeat"])
+if args["findCompetitiveRatio"]:
+    ratioLs = []
+    for i in range(20, 50):
+        args["numRiders"] = i
+        ratio = analysis.multipleExperimentOnCompetitiveRatio()
+        ratioLs.append(ratio)
+    x = [i for i in range(20,50)]
+    y = ratioLs
+    plt.plot(x, y)
+    plt.title("Competitive Ratio vs Number of Riders")
+    plt.savefig(args["path"] + "CRvsRiders" + str(datetime.datetime.now())+ ".svg", format='svg', dpi=2000)
 
-analysis.simulateOnce()
-analysis.basicAnalysis()
 
-if args["showEventPlot"]:
-    # analysis.showEventPlot()
-    analysis.plotBFL()
-if args["showAvgWT"]: 
-    analysis.AverageAnalysis()
+# analysis.simulateOnce()
+# analysis.basicAnalysis()
 
-if args["saveAssignmentHistory"]:
-    analysis.printOrderHistorr()
+# if args["showEventPlot"]:
+#     # analysis.showEventPlot()
+#     analysis.plotBFL()
+# if args["showAvgWT"]: 
+#     analysis.AverageAnalysis()
+
+# if args["saveAssignmentHistory"]:
+#     analysis.printOrderHistorr()
+
 
 
 
