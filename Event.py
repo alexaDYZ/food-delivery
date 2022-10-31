@@ -21,11 +21,12 @@ class Event():
         self.time = time # time when the event is executed
         self.cat = cat
         self.order = order
+        self.rider_list = None # this is for event 4 to check status for all riders; and event 2 to reassign
         self.method = None
-        self.rider_list = None # this is for event 4 only. To check status for all riders
         self.status_check_dict = None
         self.programEndTime = -1
         self.qsize = -1 # for 'Regular Check event'. to know if this is the end
+        self.record = [] # columns: [order.index, t, r2r, restArrival, delivered]
     
     def getCategory(self) : #returns a string
         return Event.category[self.cat]
@@ -40,45 +41,56 @@ class Event():
         triggeredEvent = []
         # case 1: new order comes in 
         if self.getCategory() ==  'New Order':
+            print("******* Order " +  str(self.order.index) + " comes in at t = " + 
+                    str(currTime) + "*******" if args["printAssignmentProcess"] else '')
             curr_order = self.order
             curr_order.cust.order(currTime) # customer makes order at time currTime
             assignment_method = self.method
             assignment_method.addOrder(curr_order)
             assignment_method.addCurrTime(currTime)
+            
             # find best rider
-            bestRider = assignment_method.assign()
+            bestRider = assignment_method.find_best_rider()
+            
+            # add estimated delivered time for the order, for anticipative method
+            
             # if best rider can be found:
             if bestRider:
+                print("******* Order "+ str(self.order.index)+ " is assigned to Rider "+
+                         str(bestRider.index) + "******" if args["printAssignmentProcess"] else '')
+                
                 # create "arrive at restaturant" event
-                rest_arrival_time = bestRider.getRestArrivalTime(curr_order.index)
-                e_arrival = Event(rest_arrival_time, 3, curr_order)
-                triggeredEvent.append(e_arrival)
-                # create "order delivered" event
-                finishTime = bestRider.getOrderCompleteTime(curr_order.index)
-                e_finish = Event(finishTime, 2, curr_order)
-                triggeredEvent.append(e_finish)
-            
-            #This part allows unassigned order to be reassigned later:
-                #attempt to reassign every 1 min.
-            else:
-                e_reassign = Event(self.time + args["reassignTime"], 1, curr_order)
-                triggeredEvent.append(e_reassign)
+                
+                print("************ Rider " + str(bestRider.index) + 
+                         " will arrive at Restaurant at t = "+str(self.order.t_riderReachedRestaurant)+ 
+                         "************" if args["printAssignmentProcess"] else '')
 
+                e_arrival = Event(self.order.t_riderReachedRestaurant, 3, curr_order)
+                triggeredEvent.append(e_arrival)
+                
+                # create "order delivered" event
+                t = self.order.t_delivered
+                e_finish = Event(t, 2, curr_order)
+                triggeredEvent.append(e_finish)
+                # curr_order.t_est_delivered = t
+                # curr_order.t_delivered = t
+
+            else:
+                print("******* Order " + str(self.order.index) + " is dropped ******" if args["printAssignmentProcess"] else '')
+                self.order.status = 4 # dropped
             
         # case 2: an order is delivered
+
         elif self.cat == 2:
-            # update order status
-            self.order.delivered(currTime)
-            orderIndex = self.order.index
-            # update rider
-            rider = self.order.rider
-            if rider: # check if rider is None
-                rider.loc = self.order.rest.loc
-                del rider.orderDict[orderIndex]
-                rider.status = 0 if len(rider.orderDict) == 0 else 1
-                rider.totalCurrOrder -= 1 
-            elif rider is None: print("Error: Order delivered but cannot find its rider")
             
+            print("******* Order " + str(self.order.index) +  " is delivered by Rider " + 
+                    str(self.order.rider.index) + " at t = " + str(currTime)+ 
+                    "******" if args["printAssignmentProcess"] else '')
+            
+            # update status for rider and order
+            self.order.delivered(currTime)
+            
+
         
         # case 3: rider arrives at restaurant
         elif self.cat == 3:

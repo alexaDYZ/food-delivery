@@ -102,10 +102,7 @@ def AnalyseNumOrders():
         # averaging
         avg_default = round(sum(num_delivered_list_default)/num/numEpisode,3)
         avg_anticipation = round(sum(num_delivered_list_anticipation)/num/numEpisode,3)
-        # print("delivery record(default):", num_delivered_list_default)
-        # print("delivery record:", num_delivered_list_anticipation)
-        # print("diff:" , [i-j for (i,j) in zip(num_delivered_list_default, num_delivered_list_anticipation)])
-        
+
         if num not in avg.keys():
             avg[num] = []
         
