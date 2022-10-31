@@ -1,6 +1,8 @@
 
 
+from ast import arg
 import copy
+from re import L
 import numpy as np
 from AnticipationMethod import AnticipationMethod
 from utils import dotdict
@@ -20,7 +22,7 @@ from tabulate import tabulate
 from generateData import dataGeneration
 import matplotlib.pyplot as plt
 import time
-from Analyse_Rider import runEpisode
+from RunSimulation import runEpisode
 from Analyse_Orders import AnalyseOrders
 import datetime
 import math
@@ -28,11 +30,17 @@ import math
 
 class AnalyseWaitingTime():
     def __init__(self) -> None:
+        self.baselineMethod = DefaultMethod()
+        self.anticipativeMethod = AnticipationMethod()
         self.default = None
         self.anti = None
         self.avg_d = -1 # average waiting time for default method, unit = s
         self.avg_a = -1 # average waiting time for anticipation method, unit = s
-        self.wt_df = None # waiting time data frame. ["wt_defauly", "wt_anticipation"]
+        self.wt_df = None # waiting time data frame. ["wt_defauly", "wt_anticipation"], values for all orders in 1 simulation
+        self.sim_summary = [] # summary of the waiting time, summary of 1 simulation, 1 row
+        self.exp_summary = []
+        self.summary = []
+        
 
     
     def simulateOnce(self):
@@ -47,29 +55,45 @@ class AnalyseWaitingTime():
         '''
 
         dataGeneration()
-        default,anti = runEpisode() # 2 simulation results
+        default,anti = runEpisode(self.baselineMethod, self.anticipativeMethod) # 2 simulation results
         self.default = default
         self.anti = anti
         df = pd.DataFrame(zip( self.default.wt_ls, self.anti.wt_ls), 
             columns = ['WT_default',  'WT_anticipation'])
         self.wt_df = df
 
+        # 10.31
+        # summary stats for 1 simulations -> 1 row of self.wt_df_summary
+        mean_d = self.wt_df["WT_default"].mean()
+        mean_a = self.wt_df["WT_anticipation"].mean()
+        std_d = self.wt_df["WT_default"].std()
+        std_a = self.wt_df["WT_anticipation"].std()
+        max_d = self.wt_df["WT_default"].max()
+        max_a = self.wt_df["WT_anticipation"].max()
+        min_d = self.wt_df["WT_default"].min()
+        min_a = self.wt_df["WT_anticipation"].min()
+        ifbeter = 1 if mean_a < mean_d else 0
+        row = [mean_a, mean_d, std_a,std_d, max_a,max_d,min_a,min_d, ifbeter]
+        row = [round(i/60) for i in row]
+        self.sim_summary = row
+
+
 
     
-    def basicAnalysis(self):
-        ''' printing result for analysis'''
-        print(self.wt_df.mean())
-        # print(self.wt_df.std())
+    # def basicAnalysis(self):
+    #     ''' printing result for analysis'''
+    #     print(self.wt_df.mean())
+    #     # print(self.wt_df.std())
         
 
-        # print("Default Method: #order finished", len(self.default.wt_ls))
-        # print("Anticipation Method: #order finished", len(self.anti.wt_ls))
-        # print("Average Waiting Time: \n",avg_wt_default, avg_wt_anti)
+    #     # print("Default Method: #order finished", len(self.default.wt_ls))
+    #     # print("Anticipation Method: #order finished", len(self.anti.wt_ls))
+    #     # print("Average Waiting Time: \n",avg_wt_default, avg_wt_anti)
         
-        diff = self.wt_df['WT_default'].mean()-self.wt_df['WT_anticipation'].mean() # wt_default - wt_anti
-        print("Difference in Average WT = ", diff)
+    #     diff = self.wt_df['WT_default'].mean()-self.wt_df['WT_anticipation'].mean() # wt_default - wt_anti
+    #     print("Difference in Average WT = ", diff)
 
-        return [args["numOrders"], args["orderLambda"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
+    #     return [args["numOrders"], args["orderLambda"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
 
 
     def multipleAnalysis(self):
@@ -122,38 +146,62 @@ class AnalyseWaitingTime():
         plt.legend()
         plt.show()
 
-    def multipleExperiments(self, n): # n sets of experiment 
-        '''
-        This fucntion will the multiple sets of data with same config to compute the 
-        Average waiting time for each experiment
-        '''
-        avg_wt_d = []
-        avg_wt_a = []
-        diff = []
-        for i in range(n):
-            self.simulateOnce()
-            avg_wt_d.append(self.wt_df["WT_default"].mean())
-            avg_wt_a.append(self.wt_df["WT_anticipation"].mean())
-            diff.append(self.wt_df["WT_default"].mean() - self.wt_df["WT_anticipation"].mean())
-        ifbetter = [1 if diff[i]> 0 else 0 for i in range(len(diff)) ]
-        df = pd.DataFrame(zip(avg_wt_d, avg_wt_a, diff, ifbetter), 
-            columns = ['Average Waiting Time_Default(s)',  
-                        'Average Waiting Time_Anticipation(s)',
-                        'Difference(s)', 
-                        'if Anticipation is better'])
-        df.loc[-1] = [sum(df['Average Waiting Time_Default(s)'])/n, 
-                    sum(df['Average Waiting Time_Anticipation(s)'])/n,
-                    sum(df['Difference(s)'])/n,
-                    round(sum(df['if Anticipation is better'])/n,2)
-                    ]
+    # def multipleExperiments(self, n): # n sets of experiment 
+    #     '''
+    #     This fucntion will the multiple sets of data with same config to compute the 
+    #     Average waiting time for each experiment
+    #     '''
+    #     avg_wt_d = []
+    #     avg_wt_a = []
+    #     diff = []
+    #     for i in range(n):
+    #         self.simulateOnce()
+    #         avg_wt_d.append(self.wt_df["WT_default"].mean())
+    #         avg_wt_a.append(self.wt_df["WT_anticipation"].mean())
+    #         diff.append(self.wt_df["WT_default"].mean() - self.wt_df["WT_anticipation"].mean())
+    #     ifbetter = [1 if diff[i]> 0 else 0 for i in range(len(diff)) ]
+    #     df = pd.DataFrame(zip(avg_wt_d, avg_wt_a, diff, ifbetter), 
+    #         columns = ['Average Waiting Time_Default(s)',  
+    #                     'Average Waiting Time_Anticipation(s)',
+    #                     'Difference(s)', 
+    #                     'if Anticipation is better'])
+    #     df.loc[-1] = [sum(df['Average Waiting Time_Default(s)'])/n, 
+    #                 sum(df['Average Waiting Time_Anticipation(s)'])/n,
+    #                 sum(df['Difference(s)'])/n,
+    #                 round(sum(df['if Anticipation is better'])/n,2)
+    #                 ]
 
        
-        df.to_csv(args["path"] + "_AverageWaitingTime_" + str(args["numOrders"])+ "orders" + 
-                "_numRider"+str(args['numRiders'])+
-                "_gridSize" + str(args['gridSize']) +
-                "_FPT" + str(args["FPT_avg"])+
-                ".csv",index=False)
+    #     df.to_csv(args["path"] + "_AverageWaitingTime_" + str(args["numOrders"])+ "orders" + 
+    #             "_numRider"+str(args['numRiders'])+
+    #             "_gridSize" + str(args['gridSize']) +
+    #             "_FPT" + str(args["FPT_avg"])+
+    #             ".csv",index=False)
+
+    def multipleExperiments(self, n): # n sets of experiment 
+        '''
+        Multiple experiments conducted for the same set of parameters
+        '''
         
+        for i in range(n):
+            print("numRiders: ", args["numRiders"], "----Experiment", i)
+            
+            self.simulateOnce()
+            self.exp_summary.append(self.sim_summary)
+            self.sim_summary = []
+        
+        df = pd.DataFrame(self.exp_summary, columns = ['mean_a', 'mean_d', 'std_a','std_d', 'max_a','max_d','min_a','min_d', 'ifbetter'])
+        
+        row = [args["numRiders"], 
+                    df["mean_a"].mean(), df["mean_d"].mean(),
+                    df["std_a"].mean(), df["std_d"].mean(),
+                    df["max_a"].mean(), df["max_d"].mean(),
+                    df["min_a"].mean(), df["min_d"].mean(),
+                    round(df["ifbetter"].sum()/len(df["ifbetter"]),3)
+                    ]
+
+        self.summary.append(row)
+
 
     def AverageAnalysis(self):
         '''This function compute and plot the moving average of the waiting time'''
@@ -291,55 +339,94 @@ class AnalyseWaitingTime():
         '''
         This function runs multiple experiments to find the competitive ratio of the anticipation algorithm
         '''
-        numExperiment = args["numRepeat"]
+        numExperiment = args["numExperiments"]
         df_ls = []
         for i in range(numExperiment):
             print("Experiment", i)
             self.simulateOnce() # run the simulation once
             minAverageWaitingTime = self.findOptimalAverageWaitingTime(self.anti.order_list)
-            competitiveRatio = round(self.wt_df['WT_anticipation'].mean() / minAverageWaitingTime , 3)
-            row = [self.wt_df['WT_anticipation'].mean(), minAverageWaitingTime, competitiveRatio]
+            competitiveRatio_anti = round(self.wt_df['WT_anticipation'].mean() / minAverageWaitingTime , 3)
+            competitiveRatio_default = round(self.wt_df['WT_default'].mean() / minAverageWaitingTime , 3)
+
+            # maxCR_anti = round(self.wt_df['WT_anticipation'].max() / minAverageWaitingTime , 3)
+            # maxCR_default= round(self.wt_df['WT_default'].max() / minAverageWaitingTime , 3)
+
+            row = [minAverageWaitingTime, 
+                    self.wt_df['WT_anticipation'].mean(), self.wt_df['WT_default'].mean(), 
+                    competitiveRatio_anti, competitiveRatio_default]
             df_ls.append(row)
-        df = pd.DataFrame(df_ls, columns = ['Average WT, anticipation', 'WT_minimum', 'Ratio'])
+        df = pd.DataFrame(df_ls, columns = ['WT_minimum', 
+                                            'AverageWT_anticipation', 'AverageWT_default',
+                                            'Ratio_anti', 'Ratio_default'])
         if args['saveCRhistory']:
             df.to_csv(args["path"] + "CR" + str(datetime.datetime.now())+
                     "Riders" + str(args["numRiders"]) +
                     "FPT" + str(args["FPT_avg"]) + ".csv")
-        return round(df['Ratio'].mean(),5)
+        # return round(df['Ratio_anti'].mean(),5), round(df['Ratio_default'].mean(),5)
+        return competitiveRatio_anti, competitiveRatio_default
+    
+
+    def varyNumRiders(self):
+        '''
+        This function runs multiple experiments to find the competitive ratio of the anticipation algorithm
+        '''
+        numExperiment = args["numExperiments"]
+        # numRiders = range(20, 52, 2)
+        numRiders = range(20,52,2)
+        
+        for n in numRiders:
+            print("numRiders", n)
+            args["numRiders"] = n
+            self.multipleExperiments(numExperiment)
+        
+        df = pd.DataFrame(self.summary, columns =  ['numRiders', 'mean_a', 'mean_d', 'std_a', 'std_d', 'max_a', 'max_d', 'min_a', 'min_d', 'percentage better'] )
+        
+       
+        df.to_csv(args["path"] + "summary_WT_" + str(args["numOrders"])+ "orders" + 
+                "_numRider"+str(args['numRiders'])+
+                "_gridSize" + str(args['gridSize']) +
+                "_FPT" + str(args["FPT_avg"])+
+                ".csv",index=False)
+
+
+    def run(self):
+        self.varyNumRiders()
+        # if args["showWTplot"]: 
+        #     self.multipleAnalysis()
+        # if args["doMultipleExperiments"]:
+        #     self.multipleExperiments(args["numRepeat"])
+        # if args["findCompetitiveRatio"]:
+        #     ratio_anti_ls = []
+        #     ratio_default_ls = []
+        #     for i in range(20, 80, 5): 
+        #         args["numRiders"] = i
+        #         ratio_anti, ratio_default = self.multipleExperimentOnCompetitiveRatio()
+        #         ratio_anti_ls.append(ratio_anti)
+        #         ratio_default_ls.append(ratio_default)
+        #     x = [i for i in range(20, 80, 5)]
+        #     y1 = ratio_default_ls
+        #     y2 = ratio_anti_ls
+        #     plt.plot(x, y1)
+        #     plt.plot(x, y2)
+        #     plt.legend(["default", "anticipation"])
+        #     plt.title("Competitive Ratio vs Number of Riders")
+        #     plt.savefig(args["path"] + "CRvsRiders" + "FPT"+ str(args["FPT_avg"])+ "_2.svg", format='svg', dpi=2000)
+
+
+        # self.simulateOnce()
+        # self.basicAnalysis()
+
+        # if args["showEventPlot"]:
+        #     # analysis.showEventPlot()
+        #     self.plotBFL()
+        # if args["showAvgWT"]: 
+        #     self.AverageAnalysis()
+
+        # if args["saveAssignmentHistory"]:
+        #     self.printOrderHistorr()
+
         
 
-
-        
-analysis = AnalyseWaitingTime()
-
-# if args["showWTplot"]: 
-#     analysis.multipleAnalysis()
-if args["doMultipleExperiments"]:
-    analysis.multipleExperiments(args["numRepeat"])
-if args["findCompetitiveRatio"]:
-    ratioLs = []
-    for i in range(20, 50):
-        args["numRiders"] = i
-        ratio = analysis.multipleExperimentOnCompetitiveRatio()
-        ratioLs.append(ratio)
-    x = [i for i in range(20,50)]
-    y = ratioLs
-    plt.plot(x, y)
-    plt.title("Competitive Ratio vs Number of Riders")
-    plt.savefig(args["path"] + "CRvsRiders" + str(datetime.datetime.now())+ ".svg", format='svg', dpi=2000)
-
-
-# analysis.simulateOnce()
-# analysis.basicAnalysis()
-
-# if args["showEventPlot"]:
-#     # analysis.showEventPlot()
-#     analysis.plotBFL()
-# if args["showAvgWT"]: 
-#     analysis.AverageAnalysis()
-
-# if args["saveAssignmentHistory"]:
-#     analysis.printOrderHistorr()
 
 
 

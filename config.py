@@ -4,7 +4,7 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numRepeat":100, # for averaging 
+    "numExperiments":100, # for averaging 
     
     "gridSize": 1000, # unit: m
     
@@ -19,7 +19,7 @@ args = dotdict({
     "numRestaurants": 20,
     
     
-    "FPT_avg": 0, 
+    "FPT_avg": 0, # unit: s # second # average food preparation time
     "FPT_sd":0,
     "riderSpeed":1, # unit m/s
 
@@ -51,7 +51,7 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./week9/",
+    "path": "./week11/",
     
     
 })

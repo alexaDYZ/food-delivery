@@ -11,6 +11,7 @@ class Order():
         1: 'ORDERED',
         2: 'DELIVERING',
         3: 'DELIVERED',
+        4: 'DROPPED',
     }
 
     def __init__(self, index, t_in, customer, restaurant):

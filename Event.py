@@ -76,8 +76,8 @@ class Event():
                 # curr_order.t_delivered = t
 
             else:
-                print("Error: unable to assign order. in Event.py")
-
+                print("******* Order " + str(self.order.index) + " is dropped ******" if args["printAssignmentProcess"] else '')
+                self.order.status = 4 # dropped
             
         # case 2: an order is delivered
 

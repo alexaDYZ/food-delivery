@@ -1,12 +1,16 @@
 from Analyse_NumOrders import AnalyseNumOrders
-from Analyse_Rider import AnalyseRider
+from Analyse_Rider import Analyse_Rider
 from Analyse_WaitingTime import AnalyseWaitingTime
+from Analyse_DroppedOrders import Analyse_DroppedOrders
 
 
 def main():
    # AnalyseNumOrders()
    # AnalyseRider()
-   AnalyseWaitingTime()
+   a = AnalyseWaitingTime() # Default_1b
+   # a = Analyse_DroppedOrders() # Default_1a
+   # a = Analyse_Rider()
+   a.run()
    pass
 
 

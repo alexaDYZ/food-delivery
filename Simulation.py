@@ -130,6 +130,9 @@ class Simulation():
 
         return self
 
+
+
+
     def printResult(self):
         print("\n ****************** \n ", self.method.__class__.__name__, "\n ****************** \n ")
         def print_all_order_status(orders):
@@ -160,6 +163,7 @@ class Simulation():
     
     def plotTimeHorizon(self):
         pass
+            
         # events = [(o.t, o.t_delivered) for o in self.order_list]
         # plt.eventplot(events,linelengths = 1, 
         #               colors=['C{}'.format(i) for i in range(len(events))],
@@ -173,3 +177,4 @@ class Simulation():
         #           "  lambda:" + str(args["orderLambda"]), fontsize = 10)
         
         # plt.show()
+        
