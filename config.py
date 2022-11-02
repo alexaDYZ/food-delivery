@@ -4,18 +4,18 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numExperiments":100, # for averaging 
+    "numExperiments":10, # for averaging 
     
     "gridSize": 1000, # unit: m
     
     # for each time window
     # "totalTime": 1000,
-    "numOrders":10, # same as num customers, initiliazed with -1. Assigned in generateData.py
-    "numCustomers": 10, 
+    "numOrders":1000, # same as num customers, initiliazed with -1. Assigned in generateData.py
+    "numCustomers": 1000, 
 
     "orderLambda": 30, # unit: s # second # miu of the poisson process, mean of time interval between 2 orders
 
-    "numRiders": 5,
+    "numRiders": 100,
     "numRestaurants": 20,
     
     

@@ -14,6 +14,7 @@ class Rider():
     def __init__(self, index, loc, args) :
         self.args = args
         self.index = index
+        self.init_loc = loc
         self.loc = loc
         self.status = 0
         self.nextAvailableTime = 0 # time when he will finish deliver all orders

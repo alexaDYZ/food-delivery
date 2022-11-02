@@ -26,6 +26,8 @@ from Analyse_Orders import AnalyseOrders
 from DefaultMethod_1a import DefaultMethod_1a
 import datetime
 import math
+from visualization.Visualization import RouteVisualization
+from visualization.Visualization import visualize_multiple, visualizeMaxMin
 
 class Analyse_Rider():
 
@@ -66,6 +68,9 @@ class Analyse_Rider():
         stats_a = [np.mean(ls_a), np.std(ls_a), np.max(ls_a), np.min(ls_a)]
         self.stats_a.append(stats_a)
         
+        visualizeMaxMin(self.anti.rider_list)
+
+        
         
 
     def multipleExperiments(self, n): # n sets of experiment 
@@ -94,7 +99,7 @@ class Analyse_Rider():
                 ".csv",index=False)
 
     def run(self):
-        self.multipleExperiments(100)
+        self.multipleExperiments(args["numExperiments"])
     # def AnalyseRider():
         
     #     start_time = time.time()

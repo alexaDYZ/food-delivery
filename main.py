@@ -7,10 +7,12 @@ from Analyse_DroppedOrders import Analyse_DroppedOrders
 def main():
    # AnalyseNumOrders()
    # AnalyseRider()
-   a = AnalyseWaitingTime() # Default_1b
+   # a = AnalyseWaitingTime() # Default_1b
    # a = Analyse_DroppedOrders() # Default_1a
-   # a = Analyse_Rider()
-   a.visualizeRoute()
+   a = Analyse_Rider()
+   # a.visualizeMaxMin()
+   # a.visualizeRoute()
+   a.run()
    pass
 
 

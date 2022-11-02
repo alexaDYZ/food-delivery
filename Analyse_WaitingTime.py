@@ -26,7 +26,7 @@ from RunSimulation import runEpisode
 from Analyse_Orders import AnalyseOrders
 import datetime
 import math
-from visualization_tools.Visualization import RouteVisualization
+from visualization.Visualization import RouteVisualization, visualize_one, visualize_multiple
 
 
 class AnalyseWaitingTime():
@@ -424,32 +424,47 @@ class AnalyseWaitingTime():
         # if args["saveAssignmentHistory"]:
         #     self.printOrderHistorr()
 
-        
+
+
     def visualizeRoute(self):
+        self.simulateOnce()
+        for r in self.anti.rider_list:
+            if r.orderDict:
+                visualize_one(r, title="Route of Rider " + str(r.index) + " with "+ str(len(r.orderDict))+ " orders")
+
+
+    def visualizeMaxMin(self):
+        '''
+        This function visualize specifically, the route of 2 riders:
+        rider who delivered the most orders, and who delivered the least.
+        '''
         self.simulateOnce()
         # get location list
         
-        rider = None 
+        max = 0
+        max_r = None
+        min = np.Infinity
+        min_r = None
         for r in self.anti.rider_list:
             if r.orderDict:
-                rider = r
-                
-            order_dict = rider.orderDict
-            order_index = list(order_dict.keys())
-            order_index.sort()
-            print(order_index)
-            loc_ls = []
+                if len(r.orderDict) > max:
+                    max_r = r
+                    max = len(r.orderDict)
+                    print("max", max_r.index)
 
-            for i in order_index:
-                o = order_dict[i]
-                pair = (o.rest.loc, o.cust.loc)
-                loc_ls.append(pair)
-            # print(loc_ls)
-            # print(len(loc_ls))
-            v = RouteVisualization()
-            v.setInput(loc_ls)
-            v.setGridSize(args["gridSize"])
-            v.visualize()
+                if len(r.orderDict) < min:
+                    min_r = r
+                    min = len(r.orderDict)
+                    print("min", min_r.index)
+        print("max", max_r)
+        print("min", min_r)
+       
+        fig = visualize_multiple([max_r, min_r])
+
+        
+
+
+             
 
 
 
