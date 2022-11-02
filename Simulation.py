@@ -23,7 +23,8 @@ from DefaultMethod import DefaultMethod
 import matplotlib.pyplot as plt
 
 class Simulation():
-    def __init__(self, method: AssignmentMethod,restaurant_list, rider_list, order_list, customer_list, order_time) -> None:
+    def __init__(self, method: AssignmentMethod,restaurant_list, rider_list, order_list, customer_list, order_time, args) -> None:
+        self.args = args
         self.restaurant_list = restaurant_list
         self.rider_list = rider_list
         self.order_list = order_list
@@ -87,7 +88,7 @@ class Simulation():
             # currEvent.print()
             currTime = currEvent.time
             
-            if args["printCheckPt"] and currEvent.cat != 4:
+            if self.args["printCheckPt"] and currEvent.cat != 4:
                 print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
 
             # check Event category, if it's a new order, tell it how to assign rider
@@ -121,7 +122,7 @@ class Simulation():
 
             counter += 1
         
-        if args["showEventPlot"]:
+        if self.args["showEventPlot"]:
             self.plotTimeHorizon()
         
         # # reset all order status

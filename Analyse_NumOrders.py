@@ -59,12 +59,12 @@ def runEpisode():
 
     # Method 1: default method, greedy
     greedy = DefaultMethod()
-    sim1 = Simulation(greedy,restaurant_list, rider_list, order_list, customer_list, order_time)
+    sim1 = Simulation(greedy,restaurant_list, rider_list, order_list, customer_list, order_time, args)
     res_default=sim1.simulate()
 
     # Method 2: proposed method, expectation + greedy
     expectation = AnticipationMethod()
-    sim2 = Simulation(expectation,restaurant_list, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
+    sim2 = Simulation(expectation,restaurant_list, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy, args)
     res_anti = sim2.simulate()
 
     return res_default,res_anti

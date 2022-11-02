@@ -10,12 +10,12 @@ args = dotdict({
     
     # for each time window
     # "totalTime": 1000,
-    "numOrders":2000, # same as num customers, initiliazed with -1. Assigned in generateData.py
-    "numCustomers": 2000, 
+    "numOrders":10, # same as num customers, initiliazed with -1. Assigned in generateData.py
+    "numCustomers": 10, 
 
     "orderLambda": 30, # unit: s # second # miu of the poisson process, mean of time interval between 2 orders
 
-    "numRiders": 30,
+    "numRiders": 5,
     "numRestaurants": 20,
     
     

@@ -26,6 +26,7 @@ from RunSimulation import runEpisode
 from Analyse_Orders import AnalyseOrders
 import datetime
 import math
+from visualization_tools.Visualization import RouteVisualization
 
 
 class AnalyseWaitingTime():
@@ -365,7 +366,6 @@ class AnalyseWaitingTime():
         # return round(df['Ratio_anti'].mean(),5), round(df['Ratio_default'].mean(),5)
         return competitiveRatio_anti, competitiveRatio_default
     
-
     def varyNumRiders(self):
         '''
         This function runs multiple experiments to find the competitive ratio of the anticipation algorithm
@@ -387,7 +387,6 @@ class AnalyseWaitingTime():
                 "_gridSize" + str(args['gridSize']) +
                 "_FPT" + str(args["FPT_avg"])+
                 ".csv",index=False)
-
 
     def run(self):
         self.varyNumRiders()
@@ -426,6 +425,32 @@ class AnalyseWaitingTime():
         #     self.printOrderHistorr()
 
         
+    def visualizeRoute(self):
+        self.simulateOnce()
+        # get location list
+        
+        rider = None 
+        for r in self.anti.rider_list:
+            if r.orderDict:
+                rider = r
+                
+            order_dict = rider.orderDict
+            order_index = list(order_dict.keys())
+            order_index.sort()
+            print(order_index)
+            loc_ls = []
+
+            for i in order_index:
+                o = order_dict[i]
+                pair = (o.rest.loc, o.cust.loc)
+                loc_ls.append(pair)
+            # print(loc_ls)
+            # print(len(loc_ls))
+            v = RouteVisualization()
+            v.setInput(loc_ls)
+            v.setGridSize(args["gridSize"])
+            v.visualize()
+
 
 
 

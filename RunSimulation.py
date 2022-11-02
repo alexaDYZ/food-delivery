@@ -72,12 +72,12 @@ def runEpisode(baselineMethod, anticipationMethod):
     # Method 1: default method
     # greedy = DefaultMethod()
     baselineMethod
-    sim1 = Simulation(baselineMethod,restaurant_list, rider_list, order_list, customer_list, order_time)
+    sim1 = Simulation(baselineMethod,restaurant_list, rider_list, order_list, customer_list, order_time, args)
     default = sim1.simulate()
 
     # Method 2: anticipative method
     # expectation = AnticipationMethod()
-    sim2 = Simulation(anticipationMethod,restaurant_list_copy, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy)
+    sim2 = Simulation(anticipationMethod,restaurant_list_copy, rider_list_copy, order_list_copy, customer_list_copy, order_time_copy, args)
     anti = sim2.simulate()
 
     return default, anti

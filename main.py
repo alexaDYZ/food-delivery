@@ -10,7 +10,7 @@ def main():
    a = AnalyseWaitingTime() # Default_1b
    # a = Analyse_DroppedOrders() # Default_1a
    # a = Analyse_Rider()
-   a.run()
+   a.visualizeRoute()
    pass
 
 
