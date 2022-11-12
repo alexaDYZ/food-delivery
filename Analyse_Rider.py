@@ -67,12 +67,9 @@ class Analyse_Rider():
         ls_a = [self.anti.rider_list[i].totalOrderDelivered for i in range(args["numRiders"])]
         stats_a = [np.mean(ls_a), np.std(ls_a), np.max(ls_a), np.min(ls_a)]
         self.stats_a.append(stats_a)
-        
-        visualizeMaxMin(self.anti.rider_list)
-
-        
-        
-
+        if np.max(ls_a) - np.min(ls_a) >= np.max(ls_a)/2:
+            visualizeMaxMin(self.anti.rider_list)
+    
     def multipleExperiments(self, n): # n sets of experiment 
         '''
         This fucntion will the generate n sets of data with same config to compute the 
@@ -91,6 +88,7 @@ class Analyse_Rider():
                 "_numRider"+str(args['numRiders'])+
                 "_gridSize" + str(args['gridSize']) +
                 "_FPT" + str(args["FPT_avg"])+
+                "_numRest" + str(args["numRestaurants"]) +
                 ".csv",index=False)
         df_d.to_csv(args["path"] + "Default_numDelivered_" + str(args["numOrders"])+ "orders" + 
                 "_numRider"+str(args['numRiders'])+
@@ -98,6 +96,11 @@ class Analyse_Rider():
                 "_FPT" + str(args["FPT_avg"])+
                 ".csv",index=False)
 
+    def getDistribution(self):
+        ''' This function uses data of number of completed orders of each riders among n experiments,
+        and plot them 
+        '''
+    
     def run(self):
         self.multipleExperiments(args["numExperiments"])
     # def AnalyseRider():

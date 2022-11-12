@@ -7,9 +7,9 @@ from Analyse_DroppedOrders import Analyse_DroppedOrders
 def main():
    # AnalyseNumOrders()
    # AnalyseRider()
+   a = Analyse_DroppedOrders() # Default_1a
    # a = AnalyseWaitingTime() # Default_1b
-   # a = Analyse_DroppedOrders() # Default_1a
-   a = Analyse_Rider()
+   # a = Analyse_Rider()
    # a.visualizeMaxMin()
    # a.visualizeRoute()
    a.run()

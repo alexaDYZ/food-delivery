@@ -34,10 +34,6 @@ class Analyse_DroppedOrders():
         self.anticipativeMethod = AnticipationMethod()
         self.default = None
         self.anti = None
-        self.dr_a = -1 # Dropped-out Rate, fraction of orders that are better off with anticipation method
-        self.dr_d = -1 # Dropped-out Rate, fraction of orders that are better off with default method
-        self.dr = [] # consisting of many lists. Each is [fr_a, fr_d] for 1 simulation
-        self.summary_stats_d = []
     def simulateOnce(self):
         '''
         This function performs 1 analysis using the given set of parameters.
@@ -61,12 +57,11 @@ class Analyse_DroppedOrders():
         '''
         # baseline method
         ls_d = [1 if self.default.order_list[i].status == 4 else 0 for i in range(len(self.default.order_list))]
-        self.dr_d = sum(ls_d)/len(ls_d)
+        drop_rate_d = sum(ls_d)/len(ls_d)
         # anticipative method
         ls_a = [1 if self.anti.order_list[i].status == 4 else 0 for i in range(len(self.anti.order_list))]
-        self.dr_a = sum(ls_a)/len(ls_a)
-
-        self.dr.append([self.dr_a, self.dr_d])
+        drop_rate_a = sum(ls_a)/len(ls_a)
+        return [drop_rate_a, drop_rate_d]
         
 
 
@@ -141,20 +136,22 @@ class Analyse_DroppedOrders():
         This fucntion will the generate n sets of data with same config to compute the 
         percentage of dropped-out rate for both orders
         '''
+        drop_rate_ls = []
         for i in range(n):
             print("#############Experiment ", i, "#############")
             self.simulateOnce()
-            self.findDR()
+            drop_rate_ls.append(self.findDR())
+        
             
-        df = pd.DataFrame(self.dr, columns = ["DR_anticipation", "DR_default"])
-        mean = df.mean()
-        std = df.std()
-        max = df.max()
-        min = df.min()
-        df.loc['mean'] = mean
-        df.loc['std'] = std
-        df.loc['max'] = max
-        df.loc['min'] = min
+        df = pd.DataFrame(drop_rate_ls, columns = ["DR_anticipation", "DR_default"])
+        # df.to_csv(args["path"] + "_DR_" + str(args["numRiders"])+ ".csv", index=False)
+
+        # the following data is only for default algo, since anticipation algo delivers all orders
+        mean = df["DR_default"].mean()
+        median = df["DR_default"].median()
+        uq = df["DR_default"].quantile(0.75) # upper quantile
+        lq = df["DR_default"].quantile(0.25) # lower quantile
+        std = df["DR_default"].std()
         count = (df['DR_default'] == 0).sum()
         percentage = count/len(df)
 
@@ -163,27 +160,31 @@ class Analyse_DroppedOrders():
         #         "_gridSize" + str(args['gridSize']) +
         #         "_FPT" + str(args["FPT_avg"])+
         #         ".csv",index=False)
-        
-        self.summary_stats_d.append([args["numRiders"],mean[1], std[1], max[1], min[1], percentage])
-        self.dr = []
-        
+        return [mean, median, uq, lq, std, percentage]       
     
     def varyNumRiders(self):
         '''
         This function will vary the number of riders and find the average waiting time for each case
         '''
-        numRiders = range(20,52,2)
+        summary = []
+        numRiders = range(20,46,2)
+        # numRiders = range(20,26,2)
         for num in numRiders:
             args["numRiders"] = num
-            self.multipleExperiments(args["numExperiments"])
+            stats = self.multipleExperiments(args["numExperiments"]) # a list of length 6
+            stats.insert(0, num)
+            summary.append(stats)
+
+
         
-        summary_df = pd.DataFrame(self.summary_stats_d, columns = ["numRiders", "mean", "std", "max", "min", "percentage of no drop-out"])
+        summary_df = pd.DataFrame(summary, columns = ["numRiders", "mean", "median",
+                                                                    "upper_quantile", "lower_quantile", "std",
+                                                                    "percentage simulations with no drop-out"])
         summary_df.to_csv(args["path"] + "summary_DR_" + str(args["numOrders"])+ "orders" + 
                 "_numRider"+str(args['numRiders'])+
                 "_gridSize" + str(args['gridSize']) +
                 "_FPT" + str(args["FPT_avg"])+
                 ".csv",index=False)
-
         
     def run(self):
         # self.multipleExperiments(args["numExperiments"])

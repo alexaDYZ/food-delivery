@@ -4,22 +4,22 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numExperiments":10, # for averaging 
+    "numExperiments":100, # for averaging, 100
     
     "gridSize": 1000, # unit: m
     
     # for each time window
     # "totalTime": 1000,
-    "numOrders":1000, # same as num customers, initiliazed with -1. Assigned in generateData.py
-    "numCustomers": 1000, 
+    "numOrders":2000, # same as num customers, initiliazed with -1. Assigned in generateData.py
+    "numCustomers": 2000, 
 
     "orderLambda": 30, # unit: s # second # miu of the poisson process, mean of time interval between 2 orders
 
-    "numRiders": 100,
-    "numRestaurants": 20,
+    "numRiders": 30,
+    "numRestaurants": 20, # originally 20
     
     
-    "FPT_avg": 0, # unit: s # second # average food preparation time
+    "FPT_avg": 30, # unit: s # second # average food preparation time
     "FPT_sd":0,
     "riderSpeed":1, # unit m/s
 
@@ -41,17 +41,18 @@ args = dotdict({
     "showWTplot": 0, # waiting time, see Analyse_WaitingTime.py
     "showEventPlot": 0, #  waiting time, see Simulation.py
     
-    "showAvgWT": 1,
+    "showAvgWT": 0,
     "doMultipleExperiments":0, # generate a csv for numEpisode number of experiments
     "findCompetitiveRatio":1, # find the competitive ratio for the given numRiders
     "saveCRhistory": 0, # save the CR history for each numRiders
+    "showRoute": 0, # plot rider's route
     
     # list of colors for plot
     "colorls": ['lightcoral', 'gold', 'forestgreen', 'royalblue',
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./week11/",
+    "path": "./week13/",
     
     
 })

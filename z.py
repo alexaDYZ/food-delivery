@@ -7,38 +7,49 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+# def main():
+#     data = [np.random.random((2, 3)) for _ in range(5)]
+#     fig, ax = plt.subplots()
+#     polygons = plot_polygons(data, alpha=0.5, ax=ax, color='gray')
+#     verts = plot_verts(data, marker='s', color='red', ax=ax, s=200)
+
+#     def on_click(event):
+#         visible = polygons[0][0].get_visible()
+#         plt.setp(polygons, visible=not visible)
+#         plt.setp(verts, color=np.random.random(3))
+#         plt.draw()
+#     fig.canvas.mpl_connect('button_press_event', on_click)
+
+#     ax.set(title='Click on plot to change')
+#     plt.show()
+
+
+# def plot_polygons(data, ax=None, **kwargs):
+#     if ax is None:
+#         ax = plt.gca()
+
+#     artists = [ax.fill(x, y, **kwargs) for x, y in data]
+#     return artists
+
+# def plot_verts(data, ax=None, **kwargs):
+#     if ax is None:
+#         ax = plt.gca()
+
+#     artists = [ax.scatter(x, y, **kwargs) for x, y in data]
+#     return artists
+l =[i for i in range(10)]
+print(l)
+def getAverage(ls):
+    avgLs = []
+    for i in range(len(ls)):
+        curr_avg = sum(ls[:i+1]) / (i+1) # convert to minutes
+        avgLs.append(curr_avg)
+    return avgLs
 def main():
-    data = [np.random.random((2, 3)) for _ in range(5)]
-    fig, ax = plt.subplots()
-    polygons = plot_polygons(data, alpha=0.5, ax=ax, color='gray')
-    verts = plot_verts(data, marker='s', color='red', ax=ax, s=200)
-
-    def on_click(event):
-        visible = polygons[0][0].get_visible()
-        plt.setp(polygons, visible=not visible)
-        plt.setp(verts, color=np.random.random(3))
-        plt.draw()
-    fig.canvas.mpl_connect('button_press_event', on_click)
-
-    ax.set(title='Click on plot to change')
-    plt.show()
-
-
-def plot_polygons(data, ax=None, **kwargs):
-    if ax is None:
-        ax = plt.gca()
-
-    artists = [ax.fill(x, y, **kwargs) for x, y in data]
-    return artists
-
-def plot_verts(data, ax=None, **kwargs):
-    if ax is None:
-        ax = plt.gca()
-
-    artists = [ax.scatter(x, y, **kwargs) for x, y in data]
-    return artists
-
+    print(getAverage(l))
+print(sum(l)/len(l))
 main()
+
 
 # rider_loc = np.random.randint(0,args["gridSize"], 
 #                                     size=(args["numRiders"],2))
