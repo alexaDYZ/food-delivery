@@ -41,8 +41,8 @@ class Event():
         triggeredEvent = []
         # case 1: new order comes in 
         if self.getCategory() ==  'New Order':
-            print("******* Order " +  str(self.order.index) + " comes in at t = " + 
-                    str(currTime) + "*******" if args["printAssignmentProcess"] else '')
+            # print("******* Order " +  str(self.order.index) + " comes in at t = " + 
+            #         str(currTime) + "*******" if args["printAssignmentProcess"] else '')
             curr_order = self.order
             curr_order.cust.order(currTime) # customer makes order at time currTime
             assignment_method = self.method
@@ -56,14 +56,14 @@ class Event():
             
             # if best rider can be found:
             if bestRider:
-                print("******* Order "+ str(self.order.index)+ " is assigned to Rider "+
-                         str(bestRider.index) + "******" if args["printAssignmentProcess"] else '')
+                # print("******* Order "+ str(self.order.index)+ " is assigned to Rider "+
+                #          str(bestRider.index) + "******" if args["printAssignmentProcess"] else '')
                 
                 # create "arrive at restaturant" event
                 
-                print("************ Rider " + str(bestRider.index) + 
-                         " will arrive at Restaurant at t = "+str(self.order.t_riderReachedRestaurant)+ 
-                         "************" if args["printAssignmentProcess"] else '')
+                # print("************ Rider " + str(bestRider.index) + 
+                #          " will arrive at Restaurant at t = "+str(self.order.t_riderReachedRestaurant)+ 
+                #          "************" if args["printAssignmentProcess"] else '')
 
                 e_arrival = Event(self.order.t_riderReachedRestaurant, 3, curr_order)
                 triggeredEvent.append(e_arrival)
@@ -76,16 +76,16 @@ class Event():
                 # curr_order.t_delivered = t
 
             else:
-                print("******* Order " + str(self.order.index) + " is dropped ******" if args["printAssignmentProcess"] else '')
+                # print("******* Order " + str(self.order.index) + " is dropped ******" if args["printAssignmentProcess"] else '')
                 self.order.status = 4 # dropped
             
         # case 2: an order is delivered
 
         elif self.cat == 2:
             
-            print("******* Order " + str(self.order.index) +  " is delivered by Rider " + 
-                    str(self.order.rider.index) + " at t = " + str(currTime)+ 
-                    "******" if args["printAssignmentProcess"] else '')
+            # print("******* Order " + str(self.order.index) +  " is delivered by Rider " + 
+            #         str(self.order.rider.index) + " at t = " + str(currTime)+ 
+            #         "******" if args["printAssignmentProcess"] else '')
             
             # update status for rider and order
             self.order.delivered(currTime)

@@ -44,7 +44,6 @@ def plot_no_drop(filename_in, plotname_out):
     plt.savefig(args["path"] + plotname_out + ".png",format="png", dpi=1200)
     plt.clf()
     
-
 plot_no_drop("summary_DR_2000orders_numRider44_gridSize1000_FPT30", "percentage_all_done_plot")
 
 

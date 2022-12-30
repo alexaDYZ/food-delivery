@@ -37,17 +37,17 @@ class AnticipationMethod(AssignmentMethod):
 
         def getTimeReachedRestaurant(rider:Rider, currTime): 
             
-            print("** For Order " + str(self.order.index)) if args["printAssignmentProcess"] else None
+            # print("** For Order " + str(self.order.index)) if args["printAssignmentProcess"] else None
             
             '''get the time when this rider reaches the restaurant'''
 
             # Case 1: rider is idle/free now
             if rider.status != 1:
-                ######################### debug #########################
-                print("Rider " + str(rider.index) + "is idle at t = " + str(currTime) ) if args["printAssignmentProcess"] else None
-                print("Rider " + str(rider.index) +  " will reach at " +  
-                        str(rider.distance_to(rest_loc) / args["riderSpeed"] + currTime) ) if args["printAssignmentProcess"] else None
-                ######################### debug #########################
+                # ######################### debug #########################
+                # print("Rider " + str(rider.index) + "is idle at t = " + str(currTime) ) if args["printAssignmentProcess"] else None
+                # print("Rider " + str(rider.index) +  " will reach at " +  
+                #         str(rider.distance_to(rest_loc) / args["riderSpeed"] + currTime) ) if args["printAssignmentProcess"] else None
+                # ######################### debug #########################
                 
                 R2R = rider.distance_to(rest_loc) / args["riderSpeed"]
                 
@@ -57,12 +57,12 @@ class AnticipationMethod(AssignmentMethod):
             else:
                 # Assuming there's no maximum num of orders one can take
                 
-                ######################### debug #########################
-                orderIndex = list(rider.orderDict.keys()) 
-                orderIndex.sort()
-                print("Rider " + str(rider.index) +  "have the fllowing orders in process: " + 
-                         str(orderIndex))if args["printAssignmentProcess"] else None
-                ######################### debug #########################
+                # ######################### debug #########################
+                # orderIndex = list(rider.orderDict.keys()) 
+                # orderIndex.sort()
+                # print("Rider " + str(rider.index) +  "have the fllowing orders in process: " + 
+                #          str(orderIndex))if args["printAssignmentProcess"] else None
+                # ######################### debug #########################
 
 
                 nextAvilableTime = rider.nextAvailableTime
@@ -70,9 +70,9 @@ class AnticipationMethod(AssignmentMethod):
                 
                 R2R = math.dist(lastStop, rest_loc) / args["riderSpeed"]
 
-                print("Rider "  +  str(rider.index)  + "'s nextAvilableTime: "  + str(nextAvilableTime) + 
-                        "\n R2R = " + str(R2R) + 
-                        "\n Hence will reach the restaurant at " + str(nextAvilableTime + R2R)) if args["printAssignmentProcess"] else None
+                # print("Rider "  +  str(rider.index)  + "'s nextAvilableTime: "  + str(nextAvilableTime) + 
+                #         "\n R2R = " + str(R2R) + 
+                #         "\n Hence will reach the restaurant at " + str(nextAvilableTime + R2R)) if args["printAssignmentProcess"] else None
                 
                 return nextAvilableTime + R2R
         
@@ -86,8 +86,8 @@ class AnticipationMethod(AssignmentMethod):
     # driver function, called in Event.py
     def find_best_rider(self):
 
-        print("🔮🔮🔮🔮🔮🔮🔮🔮🔮 Anticipative Method 🔮🔮🔮🔮🔮🔮🔮🔮🔮" )if args["printAssignmentProcess"] else None
-        print("calling ==== find_best_rider") if args["printAssignmentProcess"] else None
+        # print("🔮🔮🔮🔮🔮🔮🔮🔮🔮 Anticipative Method 🔮🔮🔮🔮🔮🔮🔮🔮🔮" )if args["printAssignmentProcess"] else None
+        # print("calling ==== find_best_rider") if args["printAssignmentProcess"] else None
 
         self.R2RforAll = {}
         self.findR2RforAll() # compute self.R2RforAll
@@ -96,7 +96,7 @@ class AnticipationMethod(AssignmentMethod):
         
         bestRider = self.R2RforAll[earliestRestaurantArrivalTime] # find best rider using the min
 
-        print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
+        # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
         
         riderAvailableTime = bestRider.nextAvailableTime # time when he finish the last order, before start this order
         
@@ -112,7 +112,7 @@ class AnticipationMethod(AssignmentMethod):
         return self.bestRider.nextAvailableTime
 
     def find_ealiest_arrival(self):
-        print("calling ==== find_ealiest_arrival") if args["printAssignmentProcess"] else None
+        # print("calling ==== find_ealiest_arrival") if args["printAssignmentProcess"] else None
 
         earliestRestaurantArrivalTime = min(self.R2RforAll.keys())
 

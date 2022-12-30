@@ -16,7 +16,7 @@ import pickle
 import pandas as pd
 from EventQueue import EventQueue
 from Event import Event
-from DefaultMethod import DefaultMethod
+from DefaultMethod_1b import DefaultMethod_1b
 from Simulation import Simulation
 from tabulate import tabulate
 from generateData import dataGeneration
@@ -58,7 +58,7 @@ def runEpisode():
     # start_time = time.time()
 
     # Method 1: default method, greedy
-    greedy = DefaultMethod()
+    greedy = DefaultMethod_1b()
     sim1 = Simulation(greedy,restaurant_list, rider_list, order_list, customer_list, order_time, args)
     res_default=sim1.simulate()
 

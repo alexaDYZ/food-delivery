@@ -15,7 +15,7 @@ import pickle
 import pandas as pd
 from EventQueue import EventQueue
 from Event import Event
-from DefaultMethod import DefaultMethod
+from DefaultMethod_1b import DefaultMethod_1b
 from Simulation import Simulation
 from tabulate import tabulate
 from generateData import dataGeneration
@@ -24,6 +24,7 @@ import time
 from RunSimulation import runEpisode
 from Analyse_Orders import AnalyseOrders
 from DefaultMethod_1a import DefaultMethod_1a
+from DefaultMethod_1b import DefaultMethod_1b
 import datetime
 import math
 from visualization.Visualization import RouteVisualization
@@ -32,7 +33,7 @@ from visualization.Visualization import visualize_multiple, visualizeMaxMin
 class Analyse_Rider():
 
     def __init__(self) -> None:
-        self.baselineMethod = DefaultMethod_1a()
+        self.baselineMethod = DefaultMethod_1b()
         self.anticipativeMethod = AnticipationMethod()
         self.default = None
         self.anti = None
@@ -56,32 +57,40 @@ class Analyse_Rider():
 
     def get_num_delivered_per_rider(self):
         '''
-        This function returns the number of orders delivered by each rider
+        This function returns the number of orders delivered by each rider for the two methods
         '''
         
         # baseline method
         ls_d = [self.default.rider_list[i].totalOrderDelivered for i in range(args["numRiders"])]
         stats_d = [np.mean(ls_d), np.std(ls_d), np.max(ls_d), np.min(ls_d)]
-        self.stats_d.append(stats_d)
+        # self.stats_d.append(stats_d)
         # anticipative method
         ls_a = [self.anti.rider_list[i].totalOrderDelivered for i in range(args["numRiders"])]
         stats_a = [np.mean(ls_a), np.std(ls_a), np.max(ls_a), np.min(ls_a)]
-        self.stats_a.append(stats_a)
-        if np.max(ls_a) - np.min(ls_a) >= np.max(ls_a)/2:
-            visualizeMaxMin(self.anti.rider_list)
+        # self.stats_a.append(stats_a)
+        
+        # visualize the difference between the max and min
+        # if np.max(ls_a) - np.min(ls_a) >= np.max(ls_a)/2:
+        #     visualizeMaxMin(self.anti.rider_list)
+        return stats_a, stats_d
+         
     
     def multipleExperiments(self, n): # n sets of experiment 
         '''
         This fucntion will the generate n sets of data with same config to compute the 
         percentage of dropped-out rate for both orders
         '''
+        stats_a = [] # anticipative
+        stats_d = [] # default_1b
         for i in range(n):
             print("#############Experiment ", i, "#############")
             self.simulateOnce()
-            self.get_num_delivered_per_rider()
+            a, b = self.get_num_delivered_per_rider()
+            stats_a.append(a)
+            stats_d.append(b)
             
-        df_a = pd.DataFrame(self.stats_a, columns = ["mean", "std", "max", "min"])
-        df_d = pd.DataFrame(self.stats_d, columns = ["mean", "std", "max", "min"])
+        df_a = pd.DataFrame(stats_a, columns = ["mean", "std", "max", "min"])
+        df_d = pd.DataFrame(stats_d, columns = ["mean", "std", "max", "min"])
 
 
         df_a.to_csv(args["path"] + "Anti_numDelivered_" + str(args["numOrders"])+ "orders" + 

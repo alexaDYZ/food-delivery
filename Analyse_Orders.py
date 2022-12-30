@@ -12,7 +12,7 @@ import pickle
 import pandas as pd
 from EventQueue import EventQueue
 from Event import Event
-from DefaultMethod import DefaultMethod
+from DefaultMethod_1b import DefaultMethod_1b
 from Simulation import Simulation
 from generateData import dataGeneration
 import matplotlib.pyplot as plt
@@ -22,7 +22,10 @@ import datetime
 import os
 
 class AnalyseOrders():
-    # This object takes in result of 2 simulations using their corresponding methods, and conduct analysis
+    # first, run the simulation
+    # then:
+    # input: 2 simulation class object, that has the result of 2 simulations
+    # output: 1 csv file with the delivery/assignment history for all orders, for each method
     def __init__(self, res_default, res_anti) -> None:
         self.default = res_default
         self.anti = res_anti

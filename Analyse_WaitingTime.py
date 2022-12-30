@@ -16,7 +16,7 @@ import pickle
 import pandas as pd
 from EventQueue import EventQueue
 from Event import Event
-from DefaultMethod import DefaultMethod
+from DefaultMethod_1b import DefaultMethod_1b
 from Simulation import Simulation
 from tabulate import tabulate
 from generateData import dataGeneration
@@ -31,7 +31,7 @@ from visualization.Visualization import RouteVisualization, visualize_one, visua
 
 class AnalyseWaitingTime():
     def __init__(self) -> None:
-        self.baselineMethod = DefaultMethod()
+        self.baselineMethod = DefaultMethod_1b()
         self.anticipativeMethod = AnticipationMethod()
         self.default = None
         self.anti = None
@@ -74,14 +74,10 @@ class AnalyseWaitingTime():
         ifbeter = 1 if mean_a < mean_d else 0
         row = [mean_a, mean_d, std_a,std_d, max_a,max_d,min_a,min_d, ifbeter]
         row = [round(i/60) for i in row]
-        print("sim summary", row)
+        
         return row
         
-        
 
-
-
-    
     # def basicAnalysis(self):
     #     ''' printing result for analysis'''
     #     print(self.wt_df.mean())
@@ -180,17 +176,17 @@ class AnalyseWaitingTime():
     #             "_FPT" + str(args["FPT_avg"])+
     #             ".csv",index=False)
 
-    def multipleExperiments(self, n): # n sets of experiment 
+    def multipleSims(self, n): # n sets of simulations 
         '''
-        Multiple experiments conducted for the same set of parameters
+        Multiple(n) simulations conducted for the same set of parameters
         '''
         exp_stats=[]
         
         for i in range(n):
-            print("numRiders: ", args["numRiders"], "----Experiment", i)
+            print("numRiders: ", args["numRiders"], "----Simulation", i)
             
             sim_result = self.simulateOnce()
-            self.AverageAnalysis()
+            self.cumulative_moving_average_analysis()
             exp_stats.append(sim_result)
             
         
@@ -207,14 +203,16 @@ class AnalyseWaitingTime():
         self.summary.append(exp_summary)
 
 
-    def AverageAnalysis(self):
-        '''This function compute and plot the moving average of the waiting time'''
-        if args["showAvgWT"]:
-            df = self.wt_df
-            
-            '''Average Plot'''
+    # input: simulation result dataframe with columns: "WT_default", "WT_anticipation"
+    # output: plot of cumulative moving average of waiting time
+    def cumulative_moving_average_analysis(self, wt_df):
 
-            # get average till t for every 'MA_batchsize' number of orders
+        '''This function compute and plot the moving average of the waiting time'''
+        
+        if args["showCMA_wait_time"]:
+            df = wt_df
+
+            # get cumulative average till t for every 'MA_batchsize = 10' number of orders
             
             # helper function
             def getAverage(waitingTimeLs):
@@ -252,7 +250,7 @@ class AnalyseWaitingTime():
             # plt.show()
         else: pass
 
-
+    
     def showEventPlot(self):
         
         delivered_time_d = [(o.t, o.t_delivered) for o in self.default.order_list]
@@ -329,7 +327,7 @@ class AnalyseWaitingTime():
             ".svg", format='svg', dpi=2000)
         plt.show()
         
-    def printOrderHistorr(self):
+    def printOrderHistory(self):
         a = AnalyseOrders(self.default, self.anti) # pass in the result for 1 simulation object each
         a.printHistory()
 
@@ -385,7 +383,7 @@ class AnalyseWaitingTime():
             print("numRiders", n)
             args["numRiders"] = n
             self.wt_df = []
-            self.multipleExperiments(numExperiment)
+            self.multipleSims(numExperiment)
         
         df = pd.DataFrame(self.summary, columns =  ['numRiders', 'mean_a', 'mean_d', 'std_a', 'std_d', 'max_a', 'max_d', 'min_a', 'min_d', 'percentage better'] )
         
@@ -427,13 +425,15 @@ class AnalyseWaitingTime():
         # if args["showEventPlot"]:
         #     # analysis.showEventPlot()
         #     self.plotBFL()
-        # if args["showAvgWT"]: 
+        # if args["showCMA_wait_time"]: 
         #     self.AverageAnalysis()
 
         # if args["saveAssignmentHistory"]:
         #     self.printOrderHistorr()
 
 
+
+# For visualization of routes
 
     def visualizeRoute(self):
         self.simulateOnce()

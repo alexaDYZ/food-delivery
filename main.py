@@ -1,17 +1,18 @@
 from Analyse_NumOrders import AnalyseNumOrders
 from Analyse_Rider import Analyse_Rider
-from Analyse_WaitingTime import AnalyseWaitingTime
 from Analyse_DroppedOrders import Analyse_DroppedOrders
+from make_waiting_time_plot import WaitingTimePLot
 
 
 def main():
    # AnalyseNumOrders()
    # AnalyseRider()
-   a = Analyse_DroppedOrders() # Default_1a
+   # a = Analyse_DroppedOrders() # Default_1a
    # a = AnalyseWaitingTime() # Default_1b
-   # a = Analyse_Rider()
+   # a = Analyse_Rider() # analyse equality in job allocation
    # a.visualizeMaxMin()
    # a.visualizeRoute()
+   a = WaitingTimePLot()
    a.run()
    pass
 

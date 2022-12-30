@@ -1,7 +1,4 @@
-from ast import arg
-import copy
-from mailbox import MaildirMessage
-from turtle import color
+
 from typing import Counter, Dict
 from unittest import result
 import numpy as np
@@ -18,13 +15,14 @@ import pickle
 import pandas as pd
 from EventQueue import EventQueue
 from Event import Event
-from DefaultMethod import DefaultMethod
+from DefaultMethod_1b import DefaultMethod_1b
 from Simulation import Simulation
 from tabulate import tabulate
 from generateData import dataGeneration
 import matplotlib.pyplot as plt
 import time
 import datetime
+import copy
 
 
 

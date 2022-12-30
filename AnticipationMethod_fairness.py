@@ -9,6 +9,10 @@ from config import args
 import math
 
 class AnticipationMethod(AssignmentMethod):
+    ''' 
+    This method is the modified anticipative method, to adress the fairness issue
+    12.4  not finished yet
+    '''
     def __init__(self):
         super().__init__()
         self.R2RforAll = None # a list of R2R time for the current order for all riders. will update every time a new order comes in
@@ -44,10 +48,10 @@ class AnticipationMethod(AssignmentMethod):
             # Case 1: rider is idle/free now
             if rider.status != 1:
                 ######################### debug #########################
-                print("Rider " + str(rider.index) + "is idle at t = " + str(currTime) ) if args["printAssignmentProcess"] else None
-                print("Rider " + str(rider.index) +  " will reach at " +  
-                        str(rider.distance_to(rest_loc) / args["riderSpeed"] + currTime) ) if args["printAssignmentProcess"] else None
-                ######################### debug #########################
+                # print("Rider " + str(rider.index) + "is idle at t = " + str(currTime) ) if args["printAssignmentProcess"] else None
+                # print("Rider " + str(rider.index) +  " will reach at " +  
+                #         str(rider.distance_to(rest_loc) / args["riderSpeed"] + currTime) ) if args["printAssignmentProcess"] else None
+                # ######################### debug #########################
                 
                 R2R = rider.distance_to(rest_loc) / args["riderSpeed"]
                 

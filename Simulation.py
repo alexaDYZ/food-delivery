@@ -19,7 +19,7 @@ import pickle
 import pandas as pd
 from EventQueue import EventQueue
 from Event import Event
-from DefaultMethod import DefaultMethod
+from DefaultMethod_1b import DefaultMethod_1b
 import matplotlib.pyplot as plt
 
 class Simulation():
@@ -88,8 +88,8 @@ class Simulation():
             # currEvent.print()
             currTime = currEvent.time
             
-            if self.args["printCheckPt"] and currEvent.cat != 4:
-                print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
+            if self.args["printCheckPt"] and currEvent.cat != 4: pass
+                # print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
 
             # check Event category, if it's a new order, tell it how to assign rider
             if currEvent.getCategory() == 'New Order':

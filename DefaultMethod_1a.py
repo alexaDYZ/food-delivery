@@ -11,6 +11,7 @@ import math
 
 
 class DefaultMethod_1a(AssignmentMethod):
+    'Order is dropped/lost if idle rider can not be found'
     def __init__(self) -> None:
         super().__init__()
         self.idle_candidates = None
@@ -26,7 +27,7 @@ class DefaultMethod_1a(AssignmentMethod):
         return super().addRiderList(rider_list)
    
     def find_idle_candidates(self):
-        print("finding eligibles" )if args["printAssignmentProcess"] else None
+        # print("finding eligibles" )if args["printAssignmentProcess"] else None
         # Eligible: status is free, aka idle; within a threshold of distance
         rest_loc = self.order.rest.loc
         # eligible_candidates = [r for r in self.rider_list  if r.distance_to(rest_loc) < args["riderSelectionThreshold"] and r.getStatus() == "FREE"]
@@ -35,13 +36,13 @@ class DefaultMethod_1a(AssignmentMethod):
             if r.status != 1:
                 eligible_candidates.append(r)
         self.idle_candidates = eligible_candidates
-        print("!!!! eligible riders are:") if args["printAssignmentProcess"] else None
-        print([r.index for r in self.idle_candidates]) if args["printAssignmentProcess"] else None
+        # print("!!!! eligible riders are:") if args["printAssignmentProcess"] else None
+        # print([r.index for r in self.idle_candidates]) if args["printAssignmentProcess"] else None
         
 
    
     def find_best_rider(self):
-        print("=================  Default Method  ================= ") if args["printAssignmentProcess"] else None
+        # print("=================  Default Method  ================= ") if args["printAssignmentProcess"] else None
         self.find_idle_candidates()
         
         # if there are free rider(s), pick the one with shortest R2R
@@ -58,7 +59,7 @@ class DefaultMethod_1a(AssignmentMethod):
             for r in self.idle_candidates:
                 R2RForAllEligible_dict[getR2R(r, self.order)] = r.index
 
-            print(R2RForAllEligible_dict) if args["printAssignmentProcess"] else None
+            # print(R2RForAllEligible_dict) if args["printAssignmentProcess"] else None
             bestRiderR2R = min(R2RForAllEligible_dict.keys())
             self.rider_list.sort()
             bestRider = self.rider_list[R2RForAllEligible_dict[bestRiderR2R]]
