@@ -360,11 +360,11 @@ class WaitingTimePLot():
         df_d = pd.DataFrame(d, columns = col_names_d)
         df_a = pd.DataFrame(a, columns = col_names_a)
 
-        ############### debug ###############
-        # df to csv
-        df_d.to_csv(args["path"] + "df_ia_default.csv")
-        df_a.to_csv(args["path"] + "df_ia_anti.csv")
-        ############### debug ###############
+        # ############### debug ###############
+        # # df to csv
+        # df_d.to_csv(args["path"] + "df_ia_default.csv")
+        # df_a.to_csv(args["path"] + "df_ia_anti.csv")
+        # ############### debug ###############
 
         def compute_stats(df):
             mean, median, uq, lq = [],[],[],[]
@@ -388,11 +388,11 @@ class WaitingTimePLot():
             # get x-axis labels
             valid_col_names = [round(int(col)/60,2) for col in df.columns.tolist()]
             
-            ### debug ####
-            # save to csv
-            df_stat = pd.DataFrame([mean, median, uq, lq], columns = valid_col_names)
-            df_stat.to_csv(args["path"] + "df_ia_" + method_name + "_stat.csv")
-            ##############
+            # ### debug ####
+            # # save to csv
+            # df_stat = pd.DataFrame([mean, median, uq, lq], columns = valid_col_names)
+            # df_stat.to_csv(args["path"] + "df_ia_" + method_name + "_stat.csv")
+            # ##############
 
             # plot
             plt.plot(valid_col_names, mean, color = mean_color, label = "Mean - "+ method_name, linewidth = 1)
@@ -416,8 +416,9 @@ class WaitingTimePLot():
             plt.legend()
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60) + 100 , step = 100))
             plt.suptitle("Interval Average of Waiting Time("+ str(args["numSimulations"]) + " simulations, Default_1b and Anticipation_1)")
-            plt.title("Interval: " + str(int(args["IA_interval"]/60)) + " min")
+            plt.title('Interval: ' + str(int(args["IA_interval"]/60)) + " minutes, "+ str(args["numRiders"]) + " riders")
             params = ("_numSim"+str(args["numSimulations"])
+                    + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
@@ -437,8 +438,9 @@ class WaitingTimePLot():
             plt.legend()
             plt.xticks(np.arange(0, int(max_num_intervals_a*args["IA_interval"]/60) + 100 , step = 100))  # Set label locations.
             plt.suptitle('Interval Average Distribution Plot ('+ str(args["numSimulations"])+' simulations, Anticipation Method only)')
-            plt.title('Interval: ' + str(int(args["IA_interval"]/60)) + " minutes")
+            plt.title('Interval: ' + str(int(args["IA_interval"]/60)) + " minutes, "+ str(args["numRiders"]) + " riders")
             params = ("_numSim"+str(args["numSimulations"])
+                    + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
@@ -469,7 +471,7 @@ class WaitingTimePLot():
 
         ### Multiple simulations ###
         # self.plot_sma_distribution_by_numOrders()
-        for i in [25, 30, 35, 40]:
+        for i in [20, 25, 30, 35, 40]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
 
