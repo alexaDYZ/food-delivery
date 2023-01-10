@@ -10,7 +10,7 @@ args = dotdict({
     
     # for each time window
     # "totalTime": 1000,
-    "numOrders":2000, # same as num customers, initiliazed with -1. Assigned in generateData.py
+    "numOrders": 2000, # same as num customers, initiliazed with -1. Assigned in generateData.py
     "numCustomers": 2000, 
 
     "orderLambda": 30, # unit: second # miu of the poisson process, mean of time interval between 2 orders
@@ -18,9 +18,13 @@ args = dotdict({
     "numRiders": 30,
     "numRestaurants": 20, # originally 20
     
-    
+    # For food preparation time
+    "if_truncated_normal": 1, # if we use truncated normal distribution for food preparation time
     "FPT_avg": 300, # unit: s # second # average food preparation time
-    "FPT_sd":0,
+    "FPT_sd":100,
+    "FPT_lower": 100, # lower bound of truncated normal distribution
+    "FPT_upper": 500, # upper bound of truncated normal distribution
+
     "riderSpeed":1, # unit m/s
 
     # "riderSelectionThreshold": 100000,

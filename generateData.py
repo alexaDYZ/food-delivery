@@ -3,6 +3,10 @@ from utils import dotdict
 import random
 import numpy as np
 from scipy.stats import poisson
+import scipy.stats as stats
+from matplotlib import pyplot as plt
+import datetime
+
 
 from Order import Order
 from Restaurant import Restaurant
@@ -25,18 +29,46 @@ def dataGeneration():
     '''
     This fucntion generates locations for restaurants, customers and riders
     '''
+
     # resturants  
     # location and food prep time
+
     restaurant_loc = np.random.randint(0, args["gridSize"], 
                                         size=(args["numRestaurants"],2))
+    
     # food preptime: normal distribution
     fpt_mean = args["FPT_avg"]
-    fpt_sd = args["FPT_sd"]
-    food_prep_time = np.random.normal(fpt_mean, fpt_sd, args["numRestaurants"]).tolist()
+    food_prep_time = np.random.normal(fpt_mean, 0, args["numRestaurants"]).tolist()
+    if args["if_truncated_normal"]:
+        fpt_sd = args["FPT_sd"]
+        print("Using truncated normal distribution for food preparation time")
+        food_prep_time = stats.truncnorm((args["FPT_lower"] - fpt_mean) / fpt_sd,
+                                         (args["FPT_upper"] - fpt_mean) / fpt_sd, 
+                                         loc=fpt_mean, scale=fpt_sd).rvs(args["numRestaurants"]).tolist()
+        #### debug #######
+        showFPTplot = 0 # for 1 simulation only
+        if showFPTplot:
+            plt.hist(food_prep_time)
+            plt.suptitle("Food preparation time distribution of the Simulations")
+            plt.title("(" + str(args['numRestaurants']) + " Restaurants)")
+            plt.xlabel("Food preparation time (s)")
+            plt.ylabel("Frequency")
+
+            params = ("_lambda" + str(args["orderLambda"]) 
+                    + "_numRider"+str(args['numRiders'])
+                    + "_numRest"+str(args['numRestaurants'])
+                    + "_bacthSize" + str(args['SMA_batchsize'])
+                    + "_gridSize" + str(args['gridSize'])
+                    + "_FPT" + str(args["FPT_avg"])
+                    + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+
+            plt.savefig(args["path"] + "FPT_distribution" + params + ".png", dpi=300)
+       
 
     # uniform distribution in 2d space
     restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) 
                        for i in range(args["numRestaurants"])]
+    
         
     
     # riders

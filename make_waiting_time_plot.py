@@ -403,29 +403,75 @@ class WaitingTimePLot():
             plt.fill_between(valid_col_names, uq, lq, color = shade_color, alpha = 0.2)
 
         plot_combined = True
-        plot_anticipation = True
+        plot_anticipation = False
         
         ######## Plot a combined plot ########
         if plot_combined:
+            params = ("_numSim"+str(args["numSimulations"])
+                    + "_numRider"+str(args['numRiders'])
+                    + "_numRest"+str(args['numRestaurants'])
+                    + "_orderMiu" + str(args['orderLambda'])
+                    + "_interval" + str(args['IA_interval'])
+                    + "_gridSize" + str(args['gridSize'])
+                    + "_FPT" + str(args["FPT_avg"]))
+
+            figname = args["path"] + "IA_distribution"+ params
+            
             # plot
             plt.figure(figsize=(10,5))
+            if args["if_truncated_normal"]:
+                    figname+='_tnormal'
+                    #  change the background color
+                    ax = plt.axes()
+                    ax.set_facecolor("seashell")
             plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
             plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+            plt.ylim(0, 550) # uniform the scale and range for different parameters
             plt.xlabel("Time (minutes)")
             plt.ylabel("Waiting Time (minutes)")
             plt.legend()
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60) + 100 , step = 100))
-            plt.suptitle("Interval Average of Waiting Time("+ str(args["numSimulations"]) + " simulations, Default_1b and Anticipation_1)")
-            plt.title('Interval: ' + str(int(args["IA_interval"]/60)) + " minutes, "+ str(args["numRiders"]) + " riders")
-            params = ("_numSim"+str(args["numSimulations"])
-                    + "_numRider"+str(args['numRiders'])
-                    + "_numRest"+str(args['numRestaurants'])
-                    + "_interval" + str(args['IA_interval'])
-                    + "_gridSize" + str(args['gridSize'])
-                    + "_FPT" + str(args["FPT_avg"]))
-            plt.savefig(args["path"] + "IA_distribution"+ params+ ".png", dpi=500)
+            plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
+            plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
+            # plt.title( "mean time between order arrivals = "+ str(args["orderLambda"]) + "s")
+            # plt.title(str(args["numRiders"]) + " Riders")
+
+            plt.savefig(figname+".png", dpi=500)
+
             # plt.show()
             plt.close()
+            # plot another one on for numRiders = 40
+            if args["numRiders"] == 40:
+                plt.figure(figsize=(10,5))
+                params = ("_numSim"+str(args["numSimulations"])
+                        + "_numRider"+str(args['numRiders'])
+                        + "_numRest"+str(args['numRestaurants'])
+                        + "_orderMiu" + str(args['orderLambda'])
+                        + "_interval" + str(args['IA_interval'])
+                        + "_gridSize" + str(args['gridSize'])
+                        + "_FPT" + str(args["FPT_avg"]))
+                figname = args["path"] + "IA_distribution"+ params+ "_enlarged"
+                if args["if_truncated_normal"]:
+                    figname+='_tnormal'
+                    #  change the background color
+                    ax = plt.axes()
+                    ax.set_facecolor("seashell")
+                plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
+                plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+                plt.ylim(0, 20) # uniform the scale and range for different parameters
+                plt.xlabel("Time (minutes)")
+                plt.ylabel("Waiting Time (minutes)")
+                plt.legend()
+                plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60) + 100 , step = 100))
+                plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
+                plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
+                # plt.title( "mean time between order arrivals = "+ str(args["orderLambda"]) + "s")
+                # plt.title(str(args["numRiders"]) + " Riders")
+               
+                plt.savefig(figname+".png", dpi=500)
+                # plt.show()
+                plt.close()
+
 
 
         ######## Plot one for anticipation methods, as the scales of the two doesnt match ########
@@ -438,10 +484,12 @@ class WaitingTimePLot():
             plt.legend()
             plt.xticks(np.arange(0, int(max_num_intervals_a*args["IA_interval"]/60) + 100 , step = 100))  # Set label locations.
             plt.suptitle('Interval Average Distribution Plot ('+ str(args["numSimulations"])+' simulations, Anticipation Method only)')
-            plt.title('Interval: ' + str(int(args["IA_interval"]/60)) + " minutes, "+ str(args["numRiders"]) + " riders")
+            # plt.title( "mean time between order arrival = "+ str(args["orderLambda"]) + "s")
+            plt.title( str(args["numRiders"]) + " Riders")
             params = ("_numSim"+str(args["numSimulations"])
                     + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
+                    + "_orderMiu" + str(args['orderLambda'])
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
                     + "_FPT" + str(args["FPT_avg"]))
@@ -451,9 +499,7 @@ class WaitingTimePLot():
 
 
             
-        
-
-            
+             
     
 
 ##################### Main function #####################
@@ -470,10 +516,18 @@ class WaitingTimePLot():
         # self.plot_interval_avg_by_time(df_default, df_anti)
 
         ### Multiple simulations ###
+        
+        # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        for i in [20, 25, 30, 35, 40]:
+        for i in [25, 30, 35, 40]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
+        
+        # # vary the order arrival rate
+        # for j in [25]:
+        #     args["orderLambda"] = j
+        #     self.plot_ia_distribution_by_time()
+
 
 
 
