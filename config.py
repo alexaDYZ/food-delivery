@@ -6,7 +6,7 @@ from utils import dotdict
 args = dotdict({
     "numSimulations":100, # for averaging, 100
     
-    "gridSize": 1000, # unit: m
+    "gridSize": 3000, # unit: m, default is 1000
     
     # for each time window
     # "totalTime": 1000,
@@ -16,11 +16,11 @@ args = dotdict({
     "orderLambda": 30, # unit: second # miu of the poisson process, mean of time interval between 2 orders
 
     "numRiders": 30,
-    "numRestaurants": 20, # originally 20
+    "numRestaurants": 100, # originally 20
     
     # For food preparation time
-    "if_truncated_normal": 1, # if we use truncated normal distribution for food preparation time
-    "FPT_avg": 300, # unit: s # second # average food preparation time
+    "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
+    "FPT_avg": 30, # unit: s # second # average food preparation time. default is 300
     "FPT_sd":100,
     "FPT_lower": 100, # lower bound of truncated normal distribution
     "FPT_upper": 500, # upper bound of truncated normal distribution
@@ -57,7 +57,7 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./week15_vacation/",
+    "path": "./sem2_week2/",
     
     
 })

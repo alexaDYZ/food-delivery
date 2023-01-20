@@ -426,15 +426,18 @@ class WaitingTimePLot():
                     ax.set_facecolor("seashell")
             plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
             plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
-            plt.ylim(0, 550) # uniform the scale and range for different parameters
+            # plt.ylim(0, 550) # uniform the scale and range for different parameters
+            plt.ylim(0,1500)
             plt.xlabel("Time (minutes)")
             plt.ylabel("Waiting Time (minutes)")
             plt.legend()
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60) + 100 , step = 100))
             plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
-            plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
+            if args["if_truncated_normal"]:
+                plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
+            else:
             # plt.title( "mean time between order arrivals = "+ str(args["orderLambda"]) + "s")
-            # plt.title(str(args["numRiders"]) + " Riders")
+                plt.title(str(args["numRiders"]) + " Riders")
 
             plt.savefig(figname+".png", dpi=500)
 
@@ -519,7 +522,8 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        for i in [25, 30, 35, 40]:
+        # for i in [25, 30, 35, 40]:
+        for i in [35, 40]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
         
@@ -527,6 +531,7 @@ class WaitingTimePLot():
         # for j in [25]:
         #     args["orderLambda"] = j
         #     self.plot_ia_distribution_by_time()
+
 
 
 
