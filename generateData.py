@@ -54,7 +54,7 @@ def dataGeneration():
             plt.xlabel("Food preparation time (s)")
             plt.ylabel("Frequency")
 
-            params = ("_lambda" + str(args["orderLambda"]) 
+            params = ("_lambda" + str(args["orderArrivalRate"]) 
                     + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
                     + "_bacthSize" + str(args['SMA_batchsize'])
@@ -84,16 +84,22 @@ def dataGeneration():
     customer_loc, customer_list, order_time=[],[],[]
 
     order_time = []
-    lam = args["orderLambda"]
+    rate = args["orderArrivalRate"]
     
-    
-    for i in range(args["numOrders"]):
-        interval = np.random.poisson(lam)
-        if len(order_time) != 0:
-            next_t = order_time[-1] + interval
+        # Order arrivals follows a Posisson process, with mean rate lambda = args["orderRate"]
+        # Interarrival time follows an exponential distribution with mean 1/lambda
+        # random.expovariate(arrival_rate) -> interarrival time
+
+    t = 0
+    while True:
+        t += random.expovariate(rate)
+        if t < args["simulationTime"]:
+            order_time.append(t)
         else:
-            next_t = 0 + interval
-        order_time.append(next_t)
+            break
+    
+    args['numOrders'] = len(order_time)
+    args['numCustomers'] = args['numOrders']
     
 
     # Customer:
@@ -144,3 +150,4 @@ def dataGeneration():
         pickle.dump(data, data_file)
 
 
+dataGeneration()

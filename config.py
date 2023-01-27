@@ -10,10 +10,14 @@ args = dotdict({
     
     # for each time window
     # "totalTime": 1000,
-    "numOrders": 2000, # same as num customers, initiliazed with -1. Assigned in generateData.py
-    "numCustomers": 2000, 
+    # "numOrders": 2000, # same as num customers, initiliazed with -1. Assigned in generateData.py
+    # "numCustomers": 2000, 
+    'numOrders': None, # to be assigned in generateData.py
+    'numCustomers': None,   # to be assigned in generateData.py
+    'simulationTime': 60*60*1, # unit: s, 24 hours
 
-    "orderLambda": 30, # unit: second # miu of the poisson process, mean of time interval between 2 orders
+
+    "orderArrivalRate": 1/30, # unit: number per second. default is 1/30, meaning 2 per minute
 
     "numRiders": 30,
     "numRestaurants": 100, # originally 20
@@ -57,7 +61,6 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./sem2_week2/",
-    
+    "path": "./sem2_w3/",
     
 })
