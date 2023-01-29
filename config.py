@@ -4,7 +4,7 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numSimulations":100, # for averaging, 100
+    "numSimulations":1, # for averaging, 100
     
     "gridSize": 1000, # unit: m, default is 1000
 
@@ -25,7 +25,7 @@ args = dotdict({
     
     # For food preparation time
     "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
-    "FPT_avg": 30, # unit: s # second # average food preparation time. default is 300
+    "FPT_avg": 600, # unit: s # second # average food preparation time. default is 300
     "FPT_sd":100,
     "FPT_lower": 100, # lower bound of truncated normal distribution
     "FPT_upper": 500, # upper bound of truncated normal distribution
@@ -62,6 +62,6 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./sem2_w3/",
+    "path": "./sem2_w3/McData/",
     
 })

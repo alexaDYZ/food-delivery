@@ -400,6 +400,8 @@ class WaitingTimePLot():
             plt.plot(valid_col_names, lq, color = lq_color, label = "Lower Quartile - "+ method_name, linewidth = 0.5)
             # fill between uq and lq
             plt.fill_between(valid_col_names, uq, lq, color = shade_color, alpha = 0.2)
+            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
+
 
         plot_combined = True
         plot_anticipation = False
@@ -409,7 +411,7 @@ class WaitingTimePLot():
             params = ("_numSim"+str(args["numSimulations"])
                     + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
-                    + "_orderMiu" + str(args['orderArrivalRate'])
+                    + "_orderMiu" + str(round(args['orderArrivalRate'],3))
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
                     + "_FPT" + str(args["FPT_avg"]))
@@ -449,7 +451,7 @@ class WaitingTimePLot():
                 params = ("_numSim"+str(args["numSimulations"])
                         + "_numRider"+str(args['numRiders'])
                         + "_numRest"+str(args['numRestaurants'])
-                        + "_orderMiu" + str(args['orderArrivalRate'])
+                        + "_orderMiu" + str(round(args['orderArrivalRate'],3))
                         + "_interval" + str(args['IA_interval'])
                         + "_gridSize" + str(args['gridSize'])
                         + "_FPT" + str(args["FPT_avg"]))
@@ -496,7 +498,7 @@ class WaitingTimePLot():
             params = ("_numSim"+str(args["numSimulations"])
                     + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
-                    + "_orderMiu" + str(args['orderArrivalRate'])
+                    + "_orderMiu" + str(round(args['orderArrivalRate'],3))
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
                     + "_FPT" + str(args["FPT_avg"]))
@@ -526,8 +528,8 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        # for i in [20, 25, 30, 35, 40]:
-        for i in range(300, 650, 50):
+        # for i in [25, 30, 35, 40]:
+        for i in [600, 700, 800, 1000, 1100]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
         

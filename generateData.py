@@ -95,6 +95,7 @@ def dataGeneration():
         
         if args["if_truncated_normal"]:
             fpt_sd = args["FPT_sd"]
+            fpt_mean = args["FPT_avg"]
             print("Using truncated normal distribution for food preparation time")
             food_prep_time = stats.truncnorm((args["FPT_lower"] - fpt_mean) / fpt_sd,
                                             (args["FPT_upper"] - fpt_mean) / fpt_sd, 
