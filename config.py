@@ -24,7 +24,7 @@ args = dotdict({
     "numRestaurants": 20, # originally 20
     
     # For food preparation time
-    "if_truncated_normal": 1, # if we use truncated normal distribution for food preparation time
+    "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
     "FPT_avg": 600, # unit: s # second # average food preparation time. default is 300
     "FPT_sd":200,
     "FPT_lower": 300, # lower bound of truncated normal distribution
@@ -62,6 +62,6 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./sem2_w3/SyntheticData_TruncatedNormal/",
+    "path": "./sem2_w3/SytheticData_pickRandomBest/",
     
 })

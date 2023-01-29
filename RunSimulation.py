@@ -68,7 +68,7 @@ def runEpisode(baselineMethod, anticipationMethod):
 
     # Method 1: default method
     # greedy = DefaultMethod()
-    baselineMethod
+    # baselineMethod
     sim1 = Simulation(baselineMethod,restaurant_list, rider_list, order_list, customer_list, order_time, args)
     default = sim1.simulate()
 

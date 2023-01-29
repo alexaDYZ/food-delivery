@@ -38,15 +38,15 @@ class WaitingTimePLot():
                 refer to Simulation.py for more details
         '''
         dataGeneration() # generate initial data
-        default, anti = runEpisode(self.baselineMethod, self.anticipativeMethod) # 2 simulation results
-        return default, anti
+        default, useFPT = runEpisode(self.baselineMethod, self.closestToFPTMethod) # 2 simulation results
+        return default, useFPT
 
     # input: 1 simulation class object, for each method
     # output: 1 dataframes, with the delivery/assignment history for all orders, for each method
     #        order data columns are ["Order Index", "Order-in Time", "Rider Index", "Rider Index", 
     #                               "Rider Arrives at Restaurant","Order Delivered Time", "Waiting Time", 
     #                               "DT", "Time taken before delivery"
-    def get_order_data_from_one_simulation(self,sim_default, sim_anti):        
+    def get_order_data_from_one_simulation(self,sim_default, sim_useFPT):        
         def helper(sim:Simulation):
             orders = sim.order_list
             df_2dlist = []
@@ -82,13 +82,13 @@ class WaitingTimePLot():
             return df           
         
         df_order_data_default = helper(sim_default)
-        df_order_data_anticipation = helper(sim_anti)
+        df_order_data_useFPT = helper(sim_useFPT)
         
-        return df_order_data_default, df_order_data_anticipation
+        return df_order_data_default, df_order_data_useFPT
     
 ##################### 1. Plot for 1 simulation #####################
 
-    def compute_sma_by_numOrders(self, df_order_data_default, df_order_data_anticipation):
+    def compute_sma_by_numOrders(self, df_order_data_default, df_order_data_FPT):
         # compute the average waiting time for previous n orders, n = SMA_batchsize
         # input: 2 dataframes
         # output: a list of SMA for all orders, for each method
@@ -104,12 +104,12 @@ class WaitingTimePLot():
             return list(wt_average)
 
         MA_ls_default = compute(df_order_data_default)
-        MA_ls_anticipation = compute(df_order_data_anticipation)
+        MA_ls_anticipation = compute(df_order_data_FPT)
         
         return MA_ls_default, MA_ls_anticipation
 
 
-    def plot_sma_by_numOrders(self, df_order_data_default, df_order_data_anticipation):
+    def plot_sma_by_numOrders(self, df_order_data_default, df_order_data_FPT):
         # input: 2 dataframes
         # output: plot: x0 = numOrders, y0 = SMA for default method
         def plot(df, method_name, original_color, MA_color):
@@ -136,10 +136,10 @@ class WaitingTimePLot():
             
         
         plot(df_order_data_default, "Default_1b", "orange", "red")
-        plot(df_order_data_anticipation, "Anticipation","lightblue", "darkblue" )
+        plot(df_order_data_FPT, "Anticipation","lightgreen", "darkgreen" )
 
 
-    def compute_interval_avg_by_time(self, df_order_data_default, df_order_data_anticipation):
+    def compute_interval_avg_by_time(self, df_order_data_default, df_order_data_FPT):
         # compute the average waiting time orders delivered in consecutive non-overlapping intervals
         # input: 2 dataframes 
         # outout: a list of interval average waiting time for all intervals, for each method
@@ -163,17 +163,17 @@ class WaitingTimePLot():
             return result
             
         interval_avg_default = compute(df_order_data_default)
-        interval_avg_anti = compute(df_order_data_anticipation)
-        return interval_avg_default, interval_avg_anti
+        interval_avg_useFPT = compute(df_order_data_FPT)
+        return interval_avg_default, interval_avg_useFPT
 
 
-    def plot_interval_avg_by_time(self, df_order_data_default, df_order_data_anticipation):
+    def plot_interval_avg_by_time(self, df_order_data_default, df_order_data_FPT):
         # input: 2 dataframes
         # output: plot: x0 = time, y0 = SMA for default method
 
         plt.figure(figsize=(10, 5))
         # use the interval average to plot
-        avg_default, avg_anti = self.compute_interval_avg_by_time(df_order_data_default, df_order_data_anticipation)
+        avg_default, avg_anti = self.compute_interval_avg_by_time(df_order_data_default, df_order_data_FPT)
         def plot_avg(avg_ls, method_name, line_color):
             time_ls = [round(i*args["IA_interval"]/60,2) for i in range(1, len(avg_ls)+1)] # end of each interval, in minutes
             avg_ls = [round(j/60, 2) for j in avg_ls] # convert to minutes
@@ -193,10 +193,10 @@ class WaitingTimePLot():
         
         def plot():
             plot_original(df_order_data_default, "Default_1b", "orange")
-            plot_original(df_order_data_anticipation, "Anticipation", "lightblue")
+            plot_original(df_order_data_FPT, "ClosestToFPT", "lightgreen")
 
             plot_avg(avg_default, "Default_1b", "darkred")
-            plot_avg(avg_anti, "Anticipation", "darkblue")
+            plot_avg(avg_anti, "ClosestToFPT", "darkgreen")
 
             
         plot()
@@ -210,7 +210,8 @@ class WaitingTimePLot():
             + "_numRest"+str(args['numRestaurants'])
             + "_interval" + str(args['IA_interval'])
             + "_gridSize" + str(args['gridSize'])
-            + "_FPT" + str(args["FPT_avg"]))
+            + "_FPT" + str(args["FPT_avg"])
+            + "usingFPT")
 
         plt.legend(loc='best')
         plt.savefig(args["path"] + "IA_time_min" + params + ".png", dpi=500)
@@ -286,7 +287,7 @@ class WaitingTimePLot():
         if plot_combined_graph:
             plt.figure(figsize=(10, 5))
             plot(df_d, "Default_1b", "darkred", "red", "pink", "pink","lightpink")
-            plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+            plot(df_a, "Anticipation", "darkgreen", "green", "lightgreen", "lightgreen", "lightgreen")
 
             
             plt.xticks(np.arange(0, args["numOrders"]+ 400, step = 200))  # Set label locations.
@@ -312,7 +313,7 @@ class WaitingTimePLot():
             plt.figure(figsize=(10, 5))
             # df to csv
             df_a.to_csv(args["path"] + "df_sma_anti.csv")
-            plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+            plot(df_a, "Anticipation", "darkgreen", "green", "lightgreen", "lightgreen", "lightgreen")
 
             plt.xticks(np.arange(0, args["numOrders"]+200, step = 200))  # Set label locations.
 
@@ -415,7 +416,8 @@ class WaitingTimePLot():
                     + "_orderMiu" + str(round(args['orderArrivalRate'],3))
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
-                    + "_FPT" + str(args["FPT_avg"]))
+                    + "_FPT" + str(args["FPT_avg"])
+                    + "useFPT")
 
             figname = args["path"] + "IA_distribution"+ params
             
@@ -427,7 +429,7 @@ class WaitingTimePLot():
                     ax = plt.axes()
                     ax.set_facecolor("seashell")
             plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
-            plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+            plot(df_a, "ClosestToFPT", "darkgreen", "green", "lightgreen", "lightgreen", "lightgreen")
             plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)") 
             # plt.ylim(0, 550) # uniform the scale and range for different parameters
             plt.ylim(0,600)
@@ -437,7 +439,7 @@ class WaitingTimePLot():
             x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
                
-            plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
+            plt.suptitle("Interval Average of Waiting Time using Default_1b and ClosestToFPT")
             if args["if_truncated_normal"]:
                 plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
             else:
@@ -457,7 +459,8 @@ class WaitingTimePLot():
                         + "_orderMiu" + str(round(args['orderArrivalRate'],3))
                         + "_interval" + str(args['IA_interval'])
                         + "_gridSize" + str(args['gridSize'])
-                        + "_FPT" + str(args["FPT_avg"]))
+                        + "_FPT" + str(args["FPT_avg"])
+                        + "useFPT")
                 figname = args["path"] + "IA_distribution"+ params+ "_enlarged"
                 if args["if_truncated_normal"]:
                     figname+='_tnormal'
@@ -465,7 +468,7 @@ class WaitingTimePLot():
                     ax = plt.axes()
                     ax.set_facecolor("seashell")
                 plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
-                plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+                plot(df_a, "Anticipation", "darkgreen", "green", "lightgreen", "lightgreen", "lightgreen")
                 plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")
                 plt.ylim(0, 45) # uniform the scale and range for different parameters
                 plt.xlabel("Time (minutes)")
@@ -490,7 +493,7 @@ class WaitingTimePLot():
         if plot_anticipation:
             # plot
             plt.figure(figsize=(10,5))
-            plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+            plot(df_a, "Anticipation", "darkgreen", "green", "lightgreen", "lightgreen", "lightgreen")
             plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
             plt.xlabel("Time (minutes)")
             plt.ylabel("Waiting Time (minutes)")
@@ -506,7 +509,8 @@ class WaitingTimePLot():
                     + "_orderMiu" + str(round(args['orderArrivalRate'],3))
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
-                    + "_FPT" + str(args["FPT_avg"]))
+                    + "_FPT" + str(args["FPT_avg"])
+                    + "useFPT")
             plt.savefig(args["path"] + "IA_distribution_anti" + params + ".png", dpi=500)
             # plt.show()
             plt.close()
@@ -533,8 +537,8 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        # for i in [25, 30, 35, 40, 45]:
-        for i in [50]:
+        for i in [25, 30, 35, 40, 45, 50]:
+        # for i in [40]:
         # for i in [600, 700, 800, 1000, 1100]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
