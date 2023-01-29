@@ -33,54 +33,7 @@ def dataGeneration():
     '''
     
     
-    ''' resturant list: restaurant = (location, food prep time) for reach restaurant '''
-    def generateRestaurantLocation(numRestaurants, gridSize):
-        # uniform distribution in 2d space
-        res = np.random.randint(0, gridSize, size=(numRestaurants,2))
-        return res
-    
-    def generateFPT():
-        # food preptime: normal distribution
-        
-        
-        if args["if_truncated_normal"]:
-            fpt_sd = args["FPT_sd"]
-            print("Using truncated normal distribution for food preparation time")
-            food_prep_time = stats.truncnorm((args["FPT_lower"] - fpt_mean) / fpt_sd,
-                                            (args["FPT_upper"] - fpt_mean) / fpt_sd, 
-                                            loc=fpt_mean, scale=fpt_sd).rvs(args["numRestaurants"]).tolist()
-            #### debug #######
-            showFPTplot = 0 # for 1 simulation only
-            if showFPTplot:
-                plt.hist(food_prep_time)
-                plt.suptitle("Food preparation time distribution of the Simulations")
-                plt.title("(" + str(args['numRestaurants']) + " Restaurants)")
-                plt.xlabel("Food preparation time (s)")
-                plt.ylabel("Frequency")
-
-                params = ("_lambda" + str(args["orderArrivalRate"]) 
-                        + "_numRider"+str(args['numRiders'])
-                        + "_numRest"+str(args['numRestaurants'])
-                        + "_bacthSize" + str(args['SMA_batchsize'])
-                        + "_gridSize" + str(args['gridSize'])
-                        + "_FPT" + str(args["FPT_avg"])
-                        + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
-
-                plt.savefig(args["path"] + "FPT_distribution" + params + ".png", dpi=300)
-            #### debug #######
-        else:
-            fpt_mean = args["FPT_avg"]
-            food_prep_time = np.random.normal(fpt_mean, 0, args["numRestaurants"]).tolist()
-        return food_prep_time
-    
-    def generateRestaurantList(numRestaurants, gridSize):
-        restaurant_loc = generateRestaurantLocation(numRestaurants, gridSize)
-        food_prep_time = generateFPT()
-        # combine location an corresponding food prep time
-        restaurant_list = [Restaurant(i, restaurant_loc[i], food_prep_time[i], args) 
-                        for i in range(args["numRestaurants"])]
-        return restaurant_list
-            
+   
     ''' rider list: rider = (initial location) for reach restaurant '''
     def generateRiderList(num, gridSize):
         rider_loc = np.random.randint(0, gridSize, size=(num,2))
@@ -127,21 +80,65 @@ def dataGeneration():
         customer_list += [Customer(loc[i],args) for i in range(args["numCustomers"])]
         return customer_list
     
-        
+        ''' resturant list: restaurant = (location, food prep time) for reach restaurant '''
     
+    def generateRestaurantList(numRestaurants, gridSize):
+        # uniform distribution in 2d space
+        loc_ls = np.random.randint(0, gridSize, size=(numRestaurants,2))
+        restaurant_list = [Restaurant(i, loc_ls[i], None, args) 
+                        for i in range(args["numRestaurants"])]
+        return restaurant_list
+    
+    def generateFPT():
+        # Food Preparation Time(FPT): 
+        # A list of length numOrders, each element is the food preparation time for the corresponding order
+        
+        if args["if_truncated_normal"]:
+            fpt_sd = args["FPT_sd"]
+            print("Using truncated normal distribution for food preparation time")
+            food_prep_time = stats.truncnorm((args["FPT_lower"] - fpt_mean) / fpt_sd,
+                                            (args["FPT_upper"] - fpt_mean) / fpt_sd, 
+                                            loc=fpt_mean, scale=fpt_sd).rvs(args['numOrders']).tolist()
+            #### debug #######
+            showFPTplot = 0 # for 1 simulation only
+            if showFPTplot:
+                plt.hist(food_prep_time)
+                plt.suptitle("Food preparation time distribution of the Simulations")
+                plt.title("(" + str(args['numRestaurants']) + " Restaurants)")
+                plt.xlabel("Food preparation time (s)")
+                plt.ylabel("Frequency")
+
+                params = ("_lambda" + str(args["orderArrivalRate"]) 
+                        + "_numRider"+str(args['numRiders'])
+                        + "_numRest"+str(args['numRestaurants'])
+                        + "_bacthSize" + str(args['SMA_batchsize'])
+                        + "_gridSize" + str(args['gridSize'])
+                        + "_FPT" + str(args["FPT_avg"])
+                        + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+
+                plt.savefig(args["path"] + "FPT_distribution" + params + ".png", dpi=300)
+            #### debug #######
+        else:
+            fpt_mean = args["FPT_avg"]
+            food_prep_time = np.random.normal(fpt_mean, 0, args['numOrders']).tolist()
+        return food_prep_time
+    
+         
     def generateOrderList(restaurant_list, order_time, customer_list):
         order_list = [] # store all the orders generated
         order_time.sort() # small to large
         customer_list_copy = copy.deepcopy(customer_list)
         order_time_copy = copy.deepcopy(order_time)
         order_time_copy.sort(reverse=True)
+        FPT_list = generateFPT()
         for i in range(len(order_time)):
             c = customer_list_copy.pop()
             r_index = random.randint(0,args["numRestaurants"]-1)
             r = restaurant_list[r_index]
             t = order_time_copy.pop()
-            o = Order(i, t,c,r)
+            o = Order(i, t, c, r)
             order_list.append(o)
+            r.addOrder_FPT(i, FPT_list[i])
         return order_list
 
     # The main function
@@ -161,7 +158,7 @@ def dataGeneration():
         customer_list = generateCutomerList()
         
     else:
-        restaurant_list = generateRestaurantList(args["numRestaurants"], args["gridSize"])
+        restaurant_list = generateRestaurantList(args["numRestaurants"], args["gridSize"]) # locaion only
         rider_list = generateRiderList(args["numRiders"], args["gridSize"])
         order_time = generateSyntheticOrderTime()
         customer_list = generateCutomerList()

@@ -27,9 +27,8 @@ When an order comes in at time t, this method will firstly figure out who's avai
 
 When there's no one available right now, assign the order to whoever can finish his/her current order(s) the ealiest.
 
-## How information is updated:
 
-## Analysis of performance
+## Analysis of Performance:
 
 ### Interval Average(IA) of Waiting Time 
 - For orders generated within this interval, compute the average waiting time
@@ -51,7 +50,8 @@ When there's no one available right now, assign the order to whoever can finish 
         - For each order index > "SMA_batchsize", it has a moving average value, that is the average for the previous n orders
     - to plot for multiple simulations, call **plot_sma_distribution_by_numOrders()**
         - This plot plot the mean, median, upper quantile, lower quantile of the waiting time for each window
-### Sensitivity Analysis
+
+## Sensitivity Analysis
 
 #### Vary the lambda of the order arrival process
 - original parameter: "orderArrivalRate" = 30, which is the mean interarrival time between 2 orders, in seconds
@@ -74,3 +74,11 @@ When there's no one available right now, assign the order to whoever can finish 
     ***generateData.py***
 
 
+
+
+## Run algorithms with McDonald Data:
+1. Get order arrival time from the dataset
+   - Pre-processed and saved as **data_mc_orders.ls**
+   - Otherwise, call **generate_mc_order_arrivals.py** to generate the list
+2. Set args["useMcData"]=1
+3. Perform as per normal

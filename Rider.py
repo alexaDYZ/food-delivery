@@ -46,7 +46,7 @@ class Rider():
         # calculate delivery time
         rest_loc = order.rest.loc
         cust_loc = order.cust.loc
-        FPT = order.rest.prepTime
+        FPT = order.rest.order_FPT_dict[order.index]
 
         R2R = math.dist(rest_loc, self.lastStop if self.lastStop else self.loc)/args["riderSpeed"]
         DT = math.dist(rest_loc, cust_loc)/args["riderSpeed"]
@@ -100,7 +100,7 @@ class Rider():
     def getFoodReadyTime(self, orderIndex): # given an order, returns when the food is ready on the timeline
         order = self.orderDict[orderIndex]
         orderInTime = order.t
-        foodPrepTime = order.rest.prepTime
+        foodPrepTime = order.rest.order_FPT_dict[orderIndex]
         return foodPrepTime + orderInTime
 
     

@@ -18,7 +18,7 @@ args = dotdict({
     'numCustomers': None,   # to be assigned in generateData.py
     'simulationTime': 60*60*12, # unit: s, 24 hours
 
-    "orderArrivalRate": 1/30, # unit: number per second. default is 1/30, meaning 2 per minute
+    "orderArrivalRate": round(1/30,3), # unit: number per second. default is 1/30, meaning 2 per minute
 
     "numRiders": 30,
     "numRestaurants": 20, # originally 20
