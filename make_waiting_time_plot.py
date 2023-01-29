@@ -426,6 +426,7 @@ class WaitingTimePLot():
                     ax.set_facecolor("seashell")
             plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
             plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)") 
             # plt.ylim(0, 550) # uniform the scale and range for different parameters
             plt.ylim(0,600)
             plt.xlabel("Time Horizon (Hours)")
@@ -433,7 +434,7 @@ class WaitingTimePLot():
             plt.legend()
             x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
-            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
+               
             plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
             if args["if_truncated_normal"]:
                 plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
@@ -463,13 +464,13 @@ class WaitingTimePLot():
                     ax.set_facecolor("seashell")
                 plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
                 plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
-                plt.ylim(0, 20) # uniform the scale and range for different parameters
+                plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")
+                plt.ylim(0, 45) # uniform the scale and range for different parameters
                 plt.xlabel("Time (minutes)")
                 plt.ylabel("Waiting Time (minutes)")
                 plt.legend()
                 x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
-                plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
-                plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
+                plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)    
                 plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
                 if args["if_truncated_normal"]:
                     plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
@@ -488,12 +489,12 @@ class WaitingTimePLot():
             # plot
             plt.figure(figsize=(10,5))
             plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
+            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
             plt.xlabel("Time (minutes)")
             plt.ylabel("Waiting Time (minutes)")
             plt.legend()
             x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
-            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
             plt.suptitle('Interval Average Distribution Plot ('+ str(args["numSimulations"])+' simulations, Anticipation Method only)')
             # plt.title( "mean time between order arrival = "+ str(args["orderArrivalRate"]) + "s")
             plt.title( str(args["numRiders"]) + " Riders")
@@ -530,8 +531,8 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        for i in [35,40,45]:
-        # for i in [25, 30, 35, 40]:
+        for i in [25, 30, 35, 45]:
+        # for i in [40]:
         # for i in [600, 700, 800, 1000, 1100]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
