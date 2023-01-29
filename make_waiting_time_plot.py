@@ -29,13 +29,12 @@ class WaitingTimePLot():
     
 ##################### To generage simulation data for analysis #####################
 
-    def simulateOnce(self):
+    def simulateOnce(self,):
         '''
         This function performs 1 simulation using the given set of parameters.
         Output: 2 'simulation' class objects, with simulation results. 
                 refer to Simulation.py for more details
         '''
-
         dataGeneration() # generate initial data
         default, anti = runEpisode(self.baselineMethod, self.anticipativeMethod) # 2 simulation results
         return default, anti
@@ -123,7 +122,7 @@ class WaitingTimePLot():
             plt.title('Waiting Time Plot ('+ method_name + ')')
             plt.ylabel('Waiting Time(s)')
             plt.xlabel('Order Index')
-            params = ("_lambda" + str(args["orderLambda"]) 
+            params = ("_lambda" + str(args["orderArrivalRate"]) 
                 + "_numRider"+str(args['numRiders'])
                 + "_numRest"+str(args['numRestaurants'])
                 + "_bacthSize" + str(args['SMA_batchsize'])
@@ -143,14 +142,14 @@ class WaitingTimePLot():
         # input: 2 dataframes 
         # outout: a list of interval average waiting time for all intervals, for each method
         def compute(df):
-            # arrange all orders by "Order Delivered Time"
-            df = df.sort_values(by= "Order Delivered Time")
+            # arrange all orders by "Order-in Time"
+            df = df.sort_values(by = "Order-in Time")
             # get time of the last delivered order
-            t_last = df["Order Delivered Time"].iloc[-1]
+            t_end = args["simulationTime"]
             # assign each order to an interval number
             interval = args["IA_interval"]
-            df['interval_number'] = df["Order Delivered Time"] // interval + 1
-            N = int(t_last // args["IA_interval"] + 1) # number of intervals
+            df['interval_number'] = df["Order-in Time"] // interval + 1
+            N = int(t_end // args["IA_interval"] + 1) # number of intervals
             print("N = ", N)
 
             
@@ -204,7 +203,7 @@ class WaitingTimePLot():
         plt.ylabel('Average Waiting Time(min)')
         plt.xlabel('Time(min)')
 
-        params = ("_lambda" + str(args["orderLambda"])
+        params = ("_lambda" + str(args["orderArrivalRate"])
             + "_numRider"+str(args['numRiders'])
             + "_numRest"+str(args['numRestaurants'])
             + "_interval" + str(args['IA_interval'])
@@ -296,7 +295,7 @@ class WaitingTimePLot():
             plt.xlabel('Order Index')
             plt.legend(loc='best')
 
-            params = ("_lambda" + str(args["orderLambda"])
+            params = ("_lambda" + str(args["orderArrivalRate"])
                 + "_numRider"+str(args['numRiders'])
                 + "_numRest"+str(args['numRestaurants'])
                 + "_window" + str(args['SMA_batchsize'])
@@ -321,7 +320,7 @@ class WaitingTimePLot():
             plt.xlabel('Order Index')
             plt.legend(loc='best')
 
-            params = ("_lambda" + str(args["orderLambda"])
+            params = ("_lambda" + str(args["orderArrivalRate"])
                 + "_numRider"+str(args['numRiders'])
                 + "_numRest"+str(args['numRestaurants'])
                 + "_window" + str(args['SMA_batchsize'])
@@ -410,7 +409,7 @@ class WaitingTimePLot():
             params = ("_numSim"+str(args["numSimulations"])
                     + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
-                    + "_orderMiu" + str(args['orderLambda'])
+                    + "_orderMiu" + str(args['orderArrivalRate'])
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
                     + "_FPT" + str(args["FPT_avg"]))
@@ -427,16 +426,17 @@ class WaitingTimePLot():
             plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
             plot(df_a, "Anticipation", "darkblue", "blue", "lightblue", "lightblue", "lightblue")
             # plt.ylim(0, 550) # uniform the scale and range for different parameters
-            plt.ylim(0,1500)
-            plt.xlabel("Time (minutes)")
+            plt.ylim(0,600)
+            plt.xlabel("Time Horizon (Hours)")
             plt.ylabel("Waiting Time (minutes)")
             plt.legend()
-            plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60) + 100 , step = 100))
+            x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
+            plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
             plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
             if args["if_truncated_normal"]:
                 plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
             else:
-            # plt.title( "mean time between order arrivals = "+ str(args["orderLambda"]) + "s")
+            # plt.title( "mean time between order arrivals = "+ str(args["orderArrivalRate"]) + "s")
                 plt.title(str(args["numRiders"]) + " Riders")
 
             plt.savefig(figname+".png", dpi=500)
@@ -449,7 +449,7 @@ class WaitingTimePLot():
                 params = ("_numSim"+str(args["numSimulations"])
                         + "_numRider"+str(args['numRiders'])
                         + "_numRest"+str(args['numRestaurants'])
-                        + "_orderMiu" + str(args['orderLambda'])
+                        + "_orderMiu" + str(args['orderArrivalRate'])
                         + "_interval" + str(args['IA_interval'])
                         + "_gridSize" + str(args['gridSize'])
                         + "_FPT" + str(args["FPT_avg"]))
@@ -465,11 +465,14 @@ class WaitingTimePLot():
                 plt.xlabel("Time (minutes)")
                 plt.ylabel("Waiting Time (minutes)")
                 plt.legend()
-                plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60) + 100 , step = 100))
+                x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
+                plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
                 plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
-                plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
-                # plt.title( "mean time between order arrivals = "+ str(args["orderLambda"]) + "s")
-                # plt.title(str(args["numRiders"]) + " Riders")
+                if args["if_truncated_normal"]:
+                    plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
+                else:
+                # plt.title( "mean time between order arrivals = "+ str(args["orderArrivalRate"]) + "s")
+                    plt.title(str(args["numRiders"]) + " Riders")
                
                 plt.savefig(figname+".png", dpi=500)
                 # plt.show()
@@ -485,14 +488,15 @@ class WaitingTimePLot():
             plt.xlabel("Time (minutes)")
             plt.ylabel("Waiting Time (minutes)")
             plt.legend()
-            plt.xticks(np.arange(0, int(max_num_intervals_a*args["IA_interval"]/60) + 100 , step = 100))  # Set label locations.
+            x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
+            plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
             plt.suptitle('Interval Average Distribution Plot ('+ str(args["numSimulations"])+' simulations, Anticipation Method only)')
-            # plt.title( "mean time between order arrival = "+ str(args["orderLambda"]) + "s")
+            # plt.title( "mean time between order arrival = "+ str(args["orderArrivalRate"]) + "s")
             plt.title( str(args["numRiders"]) + " Riders")
             params = ("_numSim"+str(args["numSimulations"])
                     + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
-                    + "_orderMiu" + str(args['orderLambda'])
+                    + "_orderMiu" + str(args['orderArrivalRate'])
                     + "_interval" + str(args['IA_interval'])
                     + "_gridSize" + str(args['gridSize'])
                     + "_FPT" + str(args["FPT_avg"]))
@@ -522,14 +526,14 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        # for i in [25, 30, 35, 40]:
-        for i in [35, 40]:
+        # for i in [20, 25, 30, 35, 40]:
+        for i in range(300, 650, 50):
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
         
         # # vary the order arrival rate
         # for j in [25]:
-        #     args["orderLambda"] = j
+        #     args["orderArrivalRate"] = j
         #     self.plot_ia_distribution_by_time()
 
 
@@ -538,5 +542,6 @@ class WaitingTimePLot():
 
 
     def run(self):
+        print("Start running")
 
         self.main()

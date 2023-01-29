@@ -175,7 +175,7 @@ class Simulation():
         #           "\n #Orders" + str(args["numOrders"]) +
         #           "  #Riders:" + str(args["numRiders"]) +
         #           "  Gridsize:" + str(args["gridSize"]) +
-        #           "  lambda:" + str(args["orderLambda"]), fontsize = 10)
+        #           "  lambda:" + str(args["orderArrivalRate"]), fontsize = 10)
         
         # plt.show()
         

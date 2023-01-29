@@ -1,0 +1,91 @@
+---
+title: "Mc_df_processing"
+author: "yizhuo"
+date: "2023-01-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(lubridate)
+library(stringi)
+library(stringr)
+```
+
+## Prepare data for one specific day
+
+### Load Data
+
+```{r load_df}
+FILE_PATH = "/Users/alexadong/Downloads/mc_data (1).RData"
+e <- new.env(parent = emptyenv())
+load(FILE_PATH, envir = e)
+entire_df <- e[["mc_header"]] # the df we are going to use
+```
+
+### Preliminary inspection of the df
+
+```{r inspect}
+summary(entire_df)
+nrow(entire_df)
+```
+
+### Get dataframe for one day
+```{r oneday, echo=FALSE}
+df <- filter(entire_df, entire_df$phppPeriodID == 20170810)
+# summary(df)
+# head(df)
+
+```
+
+
+## Basic Analysis of Data
+```{r analysis}
+# number of unique EventID: 42922
+length(unique(df$phEventID))
+# number of unique StoreID: 20
+length(unique(df$phpsStoreID))
+
+
+# time distribution of orders
+hist(df$phptTimeID, breaks = 240, main = "TimeID")
+hist(df$phTimeStart, breaks = 240, main = "TimeStart")
+hist(df$phTimeEnd, breaks = 240, main = "TimeEnd")
+
+```
+
+
+## Data Processing
+
+### remove irrelevant columns
+```{r remove}
+# only keep relevant columns
+df <- select(df, phpsStoreID, phppPeriodID, phptTimeID, phTimeStart, phTimeEnd)
+```
+
+### convert the start and end time from hhmmss format to seconds
+```{r to_seconds}
+# time start 
+df$phTimeStart <- as.character(df$phTimeStart) # convert to character
+df$phTimeStart <- str_pad(df$phTimeStart, 6, pad = 0) # format all into 6 digits
+df$phTimeStart <- gsub("(\\d\\d)(\\d\\d)(\\d\\d)", "\\1:\\2:\\3", df$phTimeStart)
+df$phTimeStart_s <- period_to_seconds(hms(df$phTimeStart))
+summary(df$phTimeStart_s)
+
+# time end
+df$phTimeEnd <- as.character(df$phTimeEnd) # convert to character
+df$phTimeEnd <- str_pad(df$phTimeEnd, 6, pad = 0) # format all into 6 digits
+df$phTimeEnd <- gsub("(\\d\\d)(\\d\\d)(\\d\\d)", "\\1:\\2:\\3", df$phTimeEnd)
+df$phTimeEnd_s <- period_to_seconds(hms(df$phTimeEnd))
+summary(df$phTimeEnd_s)
+
+```
+
+## Output the Dataframe into a csv file for simulation
+
+```{r output}
+write.csv(df, "/Users/alexadong/Downloads/mc_data_processed.csv", row.names=TRUE)
+
+```
+

@@ -140,7 +140,7 @@ class Analyse_Rider():
     #     # plt.axhline(y=np.nanmean(y_2), color= 'C1', label = "mean="+str(round(np.nanmean(y_2),3)))
         
     #     plt.legend()
-    #     title = "Percentage of Riders Occupied\nlambda :" + str(args["orderLambda"])+"\n#Orders per period:"+ str(args["numOrders"]) +"\n NUmber of Riders:" + str(args["numRiders"])
+    #     title = "Percentage of Riders Occupied\nlambda :" + str(args["orderArrivalRate"])+"\n#Orders per period:"+ str(args["numOrders"]) +"\n NUmber of Riders:" + str(args["numRiders"])
     #     subtitle = 'Difference in mean='+str(round(abs(np.nanmean(y_d)-np.nanmean(y_a)),3))
     #     plt.title(title+"\n"+subtitle)
         
@@ -172,7 +172,7 @@ class Analyse_Rider():
         
     #     plt.savefig(args["path"]+str(datetime.datetime.now())+ "_RiderOccupancyRate"+
     #             "_numOrders" + str(args["numOrders"]) + 
-    #             "_lambda" + str(args["orderLambda"]) +
+    #             "_lambda" + str(args["orderArrivalRate"]) +
     #             "_numRider"+str(args['numRiders'])+
     #             "_gridSize" + str(args['gridSize']) + 
     #             ".svg", format='svg', dpi=2000)

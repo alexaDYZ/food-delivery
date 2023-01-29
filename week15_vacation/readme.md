@@ -22,9 +22,9 @@ Goal:
             - null values are ignored during computation
 
 3. Vary the lambda of the order arrival process
-    - original parameter: "orderLambda" = 30, which is the mean interarrival time between 2 orders, in seconds
+    - original parameter: "orderArrivalRate" = 30, which is the mean interarrival time between 2 orders, in seconds
         - hence lambda of the arrival process = 1/30
-    - Variation: "orderLambda" = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    - Variation: "orderArrivalRate" = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         - We fix the number of riders to 30
 
 3. Probalistic Distribution of Food Preparation Time(FPT)

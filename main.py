@@ -2,6 +2,7 @@ from Analyse_NumOrders import AnalyseNumOrders
 from Analyse_Rider import Analyse_Rider
 from Analyse_DroppedOrders import Analyse_DroppedOrders
 from make_waiting_time_plot import WaitingTimePLot
+import datetime
 
 
 def main():
@@ -12,9 +13,11 @@ def main():
    # a = Analyse_Rider() # analyse equality in job allocation
    # a.visualizeMaxMin()
    # a.visualizeRoute()
+   startTime = datetime.datetime.now()
    a = WaitingTimePLot()
    a.run()
-   pass
+   endTime = datetime.datetime.now()
+   print("Time taken: ", endTime - startTime)
 
 
 if __name__ == "__main__":

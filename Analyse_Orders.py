@@ -74,7 +74,7 @@ class AnalyseOrders():
                                                     "DT", "Time taken before delivery"])
             df.to_csv(self.path + str(datetime.datetime.now()) + csvName + 
                         "_numOrders" + str(args["numOrders"]) + 
-                        "_lambda" + str(args["orderLambda"]) +
+                        "_lambda" + str(args["orderArrivalRate"]) +
                         "_numRider"+str(args['numRiders'])+
                         "_gridSize" + str(args['gridSize']) + 
                         "_FPT"+str(args['FPT_avg'])+".csv", index=False)

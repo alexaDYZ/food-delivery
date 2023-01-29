@@ -91,7 +91,7 @@ class AnalyseWaitingTime():
     #     diff = self.wt_df['WT_default'].mean()-self.wt_df['WT_anticipation'].mean() # wt_default - wt_anti
     #     print("Difference in Average WT = ", diff)
 
-    #     return [args["numOrders"], args["orderLambda"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
+    #     return [args["numOrders"], args["orderArrivalRate"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
 
 
     def multipleAnalysis(self):
@@ -113,7 +113,7 @@ class AnalyseWaitingTime():
             for j in numOrders:
                 args["numOrders"] = j
                 args["numCustomers"] = j
-                args["orderLambda"] = l
+                args["orderArrivalRate"] = l
                 self.simulateOnce()
                 res = self.basicAnalysis()
                 dfls.append(res)
@@ -242,7 +242,7 @@ class AnalyseWaitingTime():
 
             plt.savefig(args["path"] + str(datetime.datetime.now())+ "_WaitingTimePlot"+
                 "_numOrders" + str(args["numOrders"]) + 
-                "_lambda" + str(args["orderLambda"]) +
+                "_lambda" + str(args["orderArrivalRate"]) +
                 "_numRider"+str(args['numRiders'])+
                 "_gridSize" + str(args['gridSize']) + 
                 "_FPT" + str(args["FPT_avg"])+".svg", format='svg', dpi=2000)
@@ -269,10 +269,10 @@ class AnalyseWaitingTime():
         plt.title("Events acorss time \n #Orders" + str(args["numOrders"]) +
                     "  #Riders:" + str(args["numRiders"]) +
                     "  Gridsize:" + str(args["gridSize"]) +
-                    "  lambda:" + str(args["orderLambda"]), fontsize = 10)
+                    "  lambda:" + str(args["orderArrivalRate"]), fontsize = 10)
         plt.savefig("./week6/EventPlot"+"numRider"+str(args['numRiders'])
                     +"grid"+ str(args['gridSize'])
-                    +"lambda" + str(args['orderLambda'])
+                    +"lambda" + str(args['orderArrivalRate'])
                     + "_FPT" + str(args["FPT_avg"])+
                     +".svg", format='svg', dpi=2000)
         plt.show()
@@ -320,7 +320,7 @@ class AnalyseWaitingTime():
         plt.savefig(args["path"]+ 
             "delivered_time" + 
             "_numOrders" + str(args["numOrders"]) + 
-            "_lambda" + str(args["orderLambda"]) +
+            "_lambda" + str(args["orderArrivalRate"]) +
             "_numRider"+str(args['numRiders'])+
             "_gridSize" + str(args['gridSize']) + 
             "_FPT" + str(args["FPT_avg"])+

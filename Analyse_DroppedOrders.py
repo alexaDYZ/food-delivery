@@ -78,7 +78,7 @@ class Analyse_DroppedOrders():
     #     diff = self.wt_df['WT_default'].mean()-self.wt_df['WT_anticipation'].mean() # wt_default - wt_anti
     #     print("Difference in Average WT = ", diff)
 
-    #     return [args["numOrders"], args["orderLambda"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
+    #     return [args["numOrders"], args["orderArrivalRate"], self.wt_df['WT_default'].mean(), self.wt_df['WT_anticipation'].mean(), diff]   
 
 
     # def multipleAnalysis(self):
@@ -100,7 +100,7 @@ class Analyse_DroppedOrders():
     #         for j in numOrders:
     #             args["numOrders"] = j
     #             args["numCustomers"] = j
-    #             args["orderLambda"] = l
+    #             args["orderArrivalRate"] = l
     #             self.simulateOnce()
     #             res = self.basicAnalysis()
     #             dfls.append(res)

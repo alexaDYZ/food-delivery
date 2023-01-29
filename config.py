@@ -6,7 +6,9 @@ from utils import dotdict
 args = dotdict({
     "numSimulations":100, # for averaging, 100
     
-    "gridSize": 3000, # unit: m, default is 1000
+    "gridSize": 1000, # unit: m, default is 1000
+
+    "useMcData": 1, # if we use the data from the McDelivery dataset
     
     # for each time window
     # "totalTime": 1000,
@@ -14,13 +16,12 @@ args = dotdict({
     # "numCustomers": 2000, 
     'numOrders': None, # to be assigned in generateData.py
     'numCustomers': None,   # to be assigned in generateData.py
-    'simulationTime': 60*60*1, # unit: s, 24 hours
-
+    'simulationTime': 60*60*12, # unit: s, 24 hours
 
     "orderArrivalRate": 1/30, # unit: number per second. default is 1/30, meaning 2 per minute
 
     "numRiders": 30,
-    "numRestaurants": 100, # originally 20
+    "numRestaurants": 20, # originally 20
     
     # For food preparation time
     "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
