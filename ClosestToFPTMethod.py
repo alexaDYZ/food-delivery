@@ -5,6 +5,7 @@ from Order import Order
 from Customer import Customer
 from config import args
 import math
+import random
 
 class ClosestToFPTMethod(AssignmentMethod):
     def __init__(self):
@@ -82,7 +83,11 @@ class ClosestToFPTMethod(AssignmentMethod):
         
         
         for r in self.rider_list:
-            RiderArriveTime[getTimeReachedRestaurant(r, currTime)] = r
+            arrival_time = getTimeReachedRestaurant(r, currTime)
+            if arrival_time in RiderArriveTime:
+                RiderArriveTime[arrival_time].append(r)
+            else:
+                RiderArriveTime[arrival_time] = [r]
         
         return RiderArriveTime
 
@@ -97,7 +102,8 @@ class ClosestToFPTMethod(AssignmentMethod):
 
         closestTime = self.find_closest_time() # find min in self.R2RforAll
         
-        bestRider = RiderArriveTime[earliestRestaurantArrivalTime] # find best rider using the min
+        bestRiders = RiderArriveTime[closestTime] # find those who can reach the restaurant at the same time
+        bestRider = random.choice(bestRiders) # randomly choose one of them
 
         # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
         
@@ -114,17 +120,22 @@ class ClosestToFPTMethod(AssignmentMethod):
     def find_order_delivered_time(self):
         return self.bestRider.nextAvailableTime
 
-    def find_closest_time(self, RiderArriveTime, ):
+    def find_closest_time(self, RiderArriveTime ):
         # print("calling ==== find_ealiest_arrival") if args["printAssignmentProcess"] else None
         '''
         Find the rider arrival time that is nearest to the Food Ready Time(FRT) of the order.
         FRT = FPT + current time
         Note: only consider who can reach the restaurant before FRT
         '''
-        rest_loc = self.order.rest.loc
-        time = list(RiderArriveTime.keys())
-        
+        order_index = self.order.index
+        FPT = self.order.rest.order_FPT_dict[order_index]
+        currTime = self.currTime
+        FRT = FPT + currTime
 
-        return earliestRestaurantArrivalTime
+        arrival_time_ls = list(RiderArriveTime.keys())
+        time_diff_ls = [FRT - t for t in arrival_time_ls] # if time_diff > 0, rider arrives before FRT
+        time_diff_ls = [t for t in time_diff_ls if t > 0] # only consider riders who arrive before FRT
+        closestRestaurantArrivalTime = FRT - min(time_diff_ls) 
+        return closestRestaurantArrivalTime
 
    

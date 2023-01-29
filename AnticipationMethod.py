@@ -7,6 +7,7 @@ from Order import Order
 from Customer import Customer
 from config import args
 import math
+import random  
 
 class AnticipationMethod(AssignmentMethod):
     def __init__(self):
@@ -78,7 +79,12 @@ class AnticipationMethod(AssignmentMethod):
         
         
         for r in self.rider_list:
-            self.R2RforAll[getTimeReachedRestaurant(r, currTime)] = r
+            arrival_time = getTimeReachedRestaurant(r, currTime)
+            if arrival_time in self.R2RforAll:
+                self.R2RforAll[arrival_time].append(r)
+            else:
+                self.R2RforAll[arrival_time] = [r]
+
 
 
 
@@ -94,7 +100,8 @@ class AnticipationMethod(AssignmentMethod):
 
         earliestRestaurantArrivalTime = self.find_ealiest_arrival() # find min in self.R2RforAll
         
-        bestRider = self.R2RforAll[earliestRestaurantArrivalTime] # find best rider using the min
+        bestRiders = self.R2RforAll[earliestRestaurantArrivalTime] # find best rider using the min
+        bestRider = random.choice(bestRiders) # randomly choose one from the best riders
 
         # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
         

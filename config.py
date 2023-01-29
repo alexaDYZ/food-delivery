@@ -4,11 +4,11 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numSimulations":100, # for averaging, 100
+    "numSimulations":1, # for averaging, 100
     
     "gridSize": 1000, # unit: m, default is 1000
 
-    "useMcData": 1, # if we use the data from the McDelivery dataset
+    "useMcData": 0, # if we use the data from the McDelivery dataset
     
     # for each time window
     # "totalTime": 1000,
@@ -62,6 +62,6 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./sem2_w3/McData/",
+    "path": "./sem2_w3/test/",
     
 })

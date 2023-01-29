@@ -8,6 +8,7 @@ from Customer import Customer
 from config import args
 from Event import Event
 import math
+import random
 
 class DefaultMethod_1b(AssignmentMethod):
     '''
@@ -59,12 +60,18 @@ class DefaultMethod_1b(AssignmentMethod):
             R2RForAllEligible_dict = {} # key: R2R of rider r; value: rider index
 
             for r in self.idle_candidates:
-                R2RForAllEligible_dict[getR2R(r, self.order)] = r.index
+                R2R = getR2R(r, self.order)
+                if R2R in R2RForAllEligible_dict.keys():
+                    R2RForAllEligible_dict[R2R].append(r.index)
+                else:
+                    R2RForAllEligible_dict[R2R] = [r.index]
 
             # print(R2RForAllEligible_dict) if args["printAssignmentProcess"] else None
             bestRiderR2R = min(R2RForAllEligible_dict.keys())
             self.rider_list.sort()
-            bestRider = self.rider_list[R2RForAllEligible_dict[bestRiderR2R]]
+            
+            bestRiders = R2RForAllEligible_dict[bestRiderR2R]
+            bestRider = self.rider_list[random.choice(bestRiders)]
             
             self.earliestRestaurantArrival = self.currTime + bestRiderR2R
 
@@ -81,10 +88,16 @@ class DefaultMethod_1b(AssignmentMethod):
         else:
             nextAvailTimeForAll_dict = {} # key: nextAvailTime; value: rider index
             for r in self.rider_list:
-                nextAvailTimeForAll_dict[r.nextAvailableTime] = r
+                if r.nextAvailableTime in nextAvailTimeForAll_dict.keys():
+                    nextAvailTimeForAll_dict[r.nextAvailableTime].append(r.index)
+                else:
+                    nextAvailTimeForAll_dict[r.nextAvailableTime] = [r.index]
             
             earliestStartingTime = min(nextAvailTimeForAll_dict.keys()) 
-            bestRider = nextAvailTimeForAll_dict[earliestStartingTime]
+            
+            bestRiders = nextAvailTimeForAll_dict[earliestStartingTime]
+            self.rider_list.sort()
+            bestRider = self.rider_list[random.choice(bestRiders)]
 
             # find time arrival at the restaurant
             R2R = math.dist(bestRider.lastStop, self.order.rest.loc) / args["riderSpeed"]

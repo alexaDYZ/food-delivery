@@ -8,6 +8,7 @@ from Customer import Customer
 from config import args
 from Event import Event
 import math
+import random
 
 
 class DefaultMethod_1a(AssignmentMethod):
@@ -57,12 +58,17 @@ class DefaultMethod_1a(AssignmentMethod):
             R2RForAllEligible_dict = {} # key: R2R of rider r; value: rider index
 
             for r in self.idle_candidates:
-                R2RForAllEligible_dict[getR2R(r, self.order)] = r.index
+                R2R = getR2R(r, self.order)
+                if R2R in R2RForAllEligible_dict.keys():
+                    R2RForAllEligible_dict[R2R].append(r.index)
+                else:
+                    R2RForAllEligible_dict[R2R] = [r.index]
 
             # print(R2RForAllEligible_dict) if args["printAssignmentProcess"] else None
             bestRiderR2R = min(R2RForAllEligible_dict.keys())
             self.rider_list.sort()
-            bestRider = self.rider_list[R2RForAllEligible_dict[bestRiderR2R]]
+            bestRiders = R2RForAllEligible_dict[bestRiderR2R]
+            bestRider = self.rider_list[random.choice(bestRiders)]
             
             self.earliestRestaurantArrival = self.currTime + bestRiderR2R
 

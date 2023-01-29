@@ -530,8 +530,9 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
+        for i in [35,40,45]:
         # for i in [25, 30, 35, 40]:
-        for i in [600, 700, 800, 1000, 1100]:
+        # for i in [600, 700, 800, 1000, 1100]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
         
