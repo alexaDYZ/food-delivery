@@ -18,7 +18,6 @@ from EventQueue import EventQueue
 from Event import Event
 from DefaultMethod_1b import DefaultMethod_1b
 from Simulation import Simulation
-from tabulate import tabulate
 from generateData import dataGeneration
 import matplotlib.pyplot as plt
 import time

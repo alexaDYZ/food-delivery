@@ -4,7 +4,7 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numSimulations":1, # for averaging, 100
+    "numSimulations":100, # for averaging, 100
     
     "gridSize": 1000, # unit: m, default is 1000
 

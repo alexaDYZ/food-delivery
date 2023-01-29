@@ -400,7 +400,6 @@ class WaitingTimePLot():
             plt.plot(valid_col_names, lq, color = lq_color, label = "Lower Quartile - "+ method_name, linewidth = 0.5)
             # fill between uq and lq
             plt.fill_between(valid_col_names, uq, lq, color = shade_color, alpha = 0.2)
-            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
 
 
         plot_combined = True
@@ -434,6 +433,7 @@ class WaitingTimePLot():
             plt.legend()
             x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
+            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
             plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
             if args["if_truncated_normal"]:
                 plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
@@ -469,6 +469,7 @@ class WaitingTimePLot():
                 plt.legend()
                 x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
                 plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
+                plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
                 plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
                 if args["if_truncated_normal"]:
                     plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
@@ -492,6 +493,7 @@ class WaitingTimePLot():
             plt.legend()
             x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
             plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)
+            plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
             plt.suptitle('Interval Average Distribution Plot ('+ str(args["numSimulations"])+' simulations, Anticipation Method only)')
             # plt.title( "mean time between order arrival = "+ str(args["orderArrivalRate"]) + "s")
             plt.title( str(args["numRiders"]) + " Riders")
