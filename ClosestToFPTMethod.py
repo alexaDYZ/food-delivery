@@ -6,6 +6,8 @@ from Customer import Customer
 from config import args
 import math
 import random
+import pandas as pd
+import os
 
 class ClosestToFPTMethod(AssignmentMethod):
     def __init__(self):
@@ -15,6 +17,9 @@ class ClosestToFPTMethod(AssignmentMethod):
         self.order = None
         self.currTime = None
         self.rider_list = None
+        self.FPT = None
+        self.FRT = None
+        self.timeArrivalDict_rider_time = {} # for analysis
 
     def addOrder(self, newOrder):
         return super().addOrder(newOrder)
@@ -84,12 +89,18 @@ class ClosestToFPTMethod(AssignmentMethod):
         
         for r in self.rider_list:
             arrival_time = getTimeReachedRestaurant(r, currTime)
+            # # debug:
+            # self.timeArrivalDict_rider_time[r.index] = arrival_time
+            # # debug ends
             if arrival_time in RiderArriveTime:
                 RiderArriveTime[arrival_time].append(r)
             else:
                 RiderArriveTime[arrival_time] = [r]
+
+        
         
         return RiderArriveTime
+
 
 
     # driver function, called in Event.py
@@ -102,10 +113,16 @@ class ClosestToFPTMethod(AssignmentMethod):
 
         closestTime = self.find_closest_time(RiderArriveTime) # find min in self.R2RforAll
         
+        
         bestRiders = RiderArriveTime[closestTime] # find those who can reach the restaurant at the same time
         bestRider = random.choice(bestRiders) # randomly choose one of them
-
-        # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
+        # # debug:
+        # for k,v in RiderArriveTime.items():
+        #     print("TimeArrival: " + str(k))
+        #     print("Riders:")
+        #     for r in v:
+        #         print(r.index)
+        # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------")
         
         riderAvailableTime = bestRider.nextAvailableTime # time when he finish the last order, before start this order
         
@@ -114,6 +131,11 @@ class ClosestToFPTMethod(AssignmentMethod):
         bestRider.deliver(self.order, riderAvailableTime)
         
         self.bestRider = bestRider
+
+        # Debug: check assignment
+        checkAssignment = False
+        if checkAssignment:
+            self.checkAssignment(self.FRT, closestTime, bestRider.index)
         
         return bestRider
     
@@ -129,16 +151,44 @@ class ClosestToFPTMethod(AssignmentMethod):
         '''
         order_index = self.order.index
         FPT = self.order.rest.order_FPT_dict[order_index]
+        self.FPT = FPT
         currTime = self.currTime
         FRT = FPT + currTime
+        self.FRT = FRT
 
         arrival_time_ls = list(RiderArriveTime.keys())
-        time_diff_ls = [FRT - t for t in arrival_time_ls] # if time_diff > 0, rider arrives before FRT
+        time_diff_ls = [round(FRT - t,3) for t in arrival_time_ls] # if time_diff > 0, rider arrives before FRT
         time_diff_ls = [t for t in time_diff_ls if t >= 0] # only consider riders who arrive before FRT
+
+
         if len(time_diff_ls) == 0: # no one can arrive before FRT
-            closestRestaurantArrivalTime = min(arrival_time_ls)
+            # print("No rider can arrive before FRT")
+            closestRestaurantArrivalTime = round(min(arrival_time_ls),3)
         else: # when there are riders can arrive before FRT
-            closestRestaurantArrivalTime = FRT - min(time_diff_ls) 
+            closestRestaurantArrivalTime = round(FRT - min(time_diff_ls),3)
         return round(closestRestaurantArrivalTime,3)
 
-   
+
+    def checkAssignment(self, FRT, closestTime, bestRiderIndex):
+        '''
+        Check if the assignment method picked the correct rider
+        Generate a dataframe with the following columns:
+            - rider index
+            - rider status
+            - rider R2R
+            - rider time arrival at restaurant
+            - FRT
+            - chosen rider
+        '''
+        TimeArrivalDict = self.timeArrivalDict_rider_time
+        riderIndexls = list(TimeArrivalDict.keys())
+        riderIndexls.sort()
+        df = pd.DataFrame(columns = ["rider index", "Time Arrival", "FRT", "closestArrivalFound","if chosen"])
+        for r in riderIndexls:
+            newrow = pd.DataFrame({"rider index": r, "Time Arrival": TimeArrivalDict[r], "FRT": FRT, "closestArrivalFound":closestTime, "if chosen": r == bestRiderIndex}, index = [0])
+            df = pd.concat([newrow,df.loc[:]]).reset_index(drop=True)
+
+        # save to csv
+        if not os.path.exists("assignment_check"):
+            os.makedirs("assignment_check")
+        df.to_csv("assignment_check/assignment_check_order" + str(self.order.index) + ".csv", index=False)

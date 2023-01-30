@@ -346,10 +346,13 @@ class WaitingTimePLot():
         for i in range(args["numSimulations"]):
             print("Simulation ", i)
             sim_default, sim_anti = self.simulateOnce()
+            # break # debug
             df_default, df_anti = self.get_order_data_from_one_simulation(sim_default, sim_anti)
             ia_d, ia_a = self.compute_interval_avg_by_time(df_default, df_anti)
             d.append(ia_d)
             a.append(ia_a)
+        
+        # exit() # debug
 
         max_num_intervals_d = max([len(i) for i in d]) # find the max number of intervals in all simulations
         max_num_intervals_a = max([len(i) for i in a])
@@ -476,7 +479,7 @@ class WaitingTimePLot():
                 plt.legend()
                 x_lables = [int(i/60) for i in np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60)]
                 plt.xticks(np.arange(0, int(max_num_intervals_d*args["IA_interval"]/60 + 120), step = 60), x_lables)    
-                plt.suptitle("Interval Average of Waiting Time using Default_1b and Anticipation_1")
+                plt.suptitle("Interval Average of Waiting Time using Default_1b and ClosestToFPT")
                 if args["if_truncated_normal"]:
                     plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
                 else:
@@ -537,8 +540,8 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        for i in [25, 30, 35, 40, 45, 50]:
-        # for i in [40]:
+        # for i in [25, 30, 35, 40, 45, 50]:
+        for i in [40,45,50]:
         # for i in [600, 700, 800, 1000, 1100]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()

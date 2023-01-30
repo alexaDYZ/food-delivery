@@ -4,7 +4,7 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numSimulations":100, # for averaging, 100
+    "numSimulations":30, # for averaging, 100
     
     "gridSize": 1000, # unit: m, default is 1000
 
@@ -16,7 +16,7 @@ args = dotdict({
     # "numCustomers": 2000, 
     'numOrders': None, # to be assigned in generateData.py
     'numCustomers': None,   # to be assigned in generateData.py
-    'simulationTime': 60*60*12, # unit: s, 24 hours
+    'simulationTime': 60*60*12, # unit: s, 60*60*12 # 12 hours
 
     "orderArrivalRate": round(1/30,3), # unit: number per second. default is 1/30, meaning 2 per minute
 
@@ -62,6 +62,6 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./sem2_w3/SytheticData_pickRandomBest/",
-    
+    "path": "./sem2_w3/",
+
 })
