@@ -8,7 +8,7 @@ args = dotdict({
     
     "gridSize": 1000, # unit: m, default is 1000
 
-    "useMcData": 0, # if we use the data from the McDelivery dataset
+    "useMcData": 1, # if we use the data from the McDelivery dataset
     
     # for each time window
     # "totalTime": 1000,
