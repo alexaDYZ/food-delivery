@@ -135,7 +135,7 @@ class WaitingTimePLot():
             
         
         plot(df_order_data_default, "Default_1b", "orange", "red")
-        plot(df_order_data_comparison, "Patient_Anticipative_Bulk","lightyellow", "gold" )
+        plot(df_order_data_comparison, "Patient_Anticipative_Bulk","bisque", "chocolate" )
 
 
     def compute_interval_avg_by_time(self, df_order_data_default, df_order_data_comparison):
@@ -192,10 +192,10 @@ class WaitingTimePLot():
         
         def plot():
             plot_original(df_order_data_default, "Default_1b", "orange")
-            plot_original(df_order_data_comparison, "PatientAnticipative_bulk", "lightyellow")
+            plot_original(df_order_data_comparison, "PatientAnticipative_bulk", "bisque")
 
             plot_avg(avg_default, "Default_1b", "darkred")
-            plot_avg(avg_anti, "PatientAnticipative_bulk", "gold")
+            plot_avg(avg_anti, "PatientAnticipative_bulk", "chocolate")
 
             
         plot()
@@ -285,8 +285,8 @@ class WaitingTimePLot():
         ######## Plot a combined graph for both methods ########
         if plot_combined_graph:
             plt.figure(figsize=(10, 5))
-            plot(df_d, "Default_1b", "darkred", "red", "pink", "pink","lightyellow")
-            plot(df_a, "Patient_Anticipative_Bulk", "gold", "yellow", "lightyellow", "lightyellow", "lightyellow")
+            plot(df_d, "Default_1b", "darkred", "red", "pink", "pink","bisque")
+            plot(df_a, "Patient_Anticipative_Bulk", "chocolate", "tan", "bisque", "bisque", "bisque")
 
             
             plt.xticks(np.arange(0, args["numOrders"]+ 400, step = 200))  # Set label locations.
@@ -312,7 +312,7 @@ class WaitingTimePLot():
             plt.figure(figsize=(10, 5))
             # df to csv
             df_a.to_csv(args["path"] + "df_sma_anti.csv")
-            plot(df_a, "Patient_Anticipative_Bulk", "gold", "yellow", "lightyellow", "lightyellow", "lightyellow")
+            plot(df_a, "Patient_Anticipative_Bulk", "chocolate", "tan", "bisque", "bisque", "bisque")
 
             plt.xticks(np.arange(0, args["numOrders"]+200, step = 200))  # Set label locations.
 
@@ -431,7 +431,7 @@ class WaitingTimePLot():
                     ax = plt.axes()
                     ax.set_facecolor("seashell")
             plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
-            plot(df_a, "PatientAnticipative_bulk", "gold", "yellow", "lightyellow", "lightyellow", "lightyellow")
+            plot(df_a, "PatientAnticipative_bulk", "chocolate", "tan", "bisque", "bisque", "bisque")
             plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)") 
             # plt.ylim(0, 550) # uniform the scale and range for different parameters
             plt.ylim(0,600)
@@ -470,7 +470,7 @@ class WaitingTimePLot():
                     ax = plt.axes()
                     ax.set_facecolor("seashell")
                 plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
-                plot(df_a, "Patient_Anticipative_Bulk", "gold", "yellow", "lightyellow", "lightyellow", "lightyellow")
+                plot(df_a, "Patient_Anticipative_Bulk", "chocolate", "tan", "bisque", "bisque", "bisque")
                 plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")
                 plt.ylim(0, 45) # uniform the scale and range for different parameters
                 plt.xlabel("Time (minutes)")
@@ -495,7 +495,7 @@ class WaitingTimePLot():
         if plot_anticipation:
             # plot
             plt.figure(figsize=(10,5))
-            plot(df_a, "Patient_Anticipative_Bulk", "gold", "yellow", "lightyellow", "lightyellow", "lightyellow")
+            plot(df_a, "Patient_Anticipative_Bulk", "chocolate", "tan", "bisque", "bisque", "bisque")
             plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")    
             plt.xlabel("Time (minutes)")
             plt.ylabel("Waiting Time (minutes)")

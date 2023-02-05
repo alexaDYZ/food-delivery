@@ -26,7 +26,7 @@ args = dotdict({
     
     # For food preparation time
     "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
-    "FPT_avg": 300, # unit: s # second # average food preparation time. default is 300
+    "FPT_avg": 600, # unit: s # second # average food preparation time. default is 300
     "FPT_sd":200,
     "FPT_lower": 300, # lower bound of truncated normal distribution
     "FPT_upper": 1200, # upper bound of truncated normal distribution
