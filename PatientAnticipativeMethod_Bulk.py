@@ -146,15 +146,25 @@ class PatientAnticipativeMethod_Bulk(AssignmentMethod_Batching):
         #     print(e)
         for edge in edge_list: 
             u, v, w, c = edge # u, v, capacity, cost
-            mf.add_edge(u, v, w, c) # Add edge from u to v with capacity w and cost c
+            mf.add_edge(u, v, w, int(c)) # Add edge from u to v with capacity w and cost c
         
+        log = True
         # record the optimal edges
         optimal_edges = mf.mcmf(source, sink)
+        
+        o = None
+        r = None
         for e in optimal_edges:
-            if e[0] in rider_index_in_map and e[1] in order_index_in_map:
-                rider = self.rider_list[e[0] - 1]
-                order = self.pending_order_dict[e[1] + min_order_index - max(rider_index_in_map) - 1]
-                matched_res_dict[order] = rider
+            if e[1] == sink and e[0] in order_index_in_map: # the last node
+                o = self.pending_order_dict[e[0] + min_order_index - max(rider_index_in_map) - 1]
+
+            elif e[0] == source and e[1] in rider_index_in_map: # the first node
+                r = self.rider_list[e[1] - 1]
+
+            if o is not None and r is not None:
+                matched_res_dict[o] = r
+                o = None
+                r = None
 
         return matched_res_dict
 
