@@ -8,15 +8,20 @@ import matplotlib.pyplot as plt
 import random
 import pandas as pd
 import pickle
+import math
 
+from PatientAnticipativeMethod_Bulk import PatientAnticipativeMethod_Bulk
+
+a = PatientAnticipativeMethod_Bulk()
+print(PatientAnticipativeMethod_Bulk.__name__)
 # df = pd.read_csv('./McDonald_data/mc_data_processed.csv')
 # print(df.columns)
 # print(df["phpsStoreID"].nunique())
 # print(max(df["phTimeStart_s"]))
 
-with open('data_mc_orders.ls', 'rb') as data_file:
-    order_time = pickle.load(data_file)
-print(order_time[:10])
+# with open('data_mc_orders.ls', 'rb') as data_file:
+#     order_time = pickle.load(data_file)
+# print(order_time[:10])
 
 
 # # def main():
@@ -118,3 +123,27 @@ print(order_time[:10])
 # plt.show()
 
 
+#### find probability of number of arrivals within x min > numriders
+
+# def find_prob(arrival_rate, stalling_time, numRiders):
+#     # pmf of poisson distribution
+#     # P(N(x) = k) = [e^(-lambda * x) * (lambda * x)^k]/k!
+#     def find_pmf(k, arrival_rate, stalling_time):
+#         return math.exp(-arrival_rate * stalling_time) * (arrival_rate * stalling_time)**k / math.factorial(k)
+#     # find probability of number of arrivals within x min > numriders
+#     prob = 0
+#     cmf_ls = []
+#     for i in range(numRiders, 100):
+#         prob += find_pmf(i, arrival_rate, stalling_time)
+#         cmf_ls.append(prob)
+#     print("probability of number of arrivals within {} min > {}: {}".format(stalling_time, numRiders, prob))
+#     x = [i for i in range(numRiders, 100)]
+#     plt.plot(x, cmf_ls)
+#     plt.title("CMF of number of arrivals within {} min > {}".format(stalling_time, numRiders))
+#     plt.show()
+    
+
+# arrival_rate = 2 # orders per min
+# stalling_time = 3 # min
+# numRiders = 20
+# find_prob(arrival_rate, stalling_time, numRiders)

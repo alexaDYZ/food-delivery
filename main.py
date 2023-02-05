@@ -2,7 +2,8 @@ from Analyse_NumOrders import AnalyseNumOrders
 from Analyse_Rider import Analyse_Rider
 from Analyse_DroppedOrders import Analyse_DroppedOrders
 # from make_waiting_time_plot import WaitingTimePLot
-from make_waiting_time_plot_ClosestToFPT import WaitingTimePLot
+# # from make_waiting_time_plot_ClosestToFPT import WaitingTimePLot
+from make_waiting_time_plot_bulk import WaitingTimePLot
 import datetime
 
 

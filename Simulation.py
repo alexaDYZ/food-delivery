@@ -1,6 +1,7 @@
 
 from tkinter import font
 from AssignmentMethod import AssignmentMethod
+from PatientAnticipativeMethod_Bulk import PatientAnticipativeMethod_Bulk
 from itertools import count
 from tabnanny import check
 import time
@@ -39,7 +40,7 @@ class Simulation():
         self.wt_ls = [] # a list of waiting time, each element is the waiting time of an order
         
         # end of simulation
-        self.end = -1
+        self.t_termination = -1
 
         
     def simulate(self):
@@ -49,92 +50,187 @@ class Simulation():
         consisting of rider list, restaurant list, customer list 
         and order list.
         '''
-
-        self.method.addRiderList(self.rider_list)
-        
-        # create event checkpoints
-        checkpoint = EventQueue()   
-        
-        '''Initialize regular check point'''
-        initial_check = Event(0, 4, None)
-        checkpoint.put(initial_check)
-        
-        '''Put in new orders event'''
-        order_time_dict = {}
-        self.order_list.sort()
-        for o in self.order_list:
-            order_time_dict[o.t] = o
-            e = Event(o.t, 1, o)
-            checkpoint.put(e)
-            # get program end time. 
-            # Note: self.end < actual ending time of the program, 
-            # since it ends at "order appear time" of the last order, instaed
-            # of "delivered time" of the last order. 
-            # but it desent matter if we wish to know % riders occupied
-        
-        # self.end = max(order_time_dict.keys())
-        
- 
-
-        #initialize status for all
-        
-        counter = 0
-        
-        #simulation starts
-        while not checkpoint.empty():
-            # see event type, update status
-            currEvent = checkpoint.get()
-
-            # currEvent.print()
-            currTime = currEvent.time
+        # Patient Anticipative Methods(Stalling Time involved)
+        if self.method.__class__.__name__ == PatientAnticipativeMethod_Bulk.__name__:
+            self.method.addRiderList(self.rider_list)
+            '''Initialize regular check point'''
+            checkpoint = EventQueue()   
+            initial_check = Event(0, 4, None)
+            checkpoint.put(initial_check)
             
-            if self.args["printCheckPt"] and currEvent.cat != 4: pass
-                # print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
+            '''Put in new orders event'''
+            order_time_dict = {}
+            self.order_list.sort()
+            for o in self.order_list:
+                order_time_dict[o.t] = o
+                e = Event(o.t, 1, o)
+                checkpoint.put(e)
+            
+            
+            counter = 0
+            
+            stallingTime = args["stallingTime"] # the first cutoff time for orders to be assigned
+            # assign_pending_orders = Event(cutoff_time, 5, None)
+            # checkpoint.put(assign_pending_orders)
 
-            # check Event category, if it's a new order, tell it how to assign rider
-            if currEvent.getCategory() == 'New Order':
+            '''Start the Simulation'''
+            while not checkpoint.empty():
+                # see event type, update status
+                currEvent = checkpoint.get()
                 currEvent.addAssignmentMethod(self.method)
+
+                # currEvent.print()
+                currTime = currEvent.time
                 
-            elif currEvent.getCategory() == 'Regular Check':
-                currEvent.addRiderList(self.rider_list) 
-                currEvent.addStatusCheckDict(self.rider_status_check_dict)
-                currEvent.passCurrQSize(checkpoint.qsize())
-                currEvent.addProgramEndTime(self.end)
-                # print("Status check at", currTime, ":", self.status_check_dict.keys())
+                if self.args["printCheckPt"] and currEvent.cat != 4: pass
+                    # print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
 
-            # execute current event:
-            triggedEvent = currEvent.executeEvent(currTime)
+                # check Event category, if it's a new order, tell it how to assign rider
+                if currEvent.getCategory() == 'New Order':
+                    '''Start the stalling time window when a new order comes in '''
+                    
+                    if len(self.method.pending_order_dict) == 0:
+                        cutoff_time = currEvent.order.t + stallingTime
 
+                        assign_pending_orders = Event(cutoff_time, 5, None)
+                        checkpoint.put(assign_pending_orders)
 
-            if currEvent.getCategory() == 'Order Delivered':
+                    self.method.addPendingOrder(currEvent.order)
+                    #### debug
+                    # print("New order added, pending orders:", len(self.method.pending_order_dict), "at time", currTime)
+
+                elif currEvent.getCategory() == 'Match Pending Orders':
+                    # print("Match Pending Orders at time ", currTime)
+                    
+                    self.method.addCurrTime(currTime)
+                    # matching
+                    matched_res_dict = self.method.matchPendingOrders() # key: order, value: best rider
+                    #### debug
+                    # print("matched_res_dict:")
+                    # for o, r in matched_res_dict.items():
+                    #     print(o.index, r.index)
+
+                    # assign
+                    self.method.assignPendingOrders(matched_res_dict) # update status for rider and order
+                    # create new events for rider arrival and order delivered
+                    currEvent.addMatchedOrderRiderDict(matched_res_dict) # when exicute, update status for rider and order
+                    # clear pending orders
+                    self.method.clearPendingOrders()
+
+                    
+                elif currEvent.getCategory() == 'Regular Check':
+                    currEvent.addRiderList(self.rider_list) 
+                    currEvent.addStatusCheckDict(self.rider_status_check_dict)
+                    currEvent.passCurrQSize(checkpoint.qsize())
+                    currEvent.addProgramEndTime(self.t_termination)
+                    # print("Status check at", currTime, ":", self.status_check_dict.keys())
                 
-                self.numDelivered += 1
-                # get total waiting time
-                currOrder = currEvent.order
-                wt = currOrder.wt
-                self.wt_ls.append(wt)
+                elif currEvent.getCategory() == 'Order Delivered':
+                    
+                    self.numDelivered += 1
+                    # get total waiting time
+                    currOrder = currEvent.order
+                    wt = currOrder.wt
+                    self.wt_ls.append(wt)
 
+                # execute current event:
+                triggedEvent = currEvent.executeEvent(currTime)
 
-            # if there is/are new events triggered, add to checkpoint
-            if triggedEvent: 
-                for e in triggedEvent:
-                    checkpoint.put(e)
+                # if there is/are new events triggered, add to checkpoint
+                if triggedEvent: 
+                    for e in triggedEvent:
+                        checkpoint.put(e)
 
-            counter += 1
+                counter += 1
+
         
-        if self.args["showEventPlot"]:
-            self.plotTimeHorizon()
-        
-        # # reset all order status
-        # for o in self.order_list:
-        #     o.reset()
+        # Immediate Assignment Methods
+        else:
+
+            self.method.addRiderList(self.rider_list)
+            
+            # create event checkpoints
+            checkpoint = EventQueue()   
+            
+            '''Initialize regular check point'''
+            initial_check = Event(0, 4, None)
+            checkpoint.put(initial_check)
+            
+            '''Put in new orders event'''
+            order_time_dict = {}
+            self.order_list.sort()
+            for o in self.order_list:
+                order_time_dict[o.t] = o
+                e = Event(o.t, 1, o)
+                checkpoint.put(e)
+                # get program end time. 
+                # Note: self.end < actual ending time of the program, 
+                # since it ends at "order appear time" of the last order, instaed
+                # of "delivered time" of the last order. 
+                # but it desent matter if we wish to know % riders occupied
+            
+            # self.end = max(order_time_dict.keys())
+            
+    
+
+            #initialize status for all
+            
+            counter = 0
+            
+            #simulation starts
+            while not checkpoint.empty():
+                # see event type, update status
+                currEvent = checkpoint.get()
+
+                # currEvent.print()
+                currTime = currEvent.time
+                
+                if self.args["printCheckPt"] and currEvent.cat != 4: pass
+                    # print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
+
+                # check Event category, if it's a new order, tell it how to assign rider
+                if currEvent.getCategory() == 'New Order':
+                    currEvent.addAssignmentMethod(self.method)
+                    
+                elif currEvent.getCategory() == 'Regular Check':
+                    currEvent.addRiderList(self.rider_list) 
+                    currEvent.addStatusCheckDict(self.rider_status_check_dict)
+                    currEvent.passCurrQSize(checkpoint.qsize())
+                    currEvent.addProgramEndTime(self.t_termination)
+                    # print("Status check at", currTime, ":", self.status_check_dict.keys())
+                elif currEvent.getCategory() == 'Order Delivered':
+                    
+                    self.numDelivered += 1
+                    # get total waiting time
+                    currOrder = currEvent.order
+                    wt = currOrder.wt
+                    self.wt_ls.append(wt)
+                
+                # execute current event:
+                triggedEvent = currEvent.executeEvent(currTime)
+
+                # if there is/are new events triggered, add to checkpoint
+                if triggedEvent: 
+                    for e in triggedEvent:
+                        checkpoint.put(e)
+
+                counter += 1
+            
+            if self.args["showEventPlot"]:
+                self.plotTimeHorizon()
+            
+            # # reset all order status
+            # for o in self.order_list:
+            #     o.reset()
 
         return self
 
 
 
 
+# debug functions for visulization
     def printResult(self):
+        
         print("\n ****************** \n ", self.method.__class__.__name__, "\n ****************** \n ")
         def print_all_order_status(orders):
             dict = {}
@@ -159,23 +255,23 @@ class Simulation():
             df = pd.DataFrame.from_dict(dict, orient='index',
                             columns=[ '# orders delivered', 'total waiting time', 'waiting time per order'])
             print(df)
-        # print_all_order_status(self.order_list)
-        # print_all_rider_waiting_time(self.rider_list)
+        print_all_order_status(self.order_list)
+        print_all_rider_waiting_time(self.rider_list)
     
     def plotTimeHorizon(self):
-        pass
+        plot = False
+        if plot:
+            events = [(o.t, o.t_delivered) for o in self.order_list]
+            plt.eventplot(events,linelengths = 1, 
+                        colors=['C{}'.format(i) for i in range(len(events))],
+                        )
+            plt.ylabel("OrderNumber")
+            plt.xlabel("Time")
+            plt.title("Events acorss time \n Method:" + self.method.name +
+                    "\n #Orders" + str(args["numOrders"]) +
+                    "  #Riders:" + str(args["numRiders"]) +
+                    "  Gridsize:" + str(args["gridSize"]) +
+                    "  lambda:" + str(args["orderArrivalRate"]), fontsize = 10)
             
-        # events = [(o.t, o.t_delivered) for o in self.order_list]
-        # plt.eventplot(events,linelengths = 1, 
-        #               colors=['C{}'.format(i) for i in range(len(events))],
-        #              )
-        # plt.ylabel("OrderNumber")
-        # plt.xlabel("Time")
-        # plt.title("Events acorss time \n Method:" + self.method.name +
-        #           "\n #Orders" + str(args["numOrders"]) +
-        #           "  #Riders:" + str(args["numRiders"]) +
-        #           "  Gridsize:" + str(args["gridSize"]) +
-        #           "  lambda:" + str(args["orderArrivalRate"]), fontsize = 10)
-        
-        # plt.show()
+            plt.show()
         

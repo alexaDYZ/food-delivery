@@ -49,7 +49,7 @@ length(unique(df$phpsStoreID))
 
 
 # time distribution of orders
-hist(df$phptTimeID, breaks = 240, main = "TimeID")
+hist(df$phptTimeID, breaks = 144, main = "TimeID")
 hist(df$phTimeStart, breaks = 240, main = "TimeStart")
 hist(df$phTimeEnd, breaks = 240, main = "TimeEnd")
 

@@ -16,11 +16,13 @@ class Event():
         2: 'Order Delivered',
         3: 'Rider Arrived at Restaurant',
         4: 'Regular Check', # for rider saturation rate
+        5: 'Match Pending Orders',
     }
     def __init__(self, time, cat:int, order:Order):
         self.time = time # time when the event is executed
         self.cat = cat
         self.order = order
+        self.matched_dict = None # this is for event 5, to use the received matching results to assign 
         self.rider_list = None # this is for event 4 to check status for all riders; and event 2 to reassign
         self.method = None
         self.status_check_dict = None
@@ -40,7 +42,7 @@ class Event():
     def executeEvent(self, currTime):
         triggeredEvent = []
         # case 1: new order comes in 
-        if self.getCategory() ==  'New Order':
+        if self.getCategory() ==  'New Order' and self.method.name != "PatientAnticipativeMethod_Bulk":
             # print("******* Order " +  str(self.order.index) + " comes in at t = " + 
             #         str(currTime) + "*******" if args["printAssignmentProcess"] else '')
             curr_order = self.order
@@ -78,9 +80,9 @@ class Event():
             else:
                 # print("******* Order " + str(self.order.index) + " is dropped ******" if args["printAssignmentProcess"] else '')
                 self.order.status = 4 # dropped
-            
+        
+        
         # case 2: an order is delivered
-
         elif self.cat == 2:
             
             # print("******* Order " + str(self.order.index) +  " is delivered by Rider " + 
@@ -89,8 +91,6 @@ class Event():
             
             # update status for rider and order
             self.order.delivered(currTime)
-            
-
         
         # case 3: rider arrives at restaurant
         elif self.cat == 3:
@@ -122,13 +122,35 @@ class Event():
                 # trigger next regular check event
                 next_check = Event(currTime+args["statusCheckInterval"], 4, None)
                 triggeredEvent.append(next_check)
-       
+
+        elif self.cat == 5:
+            matched_dict = self.matched_dict
+            for o, r in matched_dict.items():
+                # if best rider can be found:
+                if r:
+                    # create Arrival event
+                    e_arrival = Event(o.t_riderReachedRestaurant, 3, o)
+                    triggeredEvent.append(e_arrival)
+                    
+                    # create "order delivered" event
+                    t = o.t_delivered
+                    e_finish = Event(t, 2, o)
+                    triggeredEvent.append(e_finish)
+
+
+                else:
+                    print("Order " + str(o.index) + " is dropped, no rider can be found")
+
+            self.method.clearPendingOrders()
+
         return triggeredEvent # a list of events to be added to the checkpoints EventQueue
 
     def addAssignmentMethod(self, method: AssignmentMethod):
         self.method = method      
     def addRiderList(self, ls):
         self.rider_list = ls
+    def addMatchedOrderRiderDict(self, d):
+        self.matched_dict = d
     def addStatusCheckDict(self, dict):
         self.status_check_dict = dict
     def addProgramEndTime(self, t):
@@ -140,13 +162,13 @@ class Event():
         else:
             print("Error: Event.py, wrong event type")
 
-r = Rider(1, [0,0], args)
-rest = Restaurant(1, [5,0], 10,args)
-cust = Customer([10,0],args )
-o = Order(1, 100, cust, rest)
-e_1 = Event(100, 1, o)
-e_2 = Event(110, 3, o)
-e_3 = Event(125, 2, o)
+# r = Rider(1, [0,0], args)
+# rest = Restaurant(1, [5,0], 10,args)
+# cust = Customer([10,0],args )
+# o = Order(1, 100, cust, rest)
+# e_1 = Event(100, 1, o)
+# e_2 = Event(110, 3, o)
+# e_3 = Event(125, 2, o)
 
 # e_1.executeEvent()
 # e_2.executeEvent()
