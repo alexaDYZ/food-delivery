@@ -17,6 +17,7 @@ class Event():
         3: 'Rider Arrived at Restaurant',
         4: 'Regular Check', # for rider saturation rate
         5: 'Match Pending Orders',
+        6: 'Re-Assignment', # for AssignLaterMethod
     }
     def __init__(self, time, cat:int, order:Order):
         self.time = time # time when the event is executed
@@ -42,9 +43,10 @@ class Event():
     def executeEvent(self, currTime):
         triggeredEvent = []
         # case 1: new order comes in 
-        if self.getCategory() ==  'New Order' and self.method.name != "PatientAnticipativeMethod_Bulk":
+        if (self.getCategory() ==  'New Order' and self.method.name != "PatientAnticipativeMethod_Bulk") or self.getCategory() == "Re-Assignment":
             # print("******* Order " +  str(self.order.index) + " comes in at t = " + 
             #         str(currTime) + "*******" if args["printAssignmentProcess"] else '')
+            # if self.getCategory() == "Re-Assignment": print("=== EVent.py === Re-Assignment")
             curr_order = self.order
             curr_order.cust.order(currTime) # customer makes order at time currTime
             assignment_method = self.method
@@ -79,7 +81,11 @@ class Event():
 
             else:
                 # print("******* Order " + str(self.order.index) + " is dropped ******" if args["printAssignmentProcess"] else '')
-                self.order.status = 4 # dropped
+                if self.method.name == "AssignLaterMethod": # order to be ressigned later
+                    e_reassignment = Event(self.order.reassign_time, 6, curr_order) # treat re-assignment like a new arrival
+                    triggeredEvent.append(e_reassignment)
+                else:
+                    self.order.status = 4 # dropped
         
         
         # case 2: an order is delivered

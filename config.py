@@ -4,11 +4,11 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numSimulations":100, # for averaging, 100
+    "numSimulations":30, # for averaging, 100
     
     "gridSize": 1000, # unit: m, default is 1000
 
-    "useMcData": 1, # if we use the data from the McDelivery dataset
+    "useMcData": 0, # if we use the data from the McDelivery dataset
     
     # for each time window
     # "totalTime": 1000,
@@ -17,21 +17,26 @@ args = dotdict({
     'numOrders': None, # to be assigned in generateData.py
     'numCustomers': None,   # to be assigned in generateData.py
     'simulationTime': 60*60*12, # unit: s, 60*60*12 # 12 hours
-    'stallingTime': 60*3,   # unit: s, 3 min. For PatientAnticipativeMethods
+    'stallingTime': 30,   # unit: s, 3 min. For PatientAnticipativeMethods
 
     "orderArrivalRate": round(1/30,3), # unit: number per second. default is 1/30, meaning 2 per minute
 
     "numRiders": 30,
     "numRestaurants": 20, # originally 20
     
-    # For food preparation time
+    # FPT distribution
     "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
+    "if_TNM": 1, # if we use TNM to model FPT
+    "TNM_weights": [0.2, 0.5, 0.25, 0.05],
     "FPT_avg": 600, # unit: s # second # average food preparation time. default is 300
     "FPT_sd":200,
     "FPT_lower": 300, # lower bound of truncated normal distribution
     "FPT_upper": 1200, # upper bound of truncated normal distribution
 
+
     "riderSpeed":1, # unit m/s
+
+    "threshold_assignment_time": 20*60 , # unit: s, 35 min. For AssignLaterMethod
 
     # "riderSelectionThreshold": 100000,
     # "forwardLookingTime": 3000, # unit: s 300
@@ -63,6 +68,6 @@ args = dotdict({
                 'indigo', 'black', 'darkgrey', 'orange', 'cyan',
                 'red', 'olive'],
 
-    "path": "./sem2_w4/",
+    "path": "./results/",
 
 })

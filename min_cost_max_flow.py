@@ -60,7 +60,6 @@ class min_cost_max_flow:
     self.EL.append([v, w, 0, c])
     self.AL[u].append(len(self.EL)-1)
     self.EL.append([u, 0 if directed else w, 0, -c])
-    self.AL[v].append(len(self.EL)-1)
 
   def mcmf(self, s, t):
     mf = 0

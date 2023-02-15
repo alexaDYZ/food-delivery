@@ -540,11 +540,13 @@ class WaitingTimePLot():
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
         # for i in [ 25, 30, 35, 40, 45, 50]:
-        # for i in [20]:
-        for i in [600, 700, 800, 1000, 1100]:
+        for i in [800, 1000]:
+        # for i in [600, 700, 800, 1000, 1100]:
             # args["orderArrivalRate"]= round(1/120,3)
+            startTime = datetime.datetime.now()
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()
+            print("Time for ", i, "riders: ", datetime.datetime.now() - startTime)
         
         # # vary the order arrival rate
         # for j in [25]:

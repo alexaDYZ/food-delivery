@@ -9,141 +9,64 @@ import random
 import pandas as pd
 import pickle
 import math
+import scipy.stats as stats
 
-from PatientAnticipativeMethod_Bulk import PatientAnticipativeMethod_Bulk
-
-a = PatientAnticipativeMethod_Bulk()
-print(PatientAnticipativeMethod_Bulk.__name__)
-# df = pd.read_csv('./McDonald_data/mc_data_processed.csv')
-# print(df.columns)
-# print(df["phpsStoreID"].nunique())
-# print(max(df["phTimeStart_s"]))
-
-# with open('data_mc_orders.ls', 'rb') as data_file:
-#     order_time = pickle.load(data_file)
-# print(order_time[:10])
-
-
-# # def main():
-# #     data = [np.random.random((2, 3)) for _ in range(5)]
-# #     fig, ax = plt.subplots()
-# #     polygons = plot_polygons(data, alpha=0.5, ax=ax, color='gray')
-# #     verts = plot_verts(data, marker='s', color='red', ax=ax, s=200)
-
-# #     def on_click(event):
-# #         visible = polygons[0][0].get_visible()
-# #         plt.setp(polygons, visible=not visible)
-# #         plt.setp(verts, color=np.random.random(3))
-# #         plt.draw()
-# #     fig.canvas.mpl_connect('button_press_event', on_click)
-
-# #     ax.set(title='Click on plot to change')
-# #     plt.show()
-
-
-# # def plot_polygons(data, ax=None, **kwargs):
-# #     if ax is None:
-# #         ax = plt.gca()
-
-# #     artists = [ax.fill(x, y, **kwargs) for x, y in data]
-# #     return artists
-
-# # def plot_verts(data, ax=None, **kwargs):
-# #     if ax is None:
-# #         ax = plt.gca()
-
-# #     artists = [ax.scatter(x, y, **kwargs) for x, y in data]
-# #     return artists
-# # l =[i for i in range(10)]
-# # print(l)
-# # def getAverage(ls):
-# #     avgLs = []
-# #     for i in range(len(ls)):
-# #         curr_avg = sum(ls[:i+1]) / (i+1) # convert to minutes
-# #         avgLs.append(curr_avg)
-# #     return avgLs
-# # def main():
-# #     print(getAverage(l))
-# # print(sum(l)/len(l))
-# # main()
-
-
-# # rider_loc = np.random.randint(0,args["gridSize"], 
-# #                                     size=(args["numRiders"],2))
-# # rider_list = [Rider(i, rider_loc[i],args) 
-# #                 for i in range(args["numRiders"])]
-# # rider_list.sort()
-# # print([r.index for r in rider_list])
-# # # c = Customer((10,1), args)
-# # # r = Restaurant(1, (10,10), 10, args)
-# # id = [1,2,3,4,5]
-# # t = [10,20,30,40,50]
-# # # t.sort(reverse=True)
-# # # ls = []
-# # # for i,time in zip(id, t):
-# # #     o = Order(i, time, c, r)
-# # #     ls.append(o)
-
-# # # ls.sort()
-# # # for o in ls:
-# # #     o.print()
-
-# # for i in range(len(id) - 3 + 1):
-# #     print(id[i:i+3])
-# def round_up(ls,digit):
-#     return [round(i,digit) for i in ls]
-
-# ls = []
-# t = 0
-# while True:
-#     t += random.expovariate(1/30)
-#     if t < 60*60*1 :
-#         ls.append(t)
-#     else: break
-# ls= round_up(ls,1)
-
-
-# # ls_2 = []
-# # t2 = 0
-# # while len(ls_2)<120:
-# #     t2 += (np.random.poisson(30) / 60)
-# #     ls_2.append(t2)
-# # ls_2 = round_up(ls_2,2)
+# print(plt.colormaps())
+# get color from color map
+cm = plt.get_cmap('tab20_r')
+print(cm("tab20c_r"))
 
 
 
-# print(ls)
-# print("empirical rate:", max(ls)/len(ls))
-# print("# orders:", len(ls))
-# # print(ls_2)
+# def generate_a_FPT():
+#     '''Generate a FPT for the restaurant'''
+#     means = [i*60 for i in [10, 20, 40, 60]]
+#     stds = [i*60 for i in [2, 5, 5, 10]]
+#     upper = [i*60 for i in [20, 40, 60, 100]]
+#     lower = [i*60 for i in [5, 10, 20, 40]]
 
-# plt.hist(ls, bins=200, alpha=0.5, label='expovariate')
-# # plt.hist(ls_2, bins=20, alpha=0.5, label='poisson')
-# # plt.legend()
+#     i = 3
+#     FPT = stats.truncnorm((lower[i] - means[i]) / stds[i],
+#                                         (upper[i] - means[i]) / stds[i], 
+#                                         loc=means[i], scale=stds[i]).rvs(1).tolist()[0]
+#     FPT = round(FPT, 2)
+#     return FPT
+
+# print(generate_a_FPT())
+
+
+
+
+# # total_num = 10000
+# # weights = [0.2, 0.5, 0.25, 0.05]
+# # # check if weights sum to 1
+# # print(sum(weights))
+
+# # fast = np.random.normal(10, 2, int(total_num*weights[0]))
+# # normal = np.random.normal(20, 5, int(total_num*weights[1]))
+# # slow = np.random.normal(40, 5, int(total_num*weights[2]))
+# # very_slow = np.random.normal(60, 10, int(total_num*weights[3]))
+# # # all = np.concatenate((fast, normal, slow, very_slow))
+# # fast = stats.truncnorm.rvs((5 - 10) / 2, (20 - 10) / 2, loc=10, scale=2, size=int(total_num*weights[0])) # range : 5-20
+# # normal = stats.truncnorm.rvs((10 - 20) / 5, (40 - 20) / 5, loc=20, scale=5, size=int(total_num*weights[1])) # range : 10-40
+# # slow = stats.truncnorm.rvs((20 - 40) / 5, (60 - 40) / 5, loc=40, scale=5, size=int(total_num*weights[2])) # range : 20-60
+# # very_slow = stats.truncnorm.rvs((40 - 60) / 10, (100 - 60) / 10, loc=60, scale=10, size=int(total_num*weights[3])) # range : 40-100
+# # all = np.concatenate((fast, normal, slow, very_slow))
+
+# # # 1 bin for 1 unit
+
+# # plt.hist(all, bins=95, alpha=0.5, label='all')
+# plt.hist(fast, bins=15, alpha=0.5, label='fast')
+# plt.hist(normal, bins=30, alpha=0.5, label='normal')
+# plt.hist(slow, bins=40, alpha=0.5, label='slow')
+# plt.hist(very_slow, bins=60, alpha=0.5, label='very_slow')
+
+# plt.legend(loc='upper right')
+# plt.xlim(0, 100)
+# plt.xticks(np.arange(0, 100, 5))
+# plt.xlabel('FPT (min)')
+# plt.yticks(np.arange(0, 500, 100))
+# plt.ylabel('Frequency')
+# plt.title('FPT Distribution\n (total number = 10000)')
+
 # plt.show()
-
-
-#### find probability of number of arrivals within x min > numriders
-
-# def find_prob(arrival_rate, stalling_time, numRiders):
-#     # pmf of poisson distribution
-#     # P(N(x) = k) = [e^(-lambda * x) * (lambda * x)^k]/k!
-#     def find_pmf(k, arrival_rate, stalling_time):
-#         return math.exp(-arrival_rate * stalling_time) * (arrival_rate * stalling_time)**k / math.factorial(k)
-#     # find probability of number of arrivals within x min > numriders
-#     prob = 0
-#     cmf_ls = []
-#     for i in range(numRiders, 100):
-#         prob += find_pmf(i, arrival_rate, stalling_time)
-#         cmf_ls.append(prob)
-#     print("probability of number of arrivals within {} min > {}: {}".format(stalling_time, numRiders, prob))
-#     x = [i for i in range(numRiders, 100)]
-#     plt.plot(x, cmf_ls)
-#     plt.title("CMF of number of arrivals within {} min > {}".format(stalling_time, numRiders))
-#     plt.show()
-    
-
-# arrival_rate = 2 # orders per min
-# stalling_time = 3 # min
-# numRiders = 20
-# find_prob(arrival_rate, stalling_time, numRiders)

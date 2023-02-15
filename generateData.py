@@ -101,13 +101,63 @@ def dataGeneration():
                                             (args["FPT_upper"] - fpt_mean) / fpt_sd, 
                                             loc=fpt_mean, scale=fpt_sd).rvs(args['numOrders']).tolist()
             #### debug #######
+            showFPTplot = 1# for 1 simulation only
+            if showFPTplot:
+                fpt_in_minute = [round(i/60, 3) for i in food_prep_time]
+                plt.hist(fpt_in_minute, bins=15, alpha=0.5)
+                plt.title('FPT Distribution (Truncated Normal)\n ('+ str(len(fpt_in_minute))+' orders)')
+                plt.xlabel("FPT (min)")
+                plt.ylabel("Frequency")
+                plt.xticks(np.arange(0, 21, 5))
+
+                params = ("_lambda" + str(args["orderArrivalRate"]) 
+                        + "_numRider"+str(args['numRiders'])
+                        + "_numRest"+str(args['numRestaurants'])
+                        + "_bacthSize" + str(args['SMA_batchsize'])
+                        + "_gridSize" + str(args['gridSize'])
+                        + "_FPT" + str(args["FPT_avg"])
+                        )
+
+                plt.savefig(args["path"] + "FPT_distribution" + params + ".png", dpi=300)
+            #### debug #######
+        if args['if_TNM']:
+            # suppose we have 4 clusters, all are modeled as truncated normal distribution
+            total_num = args['numOrders']
+            weights = args["TNM_weights"]
+            means = [i*60 for i in [10, 20, 40, 60]]
+            stds = [i*60 for i in [2, 5, 5, 10]]
+            upper = [i*60 for i in [20, 40, 60, 100]]
+            lower = [i*60 for i in [5, 10, 20, 40]]
+            groups = []
+            group_names = ['fast', 'normal', 'slow', 'very_slow']
+            food_prep_time = []
+            
+            for i in range(len(group_names)):
+                if i == len(group_names) - 1:  num_orders = int(total_num - len(food_prep_time)) # to avoid rounding error
+                else: num_orders = int(total_num*weights[i])
+                group = stats.truncnorm((lower[i] - means[i]) / stds[i],
+                                            (upper[i] - means[i]) / stds[i], 
+                                            loc=means[i], scale=stds[i]).rvs(num_orders).tolist()
+                group = [round(x,2) for x in group]
+                groups.append(group) # debug
+                food_prep_time.extend(group) 
+
+            
+            #### debug #######
             showFPTplot = 0 # for 1 simulation only
             if showFPTplot:
-                plt.hist(food_prep_time)
-                plt.suptitle("Food preparation time distribution of the Simulations")
-                plt.title("(" + str(args['numRestaurants']) + " Restaurants)")
-                plt.xlabel("Food preparation time (s)")
-                plt.ylabel("Frequency")
+                for i in range(len(group_names)):
+                    # plot in minutes
+                    data = [x/60 for x in groups[i]]
+                    plt.hist(data, bins=int(max(data)-min(data)), alpha=0.5, label=group_names[i])
+                
+                plt.legend(loc='upper right')
+                plt.xlim(0, 100)
+                plt.xticks(np.arange(0, 105, 5))
+                plt.xlabel('FPT (min)')
+                # plt.yticks(np.arange(0, 500, 100))
+                plt.ylabel('Frequency')
+                plt.title('FPT Distribution (Mixture of Truncated Normal)\n ('+ str(total_num)+' orders)')
 
                 params = ("_lambda" + str(args["orderArrivalRate"]) 
                         + "_numRider"+str(args['numRiders'])
@@ -117,8 +167,8 @@ def dataGeneration():
                         + "_FPT" + str(args["FPT_avg"])
                         + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
-                plt.savefig(args["path"] + "FPT_distribution" + params + ".png", dpi=300)
-            #### debug #######
+                plt.savefig(args["path"] + "FPT_TNM" + params + ".png")
+                plt.close()
         else:
             fpt_mean = args["FPT_avg"]
             food_prep_time = np.random.normal(fpt_mean, 0, args['numOrders']).tolist()
@@ -132,6 +182,13 @@ def dataGeneration():
         order_time_copy = copy.deepcopy(order_time)
         order_time_copy.sort(reverse=True)
         FPT_list = generateFPT()
+        random.shuffle(FPT_list)
+        # if args['if_TNM']:
+        #     '''each restaurant has a range of FPT'''
+        #     FPT_list.sort()
+
+
+        # else:
         for i in range(len(order_time)):
             c = customer_list_copy.pop()
             r_index = random.randint(0,args["numRestaurants"]-1)
@@ -181,3 +238,4 @@ def dataGeneration():
         pickle.dump(data, data_file)
 
 
+dataGeneration()

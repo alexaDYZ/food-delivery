@@ -91,13 +91,19 @@ class PatientAnticipativeMethod_Bulk(AssignmentMethod_Batching):
         return timeArrival
 
     def matchPendingOrders(self):
+        # debug
+        log = False
+
+
         matched_res_dict = {} # key: order, value: matched rider
 
         # input is  
         # #vertices, #edges, source node index, sink node index
         numPendingOrders = len(self.pending_order_dict)
-        V = args["numRiders"] + numPendingOrders + 2
-        E = args["numRiders"] + numPendingOrders + numPendingOrders * args["numRiders"]
+        numRiders = args["numRiders"]
+
+        V = numRiders + numPendingOrders + 2
+        E = numRiders + numPendingOrders + numPendingOrders * numRiders
         source = 0
 
         mf = min_cost_max_flow(V) # Create a min_cost_max_flow object
@@ -106,25 +112,32 @@ class PatientAnticipativeMethod_Bulk(AssignmentMethod_Batching):
         edge_list = []
 
         rider_index_in_map = [r.index + 1 for r in self.rider_list] # source is 0, so rider index starts from 1
-        min_order_index = min(self.pending_order_dict.keys())
-
-        order_index_in_map = [o - min_order_index + max(rider_index_in_map) + 1 for o in self.pending_order_dict.keys()] # orde index is right after the rider index. to avoid conflict, + 1
+        
+        order_index_in_map_dict = {} # key: index in map, value: real index
+        pending_order_index = list(self.pending_order_dict.keys())
+        
+        for i in range(numPendingOrders):
+            map_index = i + max(rider_index_in_map) + 1
+            order_index_in_map_dict[map_index] = pending_order_index[i]
+    
+        
         self.rider_list.sort(key=lambda x: x.index)
-        sink = max(order_index_in_map) + 1
+        sink = max(order_index_in_map_dict.keys()) + 1
 
-        
-        
+
+
 
         # add edges
         # 1. source to all riders
         for r in rider_index_in_map:
             edge_list.append((source, r, 1, 0))
+        if log: print("after adding riders, num edges = ",len(edge_list))
 
         # 2. all riders to all orders
         for r in rider_index_in_map:
-            for o in order_index_in_map:
+            for o in order_index_in_map_dict.keys():
                 
-                o_real_index = o + min_order_index - max(rider_index_in_map) - 1
+                o_real_index = order_index_in_map_dict[o]
                 r_real_index = r - 1
                 
 
@@ -133,10 +146,13 @@ class PatientAnticipativeMethod_Bulk(AssignmentMethod_Batching):
                 timeArrival = self.findR2R(order, rider) # recover the real index
 
                 edge_list.append((r, o, 1, timeArrival))
+        if log: print("after adding rider-order pair, num edges = ",len(edge_list))
 
         # 3. all orders to sink
-        for o in order_index_in_map:
+        for o in order_index_in_map_dict.keys():
             edge_list.append((o, sink, 1, 0))
+        if log: print("after adding orders , num edges = ",len(edge_list))
+
 
         #########  debug
         # print("check if the number is edges is correct: " + str(len(edge_list)) + " == " + str(E))
@@ -148,15 +164,16 @@ class PatientAnticipativeMethod_Bulk(AssignmentMethod_Batching):
             u, v, w, c = edge # u, v, capacity, cost
             mf.add_edge(u, v, w, int(c)) # Add edge from u to v with capacity w and cost c
         
-        log = True
+        
         # record the optimal edges
         optimal_edges = mf.mcmf(source, sink)
         
         o = None
         r = None
         for e in optimal_edges:
-            if e[1] == sink and e[0] in order_index_in_map: # the last node
-                o = self.pending_order_dict[e[0] + min_order_index - max(rider_index_in_map) - 1]
+            if e[1] == sink and e[0] in order_index_in_map_dict.keys(): # the last node
+                o_real_index = order_index_in_map_dict[e[0]]
+                o = self.pending_order_dict[o_real_index]
 
             elif e[0] == source and e[1] in rider_index_in_map: # the first node
                 r = self.rider_list[e[1] - 1]
@@ -181,39 +198,3 @@ class PatientAnticipativeMethod_Bulk(AssignmentMethod_Batching):
     
     def clearPendingOrders(self):
         return super().clearPendingOrders()
-
-    # def find_best_rider(self, order):
-    #     '''
-    #     Use Hungarian to do the matching
-    #     '''
-
-    #     # print("🔮🔮🔮🔮🔮🔮🔮🔮🔮 Anticipative Method 🔮🔮🔮🔮🔮🔮🔮🔮🔮" )if args["printAssignmentProcess"] else None
-    #     # print("calling ==== find_best_rider") if args["printAssignmentProcess"] else None
-        
-    #     self.findR2RforAll() # compute self.R2RforAll dictionary
-
-    #     earliestRestaurantArrivalTime = self.find_ealiest_arrival() # find min in self.R2RforAll
-        
-    #     bestRiders = self.R2RforAll[earliestRestaurantArrivalTime] # find best rider using the min
-    #     bestRider = random.choice(bestRiders) # randomly choose one from the best riders
-
-    #     # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
-        
-    #     riderAvailableTime = bestRider.nextAvailableTime # time when he finish the last order, before start this order
-        
-    #     # update rider status
-    #     self.order.foundRider(bestRider)
-    #     bestRider.deliver(self.order, riderAvailableTime)
-        
-    #     self.bestRider = bestRider
-        
-    #     return bestRider
-    
-    # def find_ealiest_arrival(self):
-    #     # print("calling ==== find_ealiest_arrival") if args["printAssignmentProcess"] else None
-
-    #     earliestRestaurantArrivalTime = min(self.R2RforAll.keys())
-
-    #     return earliestRestaurantArrivalTime
-
-    

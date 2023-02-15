@@ -1,0 +1,20 @@
+Observation:
+1) ClosestToFPT has a similar performance to the baseline
+2) For both methods, they never yield satisfactory results(deliver all within 45 min), depite a large number of riders
+-  see rider = 70, 80
+
+
+ClosestToFPT:
+for each order:
+    - find rider's arrival time @ restaurant
+    - pick whoever can reach the closest to the FRT
+
+Reason of Failure:
+- when there is a surplus of riders, idle riders reach too early, hence wont be picked
+- instead, the busy rider will arrive later, closer to FRT, hence will be picked
+
+Solution:
+- given that, the expected distance between any two points in the grid is 0.52*x, for gridSize = x * x
+- for 
+
+

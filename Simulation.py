@@ -2,6 +2,7 @@
 from tkinter import font
 from AssignmentMethod import AssignmentMethod
 from PatientAnticipativeMethod_Bulk import PatientAnticipativeMethod_Bulk
+from PatientAnticipativeMethod_Soft import PatientAnticipativeMethod_Soft
 from itertools import count
 from tabnanny import check
 import time
@@ -143,6 +144,96 @@ class Simulation():
 
                 counter += 1
 
+        # # 
+        # elif self.method.__class__.__name__ == PatientAnticipativeMethod_Soft.__name__:
+        #     self.method.addRiderList(self.rider_list)
+        #     '''Initialize regular check point'''
+        #     checkpoint = EventQueue()   
+        #     initial_check = Event(0, 4, None)
+        #     checkpoint.put(initial_check)
+
+        #     '''Put in new orders event'''
+        #     order_time_dict = {}
+        #     self.order_list.sort()
+        #     for o in self.order_list:
+        #         order_time_dict[o.t] = o
+        #         e = Event(o.t, 1, o)
+        #         checkpoint.put(e)
+
+        #     stallingTime = args["stallingTime"] # the first cutoff time for orders to be assigned
+
+
+        #     '''Start the Simulation'''
+        #     while not checkpoint.empty():
+        #         # see event type, update status
+        #         currEvent = checkpoint.get()
+        #         currEvent.addAssignmentMethod(self.method)
+
+        #         # currEvent.print()
+        #         currTime = currEvent.time
+                
+        #         if self.args["printCheckPt"] and currEvent.cat != 4: pass
+        #             # print("\n 💥 checkpoint", counter, " time ", round(currTime,2), "Event cat:", currEvent.getCategory() ,"\n")
+
+        #         # check Event category, if it's a new order, tell it how to assign rider
+        #         if currEvent.getCategory() == 'New Order':
+        #             '''each order is assigned after the stalling time window'''
+                    
+        #             # for every new order, add a checkpoint event in the future
+        #             cutoff_time = currEvent.order.t + stallingTime
+
+        #             assign_pending_orders = Event(cutoff_time, 5, None)
+        #             checkpoint.put(assign_pending_orders)
+                        
+
+        #             self.method.addPendingOrder(currEvent.order)
+        #             #### debug
+        #             # print("New order added, pending orders:", len(self.method.pending_order_dict), "at time", currTime)
+
+        #         elif currEvent.getCategory() == 'Match Pending Orders':
+        #             # print("Match Pending Orders at time ", currTime)
+                    
+        #             self.method.addCurrTime(currTime)
+        #             # matching
+        #             matched_res_dict = self.method.matchPendingOrders() # key: order, value: best rider
+        #             #### debug
+        #             # print("matched_res_dict:")
+        #             # for o, r in matched_res_dict.items():
+        #             #     print(o.index, r.index)
+
+        #             # assign
+        #             self.method.assignPendingOrders(matched_res_dict) # update status for rider and order
+        #             # create new events for rider arrival and order delivered
+        #             currEvent.addMatchedOrderRiderDict(matched_res_dict) # when exicute, update status for rider and order
+        #             # clear pending orders
+        #             self.method.clearPendingOrders()
+
+                    
+        #         elif currEvent.getCategory() == 'Regular Check':
+        #             currEvent.addRiderList(self.rider_list) 
+        #             currEvent.addStatusCheckDict(self.rider_status_check_dict)
+        #             currEvent.passCurrQSize(checkpoint.qsize())
+        #             currEvent.addProgramEndTime(self.t_termination)
+        #             # print("Status check at", currTime, ":", self.status_check_dict.keys())
+                
+        #         elif currEvent.getCategory() == 'Order Delivered':
+                    
+        #             self.numDelivered += 1
+        #             # get total waiting time
+        #             currOrder = currEvent.order
+        #             wt = currOrder.wt
+        #             self.wt_ls.append(wt)
+
+        #         # execute current event:
+        #         triggedEvent = currEvent.executeEvent(currTime)
+
+        #         # if there is/are new events triggered, add to checkpoint
+        #         if triggedEvent: 
+        #             for e in triggedEvent:
+        #                 checkpoint.put(e)
+
+        #         counter += 1
+
         
         # Immediate Assignment Methods
         else:
@@ -190,6 +281,7 @@ class Simulation():
 
                 # check Event category, if it's a new order, tell it how to assign rider
                 if currEvent.getCategory() == 'New Order':
+                    # print("New order === Order Index ", currEvent.order.index, " at ",currTime)
                     currEvent.addAssignmentMethod(self.method)
                     
                 elif currEvent.getCategory() == 'Regular Check':
@@ -198,13 +290,17 @@ class Simulation():
                     currEvent.passCurrQSize(checkpoint.qsize())
                     currEvent.addProgramEndTime(self.t_termination)
                     # print("Status check at", currTime, ":", self.status_check_dict.keys())
+
                 elif currEvent.getCategory() == 'Order Delivered':
-                    
                     self.numDelivered += 1
                     # get total waiting time
                     currOrder = currEvent.order
                     wt = currOrder.wt
                     self.wt_ls.append(wt)
+
+                elif currEvent.getCategory() == "Re-Assignment": 
+                    # print("Reassigning Order " + str(currEvent.order.index) + " at t = " + str(currTime))
+                    currEvent.addAssignmentMethod(self.method)
                 
                 # execute current event:
                 triggedEvent = currEvent.executeEvent(currTime)

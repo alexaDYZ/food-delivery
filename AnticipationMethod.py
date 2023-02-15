@@ -17,6 +17,7 @@ class AnticipationMethod(AssignmentMethod):
 
     def addOrder(self, newOrder):
         return super().addOrder(newOrder)
+        
     def addCurrTime(self, currTime):
         return super().addCurrTime(currTime)
     def addRiderList(self, rider_list):
@@ -121,8 +122,6 @@ class AnticipationMethod(AssignmentMethod):
     def find_ealiest_arrival(self):
         # print("calling ==== find_ealiest_arrival") if args["printAssignmentProcess"] else None
 
-        earliestRestaurantArrivalTime = min(self.R2RforAll.keys())
-
-        return earliestRestaurantArrivalTime
+        return min(self.R2RforAll.keys())
 
     

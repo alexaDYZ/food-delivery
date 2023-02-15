@@ -27,7 +27,8 @@ import copy
 
 # this function does 1 iteration of data-generation and simulation
 # input is two Method object
-def runEpisode(baselineMethod, alternativeMethod):
+
+def get_data_for_simulation():
     ''' 
     Import Data 
     '''
@@ -41,30 +42,37 @@ def runEpisode(baselineMethod, alternativeMethod):
         customer_list = dict["customer list"]
         order_time = dict["order time"]
 
-        restaurant_list_copy = copy.deepcopy(restaurant_list)
-        rider_list_copy = copy.deepcopy(rider_list)
-        order_list_copy = copy.deepcopy(order_list)
-        customer_list_copy = copy.deepcopy(customer_list )
-        order_time_copy = copy.deepcopy(order_time)
         
         
+    # debug
     def getOrderDist(orderls):
         timels = [o.t for o in orderls]
         plt.hist(timels, bins=[i for i in range(min(timels), max(timels)+1)])
         plt.show()
         pass
-    
+    # debug
     if args["showOrderTimeDist"]:
         getOrderDist(order_list)
+    
+    return restaurant_list, rider_list, order_list, customer_list, order_time,
+    
+    
 
 
+def runEpisode(baselineMethod, alternativeMethod):
+    
+    # get data
+    restaurant_list, rider_list, order_list, customer_list, order_time = get_data_for_simulation()
+
+    restaurant_list_copy = copy.deepcopy(restaurant_list)
+    rider_list_copy = copy.deepcopy(rider_list)
+    order_list_copy = copy.deepcopy(order_list)
+    customer_list_copy = copy.deepcopy(customer_list )
+    order_time_copy = copy.deepcopy(order_time)
+    
     '''
     Start Simulation
     '''
-    # start timer:
-    # start_time = time.time()
-
-
 
     # Method 1: default method
     # baselineMethod
@@ -76,3 +84,24 @@ def runEpisode(baselineMethod, alternativeMethod):
     alt = sim2.simulate()
 
     return default, alt
+
+def runEpisode_single_medthod(method):
+    # get data
+    restaurant_list, rider_list, order_list, customer_list, order_time = get_data_for_simulation()
+    args["numOrders"] = len(order_list)
+    '''
+    Start Simulation
+    '''
+
+    sim = Simulation(method,restaurant_list, rider_list, order_list, customer_list, order_time, args)
+    sim_res = sim.simulate()
+
+    if method.name == "AssignLaterMethod":
+        count = 0
+        for o in sim.order_list:
+            if o.ifReassigned:
+                count += 1
+        
+        print("Reassigned orders: ", round(count/len(sim.order_list), 2)*100, "%")
+
+    return sim_res

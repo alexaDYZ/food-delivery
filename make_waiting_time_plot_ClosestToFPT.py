@@ -280,8 +280,8 @@ class WaitingTimePLot():
             # fill between uq and lq
             plt.fill_between(valid_col_names, uq, lq, color = shade_color, alpha = 0.2)
 
-        plot_combined_graph = False
-        plot_anticipation = True
+        plot_combined_graph = True
+        plot_anticipation = False
         
         ######## Plot a combined graph for both methods ########
         if plot_combined_graph:
@@ -305,7 +305,7 @@ class WaitingTimePLot():
                 + "_gridSize" + str(args['gridSize'])
                 + "_FPT" + str(args["FPT_avg"]))
             
-            plt.savefig(args["path"] + "SMA_distribution" + params + ".png", dpi=500)
+            plt.savefig(args["path"] + "SMA_distribution" + params + ".png", dpi=200)
             plt.show()
         
         ######## Plot one for anticipation methods, as the scales of the two doesnt match ########
@@ -427,10 +427,15 @@ class WaitingTimePLot():
             # plot
             plt.figure(figsize=(10,5))
             if args["if_truncated_normal"]:
-                    figname+='_tnormal'
-                    #  change the background color
-                    ax = plt.axes()
-                    ax.set_facecolor("seashell")
+                figname+='_tnormal'
+                #  change the background color
+                ax = plt.axes()
+                ax.set_facecolor("seashell")
+            elif args["if_TNM"]:
+                figname+='_TNM'
+                #  change the background color
+                ax = plt.axes()
+                ax.set_facecolor("aliceblue")
             plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
             plot(df_a, "ClosestToFPT", "darkgreen", "green", "lightgreen", "lightgreen", "lightgreen")
             plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)") 
@@ -445,11 +450,13 @@ class WaitingTimePLot():
             plt.suptitle("Interval Average of Waiting Time using Default_1b and ClosestToFPT")
             if args["if_truncated_normal"]:
                 plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
+            elif args["if_TNM"]:
+                    plt.title("TNM for FPT, " + str(args["numRiders"]) + " Riders")
             else:
             # plt.title( "mean time between order arrivals = "+ str(args["orderArrivalRate"]) + "s")
                 plt.title(str(args["numRiders"]) + " Riders")
 
-            plt.savefig(figname+".png", dpi=500)
+            plt.savefig(figname+".png", dpi=200)
 
             # plt.show()
             plt.close()
@@ -470,6 +477,12 @@ class WaitingTimePLot():
                     #  change the background color
                     ax = plt.axes()
                     ax.set_facecolor("seashell")
+                elif args["if_TNM"]:
+                    figname+='_TNM'
+                    #  change the background color
+                    ax = plt.axes()
+                    ax.set_facecolor("aliceblue")
+
                 plot(df_d, "Default", "darkred", "red", "pink", "pink", "pink")
                 plot(df_a, "Anticipation", "darkgreen", "green", "lightgreen", "lightgreen", "lightgreen")
                 plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")
@@ -482,11 +495,13 @@ class WaitingTimePLot():
                 plt.suptitle("Interval Average of Waiting Time using Default_1b and ClosestToFPT")
                 if args["if_truncated_normal"]:
                     plt.title("Truncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
+                elif args["if_TNM"]:
+                    plt.title("TNM for FPT, " + str(args["numRiders"]) + " Riders")
                 else:
                 # plt.title( "mean time between order arrivals = "+ str(args["orderArrivalRate"]) + "s")
                     plt.title(str(args["numRiders"]) + " Riders")
                
-                plt.savefig(figname+".png", dpi=500)
+                plt.savefig(figname+".png", dpi=200)
                 # plt.show()
                 plt.close()
 
@@ -540,8 +555,8 @@ class WaitingTimePLot():
         
         # Variations of numRiders
         # self.plot_sma_distribution_by_numOrders()
-        # for i in [25, 30, 35, 40, 45, 50]:
-        for i in [40,45,50]:
+        for i in [i*10 for i in range(3,9)]:
+        # for i in [250, 300, 350, 400, 450, 500]:
         # for i in [600, 700, 800, 1000, 1100]:
             args["numRiders"] = i
             self.plot_ia_distribution_by_time()

@@ -1,9 +1,10 @@
 from Analyse_NumOrders import AnalyseNumOrders
 from Analyse_Rider import Analyse_Rider
 from Analyse_DroppedOrders import Analyse_DroppedOrders
-# from make_waiting_time_plot import WaitingTimePLot
-# # from make_waiting_time_plot_ClosestToFPT import WaitingTimePLot
-from make_waiting_time_plot_bulk import WaitingTimePLot
+from make_waiting_time_plot import WaitingTimePLot
+# from make_waiting_time_plot_ClosestToFPT import WaitingTimePLot
+# from make_waiting_time_plot_bulk import WaitingTimePLot
+from make_waiting_time_plot_all import WaitingTimePLot
 import datetime
 
 
@@ -16,8 +17,13 @@ def main():
    # a.visualizeMaxMin()
    # a.visualizeRoute()
    startTime = datetime.datetime.now()
+   # a = WaitingTimePLot()
+   # a.run()
    a = WaitingTimePLot()
-   a.run()
+   # a.add_method("AnticipationMethod")
+   # a.add_method("AssignLaterMethod")
+   a.add_all_methods()
+   a.plot()
    endTime = datetime.datetime.now()
    print("Time taken: ", endTime - startTime)
 

@@ -12,6 +12,7 @@ class Order():
         2: 'DELIVERING',
         3: 'DELIVERED',
         4: 'DROPPED',
+        5: 'WAITINGforREASSIGNMENT',
     }
 
     def __init__(self, index, t_in, customer, restaurant):
@@ -25,6 +26,8 @@ class Order():
         self.t_delivered = -1
         # self.t_est_delivered = -1 # once we have a rider, we can find the estimated delivered time
         self.wt = -1
+        self.reassign_time = -1 # for AssignLaterMethod. When FPT is too long and order needs to be reassigned
+        self.ifReassigned = False # for AssignLaterMethod. debug
 
     def getOrderStatus(self):
         return Order.status[self.status]
