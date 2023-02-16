@@ -111,7 +111,7 @@ class ClosestToFPTMethod(AssignmentMethod):
 
         RiderArriveTime = self.findR2RforAll() 
 
-        closestTime = self.find_closest_time(RiderArriveTime) # find min in self.R2RforAll
+        closestTime = self.find_closest_time(RiderArriveTime) 
         
         
         bestRiders = RiderArriveTime[closestTime] # find those who can reach the restaurant at the same time
@@ -124,11 +124,14 @@ class ClosestToFPTMethod(AssignmentMethod):
         #         print(r.index)
         # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------")
         
-        riderAvailableTime = bestRider.nextAvailableTime # time when he finish the last order, before start this order
-        
-        # update rider status
+        t_start = bestRider.nextAvailableTime 
+        # update order status
         self.order.foundRider(bestRider)
-        bestRider.deliver(self.order, riderAvailableTime)
+        self.order.addRiderReachReatsurantTime(closestTime)
+        self.order.addDeliveredTime() # order.t_delivered
+
+        # update rider status
+        bestRider.deliver(self.order, t_start)
         
         self.bestRider = bestRider
 
@@ -145,7 +148,7 @@ class ClosestToFPTMethod(AssignmentMethod):
     def find_closest_time(self, RiderArriveTime):
         # print("calling ==== find_ealiest_arrival") if args["printAssignmentProcess"] else None
         '''
-        Find the rider arrival time that is nearest to the Food Ready Time(FRT) of the order.
+        Find t of (rider reaches restaurant) that is nearest to the Food Ready Time(FRT) of the order.
         FRT = FPT + current time
         Note: first consider who can reach the restaurant before FRT; if no riders can do that, find the earliest arrival time
         '''

@@ -106,11 +106,15 @@ class AnticipationMethod(AssignmentMethod):
 
         # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
         
-        riderAvailableTime = bestRider.nextAvailableTime # time when he finish the last order, before start this order
+        t_start = bestRider.nextAvailableTime # time when he finish the last order, before start this order
         
-        # update rider status
+        # update order status
         self.order.foundRider(bestRider)
-        bestRider.deliver(self.order, riderAvailableTime)
+        self.order.addRiderReachReatsurantTime(earliestRestaurantArrivalTime)
+        self.order.addDeliveredTime() # order.t_delivered
+
+        # update rider status
+        bestRider.deliver(self.order, t_start)
         
         self.bestRider = bestRider
         

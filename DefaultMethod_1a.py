@@ -73,10 +73,13 @@ class DefaultMethod_1a(AssignmentMethod):
             self.earliestRestaurantArrival = self.currTime + bestRiderR2R
 
 
+            # update order status
             self.order.foundRider(bestRider)
-            # update rider status
-            bestRider.deliver(self.order, self.currTime) # update the rider's lastStop loc, nextAvaiTime
+            self.order.addRiderReachReatsurantTime(self.earliestRestaurantArrival)
+            self.order.addDeliveredTime() # order.t_delivered
 
+            # update rider status
+            bestRider.deliver(self.order, self.currTime)
             self.bestRider = bestRider
             
             # return bestRider

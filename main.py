@@ -6,6 +6,7 @@ from make_waiting_time_plot import WaitingTimePLot
 # from make_waiting_time_plot_bulk import WaitingTimePLot
 from make_waiting_time_plot_all import WaitingTimePLot
 import datetime
+from Analyse_Orders import Simple
 
 
 def main():
@@ -17,13 +18,19 @@ def main():
    # a.visualizeMaxMin()
    # a.visualizeRoute()
    startTime = datetime.datetime.now()
-   # a = WaitingTimePLot()
-   # a.run()
    a = WaitingTimePLot()
-   # a.add_method("AnticipationMethod")
+   # a.run()
+   # a = WaitingTimePLot()
+   # a.add_method("AssignLaterMethod_UsefulWork")
    # a.add_method("AssignLaterMethod")
+   # a.add_method("UsefulWorkMethod")
    a.add_all_methods()
    a.plot()
+
+   # a = Simple()
+   # a.add_all_methods()
+   # a.run()
+
    endTime = datetime.datetime.now()
    print("Time taken: ", endTime - startTime)
 

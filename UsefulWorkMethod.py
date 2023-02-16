@@ -22,6 +22,7 @@ class UsefulWorkMethod(AssignmentMethod):
         self.FRT = None
         self.timeArrivalDict_rider_time = {} # for analysis
         self.freqRidersArriveBeforeFRT = 0
+        
         # self.numOrdersProcessed = 0
 
     def addOrder(self, newOrder):
@@ -110,7 +111,7 @@ class UsefulWorkMethod(AssignmentMethod):
         '''
         order_index = self.order.index
         FPT = self.order.rest.order_FPT_dict[order_index]
-        FRT = self.currTime + FPT
+        FRT = self.order.t + FPT
 
         arrival_time_ls = list(RiderArriveTime.keys()) # time arrived at the restaurant
         arrival_time_ls.sort()
@@ -130,6 +131,7 @@ class UsefulWorkMethod(AssignmentMethod):
         RiderArriveTime_beforeFRT = self.find_time_before_FRT( RiderArriveTime_dict ) # list
 
         bestRider = None
+        t_reach_rest = -100000 # time of the best rider reaches the restaurant
 
         if len(RiderArriveTime_beforeFRT) > 0: # if there are riders who can reach before FRT
 
@@ -157,27 +159,31 @@ class UsefulWorkMethod(AssignmentMethod):
                     max_next_available_time = r.nextAvailableTime
                     bestRider_id = r.index
             bestRider = self.rider_list[bestRider_id]
+            # get time it reaches the restaurnat
+            R2R = math.dist(r.lastStop if r.lastStop else r.loc, self.order.rest.loc) / args["riderSpeed"]
+            t_reach_rest = r.nextAvailableTime + R2R
 
             # bookkeeping
             self.freqRidersArriveBeforeFRT += 1
-        
-
-            
-            
-
+                   
         else: # no one can reach before FRT
             # greedy: find the earliest arrival time
             # print(" NO riders can reach before FRT")
             arrival_time_ls = list(RiderArriveTime_dict.keys())
-            earliest_arrival_time = min(arrival_time_ls)
-            bestRiders = RiderArriveTime_dict[earliest_arrival_time] # list
+            
+            t_reach_rest = min(arrival_time_ls)
+            bestRiders = RiderArriveTime_dict[t_reach_rest] # list
             bestRider = random.choice(bestRiders)
         
         
         # 3. found the best rider, update status
-        riderAvailableTime = bestRider.nextAvailableTime
+        t_start = bestRider.nextAvailableTime
+        # update order status
         self.order.foundRider(bestRider)
-        bestRider.deliver(self.order, riderAvailableTime)
+        self.order.addRiderReachReatsurantTime(t_reach_rest)
+        self.order.addDeliveredTime() # order.t_delivered
+        # update rider status
+        bestRider.deliver(self.order, t_start)
         self.bestRider = bestRider
 
         # bookkeeping

@@ -28,6 +28,7 @@ allocation algorithm. Data generated includes:
 
 def dataGeneration():
 
+
     '''
     This fucntion generates locations for restaurants, customers and riders
     '''
@@ -101,7 +102,7 @@ def dataGeneration():
                                             (args["FPT_upper"] - fpt_mean) / fpt_sd, 
                                             loc=fpt_mean, scale=fpt_sd).rvs(args['numOrders']).tolist()
             #### debug #######
-            showFPTplot = 1# for 1 simulation only
+            showFPTplot = 0# for 1 simulation only
             if showFPTplot:
                 fpt_in_minute = [round(i/60, 3) for i in food_prep_time]
                 plt.hist(fpt_in_minute, bins=15, alpha=0.5)

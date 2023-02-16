@@ -1,5 +1,7 @@
 
 from os import WTERMSIG
+import math
+from config import args
 
 
 
@@ -9,7 +11,7 @@ class Order():
     """
     status = {
         1: 'ORDERED',
-        2: 'DELIVERING',
+        2: 'ASSIGNED',
         3: 'DELIVERED',
         4: 'DROPPED',
         5: 'WAITINGforREASSIGNMENT',
@@ -37,10 +39,25 @@ class Order():
         self.status = 2
         # print("------ Order #" , self.index, "is assigned to Rider #", self.rider.index , "order is ", self.getOrderStatus() )
     
+    def addRiderReachReatsurantTime(self, t:float):
+        # time that the assigned rider reaches the restaurant
+        # called in find_best_rider() in AssignMethod child classes
+        self.t_riderReachedRestaurant = t
+    
+    def addDeliveredTime(self):
+        # called after addRiderReachReatsurantTime()
+        t_rest = self.t_riderReachedRestaurant
+        rest2cust = math.dist(self.rest.loc, self.cust.loc)/args["riderSpeed"]
+        FPT = self.rest.order_FPT_dict[self.index]
+        FRT = FPT + self.t
+        t_delivered = max(t_rest, FRT) + rest2cust
+        self.t_delivered = t_delivered
+        self.wt = self.t_delivered - self.t
+        
+
     def delivered(self, t_delivered):
         # order:
         self.status = 3
-        # self.t_delivered = t_delivered # update order delivered time
         if self.wt != self.t_delivered - self.t:
             print("Error in compute WT: self.wt = ", self.wt, " while calculated value is ", self.t_delivered - self.t)
             print("self.t_delivered = ", self.t_delivered, " and self.t = ",  self.t)

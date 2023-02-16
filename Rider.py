@@ -36,76 +36,36 @@ class Rider():
     def getStatus(self):
         return Rider.status[self.status]
 
-    def deliver(self, order:Order, riderFreeTime:float):
+    def deliver(self, order:Order, time_start_deliver:float):
 
         self.totalCurrOrder += 1
         self.status = 1
         self.orderDict[order.index] = order
         self.activeOrderDict[order.index] = order
 
-        # calculate delivery time
-        rest_loc = order.rest.loc
-        cust_loc = order.cust.loc
-        FPT = order.rest.order_FPT_dict[order.index]
-
-        R2R = math.dist(rest_loc, self.lastStop if self.lastStop else self.loc)/args["riderSpeed"]
-        DT = math.dist(rest_loc, cust_loc)/args["riderSpeed"]
-        WT = max(FPT, R2R) + DT
-
-        # order 
-        order.rider = self
-        order.t_riderReachedRestaurant = max(riderFreeTime, order.t) + R2R
-        order.t_delivered = max(riderFreeTime, order.t) + WT
-        # print("Order ", order.index, ": rider_start_t, order.t, R2R, DT, WT, reach_rest, delivered :\n",
-        #              [riderFreeTime, order.t, R2R, DT, WT, order.t_riderReachedRestaurant, order.t_delivered])
-        order.wt = order.t_delivered - order.t # the actual waiting time: WT + lagtime, where WT = max(FPT, R2R) + DT 
-        # order.wt = WT + max((riderFreeTime - order.t),0) # when the assigned rider is busy, the waiting time also includes 
-        
-
         # rider
-        self.nextAvailableTime = riderFreeTime + WT # the same as the order delivered time. 
+        self.nextAvailableTime = order.t_delivered
         self.lastStop = order.cust.loc
         self.orderCompleteTimeList.append(self.nextAvailableTime)
-        
 
+        # Calculate Rider Wait Time
         
+        FPT = order.rest.order_FPT_dict[order.index]
+        FRT = FPT + order.t  # Food Ready Time
         
+        R2R = math.dist(order.rest.loc, self.lastStop if self.lastStop else self.loc)/args["riderSpeed"]
+        t_reached  = time_start_deliver + R2R # Time Rider reach the restaurant 
+        
+        riderWT = max(0, FRT - t_reached)
+        self.totalWaitingTime += riderWT
 
-        
-        
-        
-        
-        
 
-       
-        
-        # calculate waiting time for rider
-        riderWT = R2R - FPT if FPT<R2R else 0
-        # print("------ Order #" , order.index, " waiting time is" ,waiting_time, "\n Finish Time: ", self.nextFreeTime)
-        self.totalWaitingTime+= riderWT
-
-            
-
-    # def predictStatus(self, currTime, predTime): # output is string
-    #     #Predict rider status after 'predTime' minute
-    #     predStatus = -1 # initialize
-    #     if self.status == 1: # if busy
-    #         predStatus = 0 if self.nextAvailableTime < currTime+predTime else 1
-    #     elif self.status == 0:
-    #         predStatus = self.status
-    #     else:
-    #         print("Error: Rider status error.")
-    #     return Rider.status[predStatus]
 
     def getFoodReadyTime(self, orderIndex): # given an order, returns when the food is ready on the timeline
         order = self.orderDict[orderIndex]
         orderInTime = order.t
         foodPrepTime = order.rest.order_FPT_dict[orderIndex]
         return foodPrepTime + orderInTime
-
-    
-    # def getOrderDeliveredTime(self):# given an order, returns when the rider will complete the delivery for the order
-    #     return self.nextAvailableTime
 
 
 

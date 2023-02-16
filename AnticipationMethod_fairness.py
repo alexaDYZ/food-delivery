@@ -106,6 +106,10 @@ class AnticipationMethod(AssignmentMethod):
         
         # update rider status
         self.order.foundRider(bestRider)
+        self.order.addRiderReachReatsurantTime(self.earliestRestaurantArrival)
+        self.order.addDeliveredTime() # order.t_delivered
+
+        # update rider status
         bestRider.deliver(self.order, riderAvailableTime)
         
         self.bestRider = bestRider

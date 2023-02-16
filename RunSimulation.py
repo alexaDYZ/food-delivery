@@ -92,8 +92,7 @@ def runEpisode_single_medthod(method):
     '''
     Start Simulation
     '''
-
-    sim = Simulation(method,restaurant_list, rider_list, order_list, customer_list, order_time, args)
+    sim = Simulation(method, restaurant_list, rider_list, order_list, customer_list, order_time, args)
     sim_res = sim.simulate()
 
     if method.name == "AssignLaterMethod":
@@ -103,5 +102,5 @@ def runEpisode_single_medthod(method):
                 count += 1
         
         print("Reassigned orders: ", round(count/len(sim.order_list), 2)*100, "%")
-
+    
     return sim_res

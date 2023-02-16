@@ -4,11 +4,11 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numSimulations":30, # for averaging, 100
+    "numSimulations":1, # for averaging, 100
     
     "gridSize": 1000, # unit: m, default is 1000
 
-    "useMcData": 0, # if we use the data from the McDelivery dataset
+    "useMcData": 1, # if we use the data from the McDelivery dataset
     
     # for each time window
     # "totalTime": 1000,
@@ -26,7 +26,7 @@ args = dotdict({
     
     # FPT distribution
     "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
-    "if_TNM": 1, # if we use TNM to model FPT
+    "if_TNM": 0, # if we use TNM to model FPT
     "TNM_weights": [0.2, 0.5, 0.25, 0.05],
     "FPT_avg": 600, # unit: s # second # average food preparation time. default is 300
     "FPT_sd":200,

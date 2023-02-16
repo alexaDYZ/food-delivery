@@ -11,11 +11,28 @@ import pickle
 import math
 import scipy.stats as stats
 
-# print(plt.colormaps())
-# get color from color map
-cm = plt.get_cmap('tab20_r')
-print(cm("tab20c_r"))
 
+class Plus():
+    def __init__(self):
+        self.a = 7
+        self.b = 8
+    
+    @staticmethod
+    def plus(a, b):
+        return a + b
+
+class Multiply():
+    def __init__(self):
+        self.a = 10
+        self.b = 2
+    def p(self):
+       res  = Plus.plus(self.a, self.b)
+       return res
+
+        
+
+m = Multiply()
+print(m.p())
 
 
 # def generate_a_FPT():

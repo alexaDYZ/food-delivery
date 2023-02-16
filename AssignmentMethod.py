@@ -50,5 +50,11 @@ class AssignmentMethod_Batching():
         Input: a list of eligible riders
         Output: the best rider, Rider Object
         '''
+        '''
+        Find 
+        1) best rider 
+        2) earliest time for him/her to start working on this order
+        3)R2R
+        '''
         pass
 

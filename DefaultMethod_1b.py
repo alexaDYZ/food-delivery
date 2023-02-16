@@ -47,7 +47,16 @@ class DefaultMethod_1b(AssignmentMethod):
     def find_best_rider(self):
         # print("=================  Default Method  ================= ") if args["printAssignmentProcess"] else None
         self.find_idle_candidates()
+        bestRider = None
+        earliestStartingTime = -100000
+        R2R = -100000
         
+        '''
+        Find 
+        1) best rider 
+        2) earliest time for him/her to start working on this order
+        3)R2R
+        '''
         # if there are free rider(s), pick the one with shortest R2R
         if self.idle_candidates:
             
@@ -66,23 +75,14 @@ class DefaultMethod_1b(AssignmentMethod):
                 else:
                     R2RForAllEligible_dict[R2R] = [r.index]
 
-            # print(R2RForAllEligible_dict) if args["printAssignmentProcess"] else None
-            bestRiderR2R = min(R2RForAllEligible_dict.keys())
+            R2R = min(R2RForAllEligible_dict.keys())
             self.rider_list.sort()
             
-            bestRiders = R2RForAllEligible_dict[bestRiderR2R]
+            bestRiders = R2RForAllEligible_dict[R2R]
             bestRider = self.rider_list[random.choice(bestRiders)]
             
-            self.earliestRestaurantArrival = self.currTime + bestRiderR2R
+            earliestStartingTime = self.currTime
 
-
-            self.order.foundRider(bestRider)
-            # update rider status
-            bestRider.deliver(self.order, self.currTime) # update the rider's lastStop loc, nextAvaiTime
-
-            self.bestRider = bestRider
-            
-            return bestRider
         
         # if everyone is busy, pick the one who can finish his/her order the ealiest
         else:
@@ -98,25 +98,24 @@ class DefaultMethod_1b(AssignmentMethod):
             bestRiders = nextAvailTimeForAll_dict[earliestStartingTime]
             self.rider_list.sort()
             bestRider = self.rider_list[random.choice(bestRiders)]
-
             # find time arrival at the restaurant
             R2R = math.dist(bestRider.lastStop, self.order.rest.loc) / args["riderSpeed"]
-            self.earliestRestaurantArrival = earliestStartingTime + R2R
-
-            # update relevant information 
-            # update order status
-            self.order.foundRider(bestRider)
-
-            self.order.t_riderReachedRestaurant = self.earliestRestaurantArrival
-
-            # update rider status
-            bestRider.deliver(self.order, earliestStartingTime)
-
-            self.bestRider = bestRider
+            
 
 
-            return bestRider
-        
+        self.earliestRestaurantArrival = earliestStartingTime + R2R
+        # update relevant information 
+        # update order status
+        self.order.foundRider(bestRider)
+        self.order.addRiderReachReatsurantTime(self.earliestRestaurantArrival)
+        self.order.addDeliveredTime() # order.t_delivered
+
+        # update rider status
+        bestRider.deliver(self.order, earliestStartingTime)
+
+        self.bestRider = bestRider
+        return bestRider
+
 
 
     # def find_ealiest_arrival(self):

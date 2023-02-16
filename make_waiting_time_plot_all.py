@@ -22,7 +22,9 @@ from DefaultMethod_1b import DefaultMethod_1b
 from PatientAnticipativeMethod_Bulk import PatientAnticipativeMethod_Bulk
 from  AnticipationMethod import AnticipationMethod
 from UsefulWorkMethod import UsefulWorkMethod
-from AssignLaterMethod import AssignLaterMethod
+from AssignLaterMethod import AssignLaterMethod, AssignLaterMethod_UsefulWork  
+
+
 
 class WaitingTimePLot():
     methods = {
@@ -32,6 +34,7 @@ class WaitingTimePLot():
         "PatientAnticipativeMethod_Bulk": PatientAnticipativeMethod_Bulk(),
         "UsefulWorkMethod": UsefulWorkMethod(),
         "AssignLaterMethod": AssignLaterMethod(),
+        "AssignLaterMethod_UsefulWork": AssignLaterMethod_UsefulWork(),
     }
     method_colors = {
         "DefaultMethod_1b":  ["red", "lightcoral", "pink", "pink", "pink"],
@@ -40,7 +43,8 @@ class WaitingTimePLot():
         "PatientAnticipativeMethod_Bulk": ["sandybrown", "orange", "bisque", "bisque", "bisque"],
         "UsefulWorkMethod": ["yellow", "gold",  "lightyellow", "lightyellow", "lightyellow"],
         "AssignLaterMethod": ["purple", "mediumpurple", "thistle", "thistle", "thistle"],
-        "Optimal": ["black", "grey", "grey", "grey", "grey"]
+        "Optimal": ["black", "grey", "grey", "grey", "grey"],
+        "AssignLaterMethod_UsefulWork":["pink", "hotpink", "lightpink", "lightpink", "lightpink"],
     }
     
     def __init__(self) -> None:
@@ -189,6 +193,7 @@ class WaitingTimePLot():
                 wt_ia_dict[m_name].append(wt_ia)
                 if self.plot_regret:
                     regret_ia_dict[m_name].append(regret_ia)
+                print("✅ Method ", m_name, " done")
             
             # add theoretical optimal 
             if self.add_optimal_wt:
@@ -271,6 +276,7 @@ class WaitingTimePLot():
                 + "_FPT" + str(args["FPT_avg"])
                 + "window" + str(args["stallingTime"]/60) + "min_"
                 + "_ts"+ str(int(args["threshold_assignment_time"]/60)))
+        if args["useMcData"]: params += "_Mc"
 
         figname = args["path"] + "IA_distribution"+ params
         
@@ -325,6 +331,7 @@ class WaitingTimePLot():
                     + "_FPT" + str(args["FPT_avg"])
                     + "_window" + str(round(args["stallingTime"]/60,1))+"min_"
                     + "all_methods")
+            if args["useMcData"]: params += "_Mc"
             figname = args["path"] + "IA_distribution"+ params+ "_enlarged"
             if args["if_truncated_normal"]:
                 figname+='_tnormal'
@@ -452,12 +459,13 @@ class WaitingTimePLot():
         self.plot_wt = True
         self.plot_regret = True
         
-        for i in [i*10 for i in range(5,12)]: # TNM, synthetic data
-        # for i in [i*100 for i in range(6,11)]:
+        # for i in [i*5 for i in range(4,7)]: # TNM, synthetic data
+        for i in [i*100 for i in range(5,12)]:
         # for i in [40]:
         # for i in [i*5 for i in range(7, 10)]: # deterministic FPT, synthetic data
         # for j in [i*60*5 for i in range(5, 15)]: # TNM, real data
             args["numRiders"] = i
+            args["if_TNM"] = 1
             # args["threshold_assignment_time"] = j
             # print("threshold_assignment_time: ", str(int(j/60))+"min")
             

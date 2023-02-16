@@ -188,9 +188,14 @@ class PatientAnticipativeMethod_Bulk(AssignmentMethod_Batching):
     def assignPendingOrders(self, matched_res_dict):
         for o, r in matched_res_dict.items():
             if r:
-                r_startTimeForCurrOrder = r.nextAvailableTime
+                # update order status
+                t_start = r.nextAvailableTime
+                t_reached_restaurant = t_start + math.dist(r.lastStop if r.lastStop else r.loc, o.rest.loc) / args["riderSpeed"]
                 o.foundRider(r)
-                r.deliver(o, r_startTimeForCurrOrder)
+                o.addRiderReachReatsurantTime(t_reached_restaurant)
+                o.addDeliveredTime() # order.t_delivered
+                # update rider status
+                r.deliver(o, t_start)
                 ### debug:
                 # print("Order " + str(o.index) + " is assigned to Rider " + str(r.index) ) 
             else:

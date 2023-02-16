@@ -81,7 +81,7 @@ class Event():
 
             else:
                 # print("******* Order " + str(self.order.index) + " is dropped ******" if args["printAssignmentProcess"] else '')
-                if self.method.name == "AssignLaterMethod": # order to be ressigned later
+                if "AssignLaterMethod" in self.method.name: # order to be ressigned later
                     e_reassignment = Event(self.order.reassign_time, 6, curr_order) # treat re-assignment like a new arrival
                     triggeredEvent.append(e_reassignment)
                 else:
