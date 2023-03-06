@@ -239,6 +239,7 @@ class Simulation():
         else:
 
             self.method.addRiderList(self.rider_list)
+            self.method.addRestList(self.restaurant_list)
             
             # create event checkpoints
             checkpoint = EventQueue()   
@@ -292,6 +293,7 @@ class Simulation():
                     # print("Status check at", currTime, ":", self.status_check_dict.keys())
 
                 elif currEvent.getCategory() == 'Order Delivered':
+                    currEvent.addAssignmentMethod(self.method) # to provide self.walking_rule
                     self.numDelivered += 1
                     # get total waiting time
                     currOrder = currEvent.order

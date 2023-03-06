@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 import time
 from RunSimulation import runEpisode
 from Analyse_Orders import AnalyseOrders
-from DefaultMethod_1a import DefaultMethod_1a
 from DefaultMethod_1b import DefaultMethod_1b
 import datetime
 import math

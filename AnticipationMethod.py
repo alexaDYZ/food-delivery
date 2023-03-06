@@ -9,6 +9,7 @@ from config import args
 import math
 import random  
 
+
 class AnticipationMethod(AssignmentMethod):
     def __init__(self):
         super().__init__()
@@ -22,8 +23,8 @@ class AnticipationMethod(AssignmentMethod):
         return super().addCurrTime(currTime)
     def addRiderList(self, rider_list):
         return super().addRiderList(rider_list)
-
-    # This part is different from the lookAhead method 
+    
+    # This part is different from the baseline method 
     def findR2RforAll(self):
         
         '''
@@ -43,8 +44,8 @@ class AnticipationMethod(AssignmentMethod):
             
             '''get the time when this rider reaches the restaurant'''
 
-            # Case 1: rider is idle/free now
-            if rider.status != 1:
+            # Case 1: rider is idle/free now, and stays at a fixed place
+            if rider.status == 0:
                 # ######################### debug #########################
                 # print("Rider " + str(rider.index) + "is idle at t = " + str(currTime) ) if args["printAssignmentProcess"] else None
                 # print("Rider " + str(rider.index) +  " will reach at " +  
@@ -54,8 +55,14 @@ class AnticipationMethod(AssignmentMethod):
                 R2R = rider.distance_to(rest_loc) / args["riderSpeed"]
                 
                 return currTime + R2R
+            # Case 2: rider is walking
+            elif rider.status == 2:
+                # print(" - Rider " + str(rider.index) + "is walking at t = " + str(currTime) ) 
+                curr_loc = rider.getLocation(currTime)
+                R2R = math.dist(curr_loc, rest_loc) / args["riderSpeed"]
+                return currTime + R2R
 
-            # Case 2: rider is busy now
+            # Case 3: rider is busy now
             else:
                 # Assuming there's no maximum num of orders one can take
                 
@@ -93,8 +100,7 @@ class AnticipationMethod(AssignmentMethod):
     # driver function, called in Event.py
     def find_best_rider(self):
 
-        # print("🔮🔮🔮🔮🔮🔮🔮🔮🔮 Anticipative Method 🔮🔮🔮🔮🔮🔮🔮🔮🔮" )if args["printAssignmentProcess"] else None
-        # print("calling ==== find_best_rider") if args["printAssignmentProcess"] else None
+        # print("🔮 Order" + str(self.order.index) + " 🔮")
 
         self.R2RforAll = {}
         self.findR2RforAll() # compute self.R2RforAll
@@ -104,9 +110,15 @@ class AnticipationMethod(AssignmentMethod):
         bestRiders = self.R2RforAll[earliestRestaurantArrivalTime] # find best rider using the min
         bestRider = random.choice(bestRiders) # randomly choose one from the best riders
 
-        # print("---------Order " + str(self.order.index) + " is assigned to Rider" + str(bestRider.index)+"-----------") if args["printAssignmentProcess"] else None
-        
-        t_start = bestRider.nextAvailableTime # time when he finish the last order, before start this order
+        # print("Assigned to Rider " + str(bestRider.index)+ "\n"
+        #       "Reach Restaurant at "+ str(round(earliestRestaurantArrivalTime,3))+ "\n" +
+        #       "Status = " + str(bestRider.status) + "\n"
+        #        ) 
+        if bestRider.status == 2: # if rider is walking
+            t_start = self.currTime # let him start right away, more update when r.deliver() is called
+            # print("🚶: " + str(bestRider.index) + "was waling...")
+        else: 
+            t_start = bestRider.nextAvailableTime # time when he finish the last order, before start this order
         
         # update order status
         self.order.foundRider(bestRider)

@@ -55,10 +55,16 @@ class WaitingTimePLot():
         self.methods = list(WaitingTimePLot.methods.values())
     
     # to add a single method
-    def add_method(self, method_name):
+    def add_method(self, method_name, ):
         m = WaitingTimePLot.methods[method_name]
-        self.methods.append(m)
-    
+        self.methods.append(m)   
+        
+    # to add an unlisted method
+    def add_additional_method(self, method_obj, color_ls = ["red", "lightcoral", "pink", "pink", "pink"]):
+        self.methods.append(method_obj)
+        WaitingTimePLot.method_colors[method_obj.name] = color_ls
+        
+            
     def simulateOnce_all_methods(self):
         '''
         This function performs 1 simulation using each method in self.methods.
@@ -206,18 +212,21 @@ class WaitingTimePLot():
         # == end of multiple simulations ==
 
         wt_ia_dict_res = {}
-        for m_name, ia_ls in wt_ia_dict.items(): 
-            max_num_intervals = max([len(i) for i in ia_ls]) # find the max number of intervals in all simulations
-            col_names = [str(i*args["IA_interval"]) for i in range(1, max_num_intervals+1)] # column names are order index
-            df = pd.DataFrame(ia_ls, columns = col_names)
-            wt_ia_dict_res[m_name] = df
+        if self.plot_wt:
+            for m_name, ia_ls in wt_ia_dict.items(): 
+                max_num_intervals = max([len(i) for i in ia_ls]) # find the max number of intervals in all simulations
+                col_names = [str(i*args["IA_interval"]) for i in range(1, max_num_intervals+1)] # column names are order index
+                df = pd.DataFrame(ia_ls, columns = col_names)
+                wt_ia_dict_res[m_name] = df
+        
         
         regret_ia_dict_res = {}
-        for m_name, ia_ls in regret_ia_dict.items():
-            max_num_intervals = max([len(i) for i in ia_ls]) # find the max number of intervals in all simulations
-            col_names = [str(i*args["IA_interval"]) for i in range(1, max_num_intervals+1)] # column names are order index
-            df = pd.DataFrame(ia_ls, columns = col_names)
-            regret_ia_dict_res[m_name] = df
+        if self.plot_regret:
+            for m_name, ia_ls in regret_ia_dict.items():
+                max_num_intervals = max([len(i) for i in ia_ls]) # find the max number of intervals in all simulations
+                col_names = [str(i*args["IA_interval"]) for i in range(1, max_num_intervals+1)] # column names are order index
+                df = pd.DataFrame(ia_ls, columns = col_names)
+                regret_ia_dict_res[m_name] = df
         
         
         return wt_ia_dict_res, regret_ia_dict_res
@@ -282,7 +291,7 @@ class WaitingTimePLot():
         
         if args["numRiders"] < 40:
             # set background color
-            plt.figure(figsize=(10,5))
+            plt.figure(figsize=(10,5) if len(self.methods) >= 5 else (7,5))
             if args["if_truncated_normal"]:
                     figname+='_tnormal'
                     #  change the background color
@@ -302,7 +311,10 @@ class WaitingTimePLot():
             plt.ylim(0,100)
             plt.xlabel("Time Horizon (Hours)")
             plt.ylabel("Waiting Time (Minutes)")
-            plt.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), fontsize = 8, borderaxespad=0.)
+            if len(self.methods)>= 5:
+                plt.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), fontsize = 8, borderaxespad=0.)
+            else:
+                plt.legend(loc = 'best', fontsize = 10)
             x_lables = [int(i/60) for i in np.arange(0, int(args["simulationTime"]/60 + 60), step = 60)]
             plt.xticks(np.arange(0, int(args["simulationTime"]/60 + 60), step = 60), x_lables)    
             title = "Customer's Wait Time (Interval Average)"
@@ -321,7 +333,7 @@ class WaitingTimePLot():
 
         # plot another one on for numRiders = 40
         if args["numRiders"] >= 40:
-            plt.figure(figsize=(10,5))
+            plt.figure(figsize=(10,5) if len(self.methods) >= 5 else (7,5))
             params = ("_numSim"+str(args["numSimulations"])
                     + "_numRider"+str(args['numRiders'])
                     + "_numRest"+str(args['numRestaurants'])
@@ -352,7 +364,10 @@ class WaitingTimePLot():
             plt.ylim(0, 100) # uniform the scale and range for different parameters
             plt.xlabel("Time Horizon (hours)")
             plt.ylabel("Waiting Time (minutes)")
-            plt.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), fontsize = 8, borderaxespad=0.)
+            if len(self.methods)>= 5:
+                plt.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), fontsize = 8, borderaxespad=0.)
+            else:
+                plt.legend(loc = 'best', fontsize = 10)
             x_lables = [int(i/60) for i in np.arange(0, int(args["simulationTime"]/60 + 60), step = 60)]
             plt.xticks(np.arange(0, int(args["simulationTime"]/60 + 60), step = 60), x_lables)    
             title = "Customer's Wait Time (Interval Average)"
@@ -417,7 +432,7 @@ class WaitingTimePLot():
         figname = args["path"] + "Regret"+ params
 
         # plot another one on for numRiders = 40
-        plt.figure(figsize=(10,5))
+        plt.figure(figsize=(10,5) if len(self.methods) >= 5 else (7,5))
 
         # FPT distribution - background color
         if args["if_truncated_normal"]:
@@ -432,11 +447,16 @@ class WaitingTimePLot():
         for m_name, df in regret_ia_dict.items():
             plot(df, m_name)
         
+        
+        
         # plt.axhline(y = 45, color = 'r', linestyle = 'dashed', label = "Acceptable Waiting Time (45 min)")
         plt.ylim(0, 20) # uniform the scale and range for different parameters
         plt.xlabel("Time Horizon (hours)")
         plt.ylabel("Regret (minutes)")
-        plt.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), fontsize = 8, borderaxespad=0.)
+        if len(self.methods)>= 5:
+            plt.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), fontsize = 8, borderaxespad=0.)
+        else:
+            plt.legend(loc = 'best', fontsize = 10)
         x_lables = [int(i/60) for i in np.arange(0, int(args["simulationTime"]/60 + 60), step = 60)]
         plt.xticks(np.arange(0, int(args["simulationTime"]/60 + 60), step = 60), x_lables)    
         title = "Regret of Customer's Wait Time (Interval Average)"
@@ -457,15 +477,16 @@ class WaitingTimePLot():
     def plot(self):
         self.add_optimal_wt = True
         self.plot_wt = True
-        self.plot_regret = True
+        self.plot_regret = False
         
-        # for i in [i*5 for i in range(4,7)]: # TNM, synthetic data
-        for i in [i*100 for i in range(5,12)]:
+        # for i in [i*5 for i in range(4,9)]: # TNM, synthetic data
+        # for i in [i*100 for i in range(10,12)]:
         # for i in [40]:
-        # for i in [i*5 for i in range(7, 10)]: # deterministic FPT, synthetic data
-        # for j in [i*60*5 for i in range(5, 15)]: # TNM, real data
+        # for i in [i*5 for i in range(4, 10)]: # deterministic FPT, synthetic data
+        # for j in [i*60*5 for i in range(1,2)]: # TNM, real data
+        for i in [50,60]:
+        
             args["numRiders"] = i
-            args["if_TNM"] = 1
             # args["threshold_assignment_time"] = j
             # print("threshold_assignment_time: ", str(int(j/60))+"min")
             

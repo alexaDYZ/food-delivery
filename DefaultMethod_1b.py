@@ -17,7 +17,7 @@ class DefaultMethod_1b(AssignmentMethod):
     '''
     def __init__(self) -> None:
         super().__init__()
-        self.idle_candidates = None
+        self.candidates = None
         self.bestRider = None
         self.earliestRestaurantArrival = None
 
@@ -29,24 +29,18 @@ class DefaultMethod_1b(AssignmentMethod):
     def addRiderList(self, rider_list):
         return super().addRiderList(rider_list)
    
-    def find_idle_candidates(self):
-        # print("finding eligibles" )if args["printAssignmentProcess"] else None
-        # Eligible: status is free, aka idle; within a threshold of distance
+    def find_candidates(self):# idle and walking
+        # Eligible: status is free, aka idle or walking; within a threshold of distance
         rest_loc = self.order.rest.loc
-        # eligible_candidates = [r for r in self.rider_list  if r.distance_to(rest_loc) < args["riderSelectionThreshold"] and r.getStatus() == "FREE"]
         eligible_candidates = []
         for r in self.rider_list:
-            if r.status != 1:
+            if r.status != 1: # idle and walking
                 eligible_candidates.append(r)
-        self.idle_candidates = eligible_candidates
-        # print("!!!! eligible riders are:") if args["printAssignmentProcess"] else None
-        # print([r.index for r in self.idle_candidates]) if args["printAssignmentProcess"] else None
-        
-
+        self.candidates = eligible_candidates
    
     def find_best_rider(self):
         # print("=================  Default Method  ================= ") if args["printAssignmentProcess"] else None
-        self.find_idle_candidates()
+        self.find_candidates()
         bestRider = None
         earliestStartingTime = -100000
         R2R = -100000
@@ -58,17 +52,20 @@ class DefaultMethod_1b(AssignmentMethod):
         3)R2R
         '''
         # if there are free rider(s), pick the one with shortest R2R
-        if self.idle_candidates:
+        if self.candidates: # idle and walking riders
             
-            # self.eligible_candidates.sort(key=lambda x: math.dist(x.lastStop if x.lastStop else x.loc, self.order.rest.loc), reverse=False) # sort all riders by distance to resturant
-            def getR2R(rider:Rider, order:Order, ):
+            def getR2R(rider:Rider, order:Order):
+                R2R = -1
                 # calculate the R2R time for each rider for the order
-                R2R = math.dist(rider.lastStop if rider.lastStop else rider.loc, order.rest.loc)/ args["riderSpeed"]
-                return R2R
+                if rider.status == 2: # Case: rider is walking
+                    curr_loc = rider.getLocation(self.currTime)
+                    R2R = math.dist(curr_loc, order.rest.loc) / args["riderSpeed"]
+                else: R2R = math.dist(rider.lastStop if rider.lastStop else rider.loc, order.rest.loc)/ args["riderSpeed"]
+                return round(R2R,3)
 
             R2RForAllEligible_dict = {} # key: R2R of rider r; value: rider index
 
-            for r in self.idle_candidates:
+            for r in self.candidates:
                 R2R = getR2R(r, self.order)
                 if R2R in R2RForAllEligible_dict.keys():
                     R2RForAllEligible_dict[R2R].append(r.index)
@@ -76,16 +73,17 @@ class DefaultMethod_1b(AssignmentMethod):
                     R2RForAllEligible_dict[R2R] = [r.index]
 
             R2R = min(R2RForAllEligible_dict.keys())
-            self.rider_list.sort()
+            
             
             bestRiders = R2RForAllEligible_dict[R2R]
+            self.rider_list.sort()
             bestRider = self.rider_list[random.choice(bestRiders)]
             
             earliestStartingTime = self.currTime
 
         
         # if everyone is busy, pick the one who can finish his/her order the ealiest
-        else:
+        else: # busy riders
             nextAvailTimeForAll_dict = {} # key: nextAvailTime; value: rider index
             for r in self.rider_list:
                 if r.nextAvailableTime in nextAvailTimeForAll_dict.keys():

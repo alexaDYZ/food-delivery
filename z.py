@@ -12,27 +12,32 @@ import math
 import scipy.stats as stats
 
 
-class Plus():
-    def __init__(self):
-        self.a = 7
-        self.b = 8
-    
-    @staticmethod
-    def plus(a, b):
-        return a + b
+# def getLocation(self, currTime):
+#     if self.status == 2: # rider is walking
+#         t_start, t_end, loc_start, loc_dest = self.walking_path
+#         if t_start <= currTime <= t_end:
+#             return loc_start + (loc_dest - loc_start) * (currTime - t_start)/(t_end - t_start)
+#         elif currTime > t_end:
+#             print("Error: Rider should have finished walking, but status is not updated")
+#         else:
+#             print("Error: see getLocation() in Rider.py")
+#     else:
+#         print("Error: Rider is not in walking mode")
+#         pass
 
-class Multiply():
-    def __init__(self):
-        self.a = 10
-        self.b = 2
-    def p(self):
-       res  = Plus.plus(self.a, self.b)
-       return res
+t_s = 0
+loc_s = np.array([0,0])
+loc_end = np.array([10,0])
+t_e = math.dist(loc_s, loc_end)/args["riderSpeed"]
 
-        
+t_inquiry = 5
+# curr_loc_x = loc_s + (loc_end[0] - loc_s[0]) * (t_inquiry - t_s)/(t_e - t_s)
+# curr_loc_y = loc_s + (loc_end[1] - loc_s[1]) * (t_inquiry - t_s)/(t_e - t_s)
+# curr_loc = (curr_loc_x, curr_loc_y)
+curr_loc = loc_s + (loc_end - loc_s) * (t_inquiry - t_s)/(t_e - t_s)
+print(curr_loc)
+print(type(curr_loc))
 
-m = Multiply()
-print(m.p())
 
 
 # def generate_a_FPT():

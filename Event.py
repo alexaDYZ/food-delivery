@@ -18,6 +18,8 @@ class Event():
         4: 'Regular Check', # for rider saturation rate
         5: 'Match Pending Orders',
         6: 'Re-Assignment', # for AssignLaterMethod
+        7: 'Rider Starts Walking',
+        8: 'Rider Arrived at Walking Destination',
     }
     def __init__(self, time, cat:int, order:Order):
         self.time = time # time when the event is executed
@@ -30,6 +32,7 @@ class Event():
         self.programEndTime = -1
         self.qsize = -1 # for 'Regular Check event'. to know if this is the end
         self.record = [] # columns: [order.index, t, r2r, restArrival, delivered]
+        self.rider = None # for event 7, rider walking
     
     def getCategory(self) : #returns a string
         return Event.category[self.cat]
@@ -87,17 +90,33 @@ class Event():
                 else:
                     self.order.status = 4 # dropped
         
-        
         # case 2: an order is delivered
         elif self.cat == 2:
             
             # print("******* Order " + str(self.order.index) +  " is delivered by Rider " + 
             #         str(self.order.rider.index) + " at t = " + str(currTime)+ 
-            #         "******" if args["printAssignmentProcess"] else '')
+            #         "******")
             
             # update status for rider and order
             self.order.delivered(currTime)
-        
+            
+            # check if the walking to the nearest restaurant
+            if self.method.walking_rule != 0: # 0 is no walking
+                r = self.order.rider
+                # check if it has other orders to deliver
+                if r.status == 0:
+                    # rider starts walking to the restaurant
+                    dest = r.find_walking_dest(self.method.rest_list, self.method.walking_rule)
+                    _, t_end, _, _ = r.moveTo(currTime, dest)
+                    e_start = Event(currTime, 7, None)
+                    e_start.rider = r
+                    # create event for rider to arrive at restaurant
+                    e_arrival = Event(t_end, 8, None)
+                    e_arrival.rider = r
+                    triggeredEvent.append(e_arrival)
+                    print("t = "+str(round(currTime,2))+": Rider " + str(r.index) + " finished Order "+ str(self.order.index)+", starts walking" )
+                elif r.status == 1:
+                    print("t = "+str(round(currTime,2))+": Rider " + str(r.index) + " finished Order "+ str(self.order.index)+", work on next order" )
         # case 3: rider arrives at restaurant
         elif self.cat == 3:
             #update rider location
@@ -148,6 +167,25 @@ class Event():
                     print("Order " + str(o.index) + " is dropped, no rider can be found")
 
             self.method.clearPendingOrders()
+        
+        # rider stars walking
+        elif self.cat == 7:
+            # print("Rider " + str(self.rider.index) + " starts walking at t = " + str(currTime))
+            pass
+
+        # when rider finished walking, and arrived at the target restaurant 
+        elif self.cat == 8:
+            # update rider location
+            r = self.rider
+            if r.walking_path == None: # walking is disrupted, rider was assigned an order while walking.
+                print("walking is disrupted, rider"+ str(r.index) +" was assigned an order while walking at" )
+                pass
+            else:
+                _, t_end, _, loc_dest = r.walking_path
+                r.loc = loc_dest
+                r.status = 0 # from walking to idle
+                r.walking_path = None
+                print("Rider " + str(r.index) + "finishes walking at t = " + str(t_end))
 
         return triggeredEvent # a list of events to be added to the checkpoints EventQueue
 

@@ -1,18 +1,30 @@
 from config import args
 class AssignmentMethod():
+    WALKING_RULE = {
+        "No Walking": 0 ,
+        "Nearest Restaurant": 1,
+        "Probabilistic":2,
+    }
     def __init__(self) -> None:
         self.order = None
         self.rider_list = None
+        self.rest_list = None
         self.currTime = None
         self.name = self.__class__.__name__
+        self.walking_rule = 0 # default is no walking
         
     def addOrder(self, newOrder):
         self.order = newOrder
     def addRiderList(self, rider_list):
         self.rider_list = rider_list
+    def addRestList(self, rest_list):
+        self.rest_list = rest_list
     def addCurrTime(self, currTime):
         self.currTime = currTime
-    def find_idle_candidates(self):
+    def setWalkingRule(self, rule_name):
+        self.walking_rule = AssignmentMethod.WALKING_RULE[rule_name]
+        self.name = self.__class__.__name__ + "_" + rule_name
+    def find_candidates(self):
         '''
         Input: a list of all riders
         Output: a list of eligible riders, eligibility is defined accordingly

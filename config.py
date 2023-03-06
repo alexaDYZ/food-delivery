@@ -4,29 +4,26 @@ from utils import dotdict
 
 # set key args
 args = dotdict({
-    "numSimulations":1, # for averaging, 100
+    "numSimulations":100, # for averaging, 100
     
     "gridSize": 1000, # unit: m, default is 1000
 
-    "useMcData": 1, # if we use the data from the McDelivery dataset
-    
-    # for each time window
-    # "totalTime": 1000,
-    # "numOrders": 2000, # same as num customers, initiliazed with -1. Assigned in generateData.py
-    # "numCustomers": 2000, 
+    "useMcData": 0, # if we use the data from the McDelivery dataset
+
     'numOrders': None, # to be assigned in generateData.py
     'numCustomers': None,   # to be assigned in generateData.py
     'simulationTime': 60*60*12, # unit: s, 60*60*12 # 12 hours
-    'stallingTime': 30,   # unit: s, 3 min. For PatientAnticipativeMethods
+    'stallingTime': 60*3,   # unit: s, 3 min. For PatientAnticipativeMethods
+
 
     "orderArrivalRate": round(1/30,3), # unit: number per second. default is 1/30, meaning 2 per minute
 
-    "numRiders": 30,
-    "numRestaurants": 20, # originally 20
+    "numRiders": 30, # default: 30
+    "numRestaurants": 20, # default: 20
     
     # FPT distribution
     "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
-    "if_TNM": 0, # if we use TNM to model FPT
+    "if_TNM": 1, # if we use TNM to model FPT
     "TNM_weights": [0.2, 0.5, 0.25, 0.05],
     "FPT_avg": 600, # unit: s # second # average food preparation time. default is 300
     "FPT_sd":200,
@@ -36,7 +33,7 @@ args = dotdict({
 
     "riderSpeed":1, # unit m/s
 
-    "threshold_assignment_time": 20*60 , # unit: s, 35 min. For AssignLaterMethod
+    "threshold_assignment_time": 9*60 , # unit: s, 35 min. For AssignLaterMethod
 
     # "riderSelectionThreshold": 100000,
     # "forwardLookingTime": 3000, # unit: s 300

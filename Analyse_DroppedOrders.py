@@ -22,14 +22,18 @@ import matplotlib.pyplot as plt
 import time
 from RunSimulation import runEpisode
 from Analyse_Orders import AnalyseOrders
-from DefaultMethod_1a import DefaultMethod_1a
+from Greedy_cancel import Greedy_cancel
 import datetime
 import math
 
 
 class Analyse_DroppedOrders():
+    methods = {
+        "Greedy(drop)": Greedy_cancel(),
+        "AnticipationMethod": AnticipationMethod(),
+    }
     def __init__(self) -> None:
-        self.baselineMethod = DefaultMethod_1a()
+        self.baselineMethod = Greedy_cancel()
         self.anticipativeMethod = AnticipationMethod()
         self.default = None
         self.anti = None

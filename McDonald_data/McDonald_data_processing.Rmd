@@ -2,7 +2,9 @@
 title: "Mc_df_processing"
 author: "yizhuo"
 date: "2023-01-28"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -42,16 +44,15 @@ df <- filter(entire_df, entire_df$phppPeriodID == 20170810)
 
 ## Basic Analysis of Data
 ```{r analysis}
-# number of unique EventID: 42922
-length(unique(df$phEventID))
+# number of orders on this day: 54311
+nrow(df)
 # number of unique StoreID: 20
 length(unique(df$phpsStoreID))
 
-
 # time distribution of orders
 hist(df$phptTimeID, breaks = 144, main = "TimeID")
-hist(df$phTimeStart, breaks = 240, main = "TimeStart")
-hist(df$phTimeEnd, breaks = 240, main = "TimeEnd")
+# hist(df$phTimeStart, breaks = 240, main = "TimeStart")
+# hist(df$phTimeEnd, breaks = 240, main = "TimeEnd")
 
 ```
 

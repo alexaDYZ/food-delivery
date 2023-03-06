@@ -30,6 +30,7 @@ class Order():
         self.wt = -1
         self.reassign_time = -1 # for AssignLaterMethod. When FPT is too long and order needs to be reassigned
         self.ifReassigned = False # for AssignLaterMethod. debug
+        self.assigned_to_walking_rider = False # debug
 
     def getOrderStatus(self):
         return Order.status[self.status]

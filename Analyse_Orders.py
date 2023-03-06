@@ -109,9 +109,10 @@ class Simple():
     def add_method(self, method_name):
         m = Simple.methods[method_name]
         self.methods.append(m)
-    
-  
 
+    def add_additional_method(self, method_obj):
+        self.methods.append(method_obj)
+        
     def get_order_df_from_sim_res(self,sim):
         orders = sim.order_list
         
@@ -144,13 +145,17 @@ class Simple():
             # 11. rider_reached_before_FRT
             x = 1 if o.t_riderReachedRestaurant<o.rest.order_FPT_dict[o.index]+o.t else 0
             row.append(x)
+            # 12. assigned_to_walking_rider
+            x = 1 if o.assigned_to_walking_rider else 0
+            row.append(x)
 
             row = [round(x, 2) if x else None for x in row]
             df_2dlist.append(row)
         df = pd.DataFrame(df_2dlist, columns=["Order Index", "Order-in Time", 
                                             "Rider Index", "Rider Arrives at Restaurant", "FRT",
                                             "Order Delivered Time", "Waiting Time", 
-                                             "Theoretical Best WT", "WT regret", "FPT", "rider_reached_before_FRT"])
+                                             "Theoretical Best WT", "WT regret", "FPT", "rider_reached_before_FRT",
+                                             "assigned_to_walking_rider"])
         df.to_csv("results/df_"+ sim.method.name+ ".csv")
         return df           
 

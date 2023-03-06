@@ -1,0 +1,25 @@
+x : % of orders assigned to riders who arrive before FRT
+y : % of orders reassigned
+
+** FPT = 60 **
+y = 0 for all numRider
+x = [1.4, 20.7, 76.5, 84.5, 98.5, 99.9] for numRider = [20, 25, 30, 35, 40, 45]
+
+
+** truncated normal **
+y = 0 for all numRider
+x = [2.0, 2.5, 72.7, 89.6, 95.2, 99.6] for numRider = [20, 25, 30, 35, 40, 45]
+
+** TNM **
+y = [56, 56, 55, 58, 55, 56] for numRider = [20, 25, 30, 35, 40, 45]
+x = [3.8, 8.7, 25.6, 56, 64.8, 81.8] 
+(threshold = 20min)
+
+
+-----------------------------------------------------------------------------
+
+MCDonalds TNM
+x = [41.7, 61.2, 75.2, 82.6, 88.5] for numRider = [800, 900, 1000, 1100, 1200]
+y = [56, 55, 56, 55, 56] 
+(threshold = 20min)
+

@@ -22,6 +22,7 @@ class AssignLaterMethod(AssignmentMethod):
         self.FRT = None
         # self.timeArrivalDict_rider_time = {} # for analysis
         self.to_be_assigned = [] # list of order index, to be asssigned later, due to large FPT
+        self.threshold = None # for debug
 
     def addOrder(self, newOrder):
         return super().addOrder(newOrder)
@@ -30,6 +31,9 @@ class AssignLaterMethod(AssignmentMethod):
         return super().addCurrTime(currTime)
     def addRiderList(self, rider_list):
         return super().addRiderList(rider_list)
+    def addThreshold(self, x):
+        args["threshold_assignment_time"] = x*60 # x is in min
+        self.threshold = x
 
     def findR2RforAll(self):
 
@@ -148,6 +152,8 @@ class AssignLaterMethod_UsefulWork(AssignLaterMethod):
         return super().addRiderList(rider_list)
     def findR2RforAll(self):
         return super().findR2RforAll()
+    def addThreshold(self, x):
+        super().addThreshold(x)
 
     def find_best_rider(self):
         best_rider = None
