@@ -1,6 +1,7 @@
 import math
 from config import args
 from Order import Order
+import random
 
 # terms:
 # fmdistance: first mile distance, from rider location to the restaurant
@@ -16,10 +17,11 @@ class Rider():
     def __init__(self, index, loc, args) :
         self.args = args
         self.index = index
-        self.init_loc = loc
+        # self.init_loc = loc
         self.loc = loc
         self.status = 0
-        self.nextAvailableTime = 0 # time when he will finish deliver all orders
+        self.nextAvailableTime_predicted = 0 # predicted
+        self.nextAvailableTime_actual = 0 # actual
         self.lastStop = None # last order's customer loc
         self.orderCompleteTimeList = [] # This keeps track of the completion time of all orders this rider is delivering
         self.orderDict= {} # order dictionary. key: order index, value: order object. of All orders the rider has served/is serving
@@ -42,11 +44,13 @@ class Rider():
         return Rider.status[self.status]
 
     def deliver(self, order:Order, time_start_deliver:float):
+        'all in actual time' 
+
         if self.status == 2: # if rider is walking, stop walking and start deliver
             print("Rider "+ str(self.index)+" status change: walking -> deliver")
             self.status = 1
             self.loc = self.getLocation(time_start_deliver) # halfway of walking
-            self.nextAvailableTime = time_start_deliver # now
+            self.nextAvailableTime_predicted = time_start_deliver # now
             self.walking_path = None # clear the walking path
             order.assigned_to_walking_rider = True
 
@@ -57,9 +61,8 @@ class Rider():
 
         # rider
         
-        self.nextAvailableTime = order.t_delivered
         self.lastStop = order.cust.loc
-        self.orderCompleteTimeList.append(self.nextAvailableTime)
+        self.orderCompleteTimeList.append(self.nextAvailableTime_actual)
 
         # Calculate Rider Wait Time
         
@@ -71,6 +74,8 @@ class Rider():
         
         riderWT = max(0, FRT - t_reached)
         self.totalWaitingTime += riderWT
+
+        # self.nextAvailableTime_actual is updated in Order object, addDeliveredTime()
 
     def getFoodReadyTime(self, orderIndex): # given an order, returns when the food is ready on the timeline
         order = self.orderDict[orderIndex]
@@ -95,7 +100,8 @@ class Rider():
             return rest_list[nearest_rest_index].loc
                 
         elif walking_rule == 2: # probablistic
-            pass
+            random_rest = random.choice(rest_list)
+            return random_rest.loc
     
     # walking mode only
     def moveTo(self, currTime, loc_dest):

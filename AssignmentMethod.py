@@ -5,6 +5,12 @@ class AssignmentMethod():
         "Nearest Restaurant": 1,
         "Probabilistic":2,
     }
+    accuracy_of_prediction = {
+        "full": 1,
+        "partial": 0.5,
+        "poor_short": 0,
+        "poor_long": 2,
+    }
     def __init__(self) -> None:
         self.order = None
         self.rider_list = None
@@ -24,6 +30,12 @@ class AssignmentMethod():
     def setWalkingRule(self, rule_name):
         self.walking_rule = AssignmentMethod.WALKING_RULE[rule_name]
         self.name = self.__class__.__name__ + "_" + rule_name
+    def setFPT_pred_accuracy(self, level):
+        # level can be "full", "partial", "poor"
+        if level in AssignmentMethod.accuracy_of_prediction.keys():
+            self.FPT_knowledge = AssignmentMethod.accuracy_of_prediction[level]
+        else:
+            raise Exception("Invalid FPT knowledge level")
     def find_candidates(self):
         '''
         Input: a list of all riders

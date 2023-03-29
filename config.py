@@ -22,10 +22,13 @@ args = dotdict({
     "numRestaurants": 20, # default: 20
     
     # FPT distribution
+    # "FPT_pred": 50*60,
     "if_truncated_normal": 0, # if we use truncated normal distribution for food preparation time
-    "if_TNM": 1, # if we use TNM to model FPT
+    "if_TNM": 0, # if we use TNM to model FPT
+    "weibull": 0, # if we use weibull distribution for food preparation time
+    "mean_estimator": 0, # the actual mean of the distribution, set in "generateData.py"
     "TNM_weights": [0.2, 0.5, 0.25, 0.05],
-    "FPT_avg": 600, # unit: s # second # average food preparation time. default is 300
+    "FPT_avg": 60*30, # unit: s # second # average food preparation time. default is 600
     "FPT_sd":200,
     "FPT_lower": 300, # lower bound of truncated normal distribution
     "FPT_upper": 1200, # upper bound of truncated normal distribution
@@ -33,7 +36,7 @@ args = dotdict({
 
     "riderSpeed":1, # unit m/s
 
-    "threshold_assignment_time": 9*60 , # unit: s, 35 min. For AssignLaterMethod
+    "threshold_assignment_time": 10*60 , # unit: s, 35 min. For AssignLaterMethod
 
     # "riderSelectionThreshold": 100000,
     # "forwardLookingTime": 3000, # unit: s 300

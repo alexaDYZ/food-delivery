@@ -9,12 +9,20 @@ from Analyse_Orders import Simple
 from AnticipationMethod import AnticipationMethod
 from DefaultMethod_1b import DefaultMethod_1b
 import sys
+from Experiment_FPT import experiment1, experiment2, experiment3
 
 
 
 
 def main():
    
+
+   
+   
+   startTime = datetime.datetime.now()
+   # experiment1()
+   experiment2()
+   # experiment3()
    # AnalyseNumOrders()
    # AnalyseRider()
    # a = Analyse_DroppedOrders() # Default_1a
@@ -22,8 +30,11 @@ def main():
    # a = Analyse_Rider() # analyse equality in job allocation
    # a.visualizeMaxMin()
    # a.visualizeRoute()
-   startTime = datetime.datetime.now()
-   a = WaitingTimePLot()
+
+   # a = WaitingTimePLot()
+   # a.add_method("AnticipationMethod") 
+   # a.add_method("DefaultMethod_1b")
+   # a.plot()
    # a.test_assign_later()
    # a.run()
    # a = WaitingTimePLot()
@@ -32,27 +43,32 @@ def main():
    # a.add_method("UsefulWorkMethod")
    # a.add_all_methods()
    def compare_anticipation_w_waiting():
-      # a.add_method("AnticipationMethod") 
-      # anti_waiting = AnticipationMethod()
+      a.add_method("AnticipationMethod") 
+      anti_waiting = AnticipationMethod()
       # anti_waiting.setWalkingRule("Nearest Restaurant")
+      anti_waiting.setWalkingRule("Probabilistic")
       # a.add_additional_method(anti_waiting, color_ls  = ["yellow", "yellow", "lightyellow", "lightyellow", "lightyellow"])
-      
-      a.add_method("DefaultMethod_1b") 
-      default_waiting = DefaultMethod_1b()
-      default_waiting.setWalkingRule("Nearest Restaurant")
-      a.add_additional_method(default_waiting, color_ls  = ["yellow", "yellow", "lightyellow", "lightyellow", "lightyellow"])
-      a.plot()
+      a.add_additional_method(anti_waiting, color_ls  = ["green", "green", "lightgreen", "lightgreen", "lightgreen"])
 
-   compare_anticipation_w_waiting()
+      
+      # a.add_method("DefaultMethod_1b") 
+      # default_waiting = DefaultMethod_1b()
+      # # default_waiting.setWalkingRule("Nearest Restaurant")
+      # default_waiting.setWaitingRule("Probabilistic")
+      # a.add_additional_method(default_waiting, color_ls  = ["green", "green", "lightgreen", "lightgreen", "lightgreen"])
+      # # a.add_additional_method(default_waiting, color_ls  = ["yellow", "yellow", "lightyellow", "lightyellow", "lightyellow"])
+      
+      a.plot()
+   # compare_anticipation_w_waiting()
 
    # a = Simple()
    # a.add_method("DefaultMethod_1b")
-   # default_waiting = DefaultMethod_1b()
-   # default_waiting.setWalkingRule("Nearest Restaurant")
-   # a.add_additional_method(default_waiting)
-   # # a.add_method("AnticipationMethod")
+   # # default_waiting = DefaultMethod_1b()
+   # # default_waiting.setWalkingRule("Nearest Restaurant")
+   # # a.add_additional_method(default_waiting)
+   # a.add_method("AnticipationMethod")
    # # anti_waiting = AnticipationMethod()
-   # # anti_waiting.setWalkingRule("Nearest Restaurant")
+   # # anti_waiting.setWalkingRule("Probabilistic")
    # # a.add_additional_method(anti_waiting)
    # a.run()
    # run this in terminal: python3 main.py &> out.txt

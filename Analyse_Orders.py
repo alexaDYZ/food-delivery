@@ -26,6 +26,8 @@ from PatientAnticipativeMethod_Bulk import PatientAnticipativeMethod_Bulk
 from  AnticipationMethod import AnticipationMethod
 from UsefulWorkMethod import UsefulWorkMethod
 from AssignLaterMethod import AssignLaterMethod, AssignLaterMethod_UsefulWork  
+# from AnticipationMethod_imperfect_knowlegde import AnticipationMethod_ImperfectKnowldge
+# from AssignLaterMethod_imperfect_knowledge import AssignLaterMethod_ImperfectKnowledge
 
 class AnalyseOrders():
     # first, run the simulation
@@ -122,46 +124,66 @@ class Simple():
             # 1. Order Index
             row.append(o.index)
             # 2. "Order-in Time"
-            row.append(o.t)
+            row.append( round(( o.t)/60,2))
             # 3. Rider Index
             row.append(o.rider.index)
-            # 4. "Rider Arrives at Restaurant"
-            row.append(o.t_riderReachedRestaurant)
-            # 5. FRT
-            row.append(o.t + o.rest.order_FPT_dict[o.index] )
-            # 6. "Order Delivered Time"
-            row.append(o.t_delivered)
-            # 7. "Waiting Time"
-            row.append(o.wt)
-        
-            # 8. "Theoretical Best WT"
+            # 4. "ACTUAL Rider Arrives at Restaurant"
+            row.append( round((o.t_riderReachedRestaurant)/60,2))
+            # 5. "PRED Rider Arrives at Restaurant"
+            row.append( round((o.t_riderReachedRestaurant_pred)/60,2))
+            # 6. ACTUAL FRT
+            row.append( round((o.t + o.rest.order_FPT_dict[o.index])/60,2) )
+            # 7. PRED FRT
+            row.append( round(o.FRT_pred/60,2) )
+            # 7. ACTUAL Order Delivered Time
+            row.append( round((o.t_delivered)/60, 2))
+            # 8. PRED predicted delivered time
+            row.append( round((o.t_delivered_pred)/60,2))
+            # 9. "Waiting Time"
+            row.append( round((o.wt)/60,2))
+            # 10. "Theoretical Best WT"
             optimal_wt = o.rest.order_FPT_dict[o.index] + math.dist(o.rest.loc, o.cust.loc)
-            row.append(optimal_wt)
-            # 9. "WT regret"
+            row.append( round((optimal_wt)/60,2))
+            # 11. "WT regret"
             regret_wt = o.wt - optimal_wt
-            row.append(regret_wt)
-            # 10. "FPT"
-            row.append(o.rest.order_FPT_dict[o.index])
-            # 11. rider_reached_before_FRT
+            row.append( round((regret_wt)/60,2))
+            # 12. "FPT"
+            row.append( round((o.rest.order_FPT_dict[o.index])/60,2))
+            # 13. predicted FPT
+            row.append( round((o.FPT_predicted)/60,2))
+            # 14. rider_reached_before_FRT
             x = 1 if o.t_riderReachedRestaurant<o.rest.order_FPT_dict[o.index]+o.t else 0
             row.append(x)
-            # 12. assigned_to_walking_rider
+            # 15. assigned_to_walking_rider
             x = 1 if o.assigned_to_walking_rider else 0
             row.append(x)
+            
+            
+            
+
+
+
+
 
             row = [round(x, 2) if x else None for x in row]
             df_2dlist.append(row)
         df = pd.DataFrame(df_2dlist, columns=["Order Index", "Order-in Time", 
-                                            "Rider Index", "Rider Arrives at Restaurant", "FRT",
-                                            "Order Delivered Time", "Waiting Time", 
-                                             "Theoretical Best WT", "WT regret", "FPT", "rider_reached_before_FRT",
-                                             "assigned_to_walking_rider"])
+                                              "Rider Index", "Rider Arrives at Restaurant - Actual", 
+                                              "Rider Arrives at Restaurant - Pred", "FRT",
+                                              "PRED FRT", "Order Delivered Time - Actual", "Order Delivered Time - Pred",
+                                            "WT", "Theoretical Best WT", 
+                                            "WT regret", "FPT", 
+                                            "FPT_pred", "Rider_reached_before_FRT",
+                                             "Assigned_to_walking_rider",
+                                             ])
         df.to_csv("results/df_"+ sim.method.name+ ".csv")
         return df           
 
 
     def run(self):
         for m in self.methods:
+            if m.name == "AssignLaterMethod_ImperfectKnowledge":
+                print("Predicted FPT is ", m.FPT_predicted)
             sim = runEpisode_single_medthod(m)
             self.get_order_df_from_sim_res(sim)
             print(m.name, "done")

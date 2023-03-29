@@ -121,11 +121,11 @@ def dataGeneration():
 
                 plt.savefig(args["path"] + "FPT_distribution" + params + ".png", dpi=300)
             #### debug #######
-        if args['if_TNM']:
+        elif args['if_TNM']:
             # suppose we have 4 clusters, all are modeled as truncated normal distribution
             total_num = args['numOrders']
             weights = args["TNM_weights"]
-            means = [i*60 for i in [10, 20, 40, 60]]
+            means = [i*60 for i in [10, 30, 40, 60]]
             stds = [i*60 for i in [2, 5, 5, 10]]
             upper = [i*60 for i in [20, 40, 60, 100]]
             lower = [i*60 for i in [5, 10, 20, 40]]
@@ -142,10 +142,11 @@ def dataGeneration():
                 group = [round(x,2) for x in group]
                 groups.append(group) # debug
                 food_prep_time.extend(group) 
+            print("TNM - mean FPT = ", str(round(np.mean(food_prep_time)/60,2)))
 
             
             #### debug #######
-            showFPTplot = 0 # for 1 simulation only
+            showFPTplot = False # for 1 simulation only
             if showFPTplot:
                 for i in range(len(group_names)):
                     # plot in minutes
@@ -170,6 +171,30 @@ def dataGeneration():
 
                 plt.savefig(args["path"] + "FPT_TNM" + params + ".png")
                 plt.close()
+        elif args['weibull']:
+            print("Using Weibull distribution for food preparation time")
+            k = 2
+            # l = 21.807
+            l = 22.5
+            samples = np.random.weibull(k, args['numOrders']) * l
+            fpt = [round(x+10, 2) for x in samples]
+            print("weibull - mean FPT = ", str(np.mean(fpt)))
+
+
+            # for debugging
+            args["mean_estimator"]  = np.mean(fpt) # to tell the algorithm, what is the mean FPT
+
+            plot = False
+            if plot:
+                plt.hist(fpt, bins = 100,alpha=0.5, color='blue')
+                plt.title('FPT Distribution (Weibull)\n ('+ str(len(fpt))+' orders)')
+                plt.xlabel("FPT (min)")
+                plt.ylabel("Frequency")
+                plt.savefig(args["path"] + "FPT_weibull" + ".png")
+                plt.close()
+                
+            fpt_in_seconds = [i*60 for i in fpt]
+            food_prep_time = np.array(fpt_in_seconds)
         else:
             fpt_mean = args["FPT_avg"]
             food_prep_time = np.random.normal(fpt_mean, 0, args['numOrders']).tolist()

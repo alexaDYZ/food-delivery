@@ -86,10 +86,10 @@ class DefaultMethod_1b(AssignmentMethod):
         else: # busy riders
             nextAvailTimeForAll_dict = {} # key: nextAvailTime; value: rider index
             for r in self.rider_list:
-                if r.nextAvailableTime in nextAvailTimeForAll_dict.keys():
-                    nextAvailTimeForAll_dict[r.nextAvailableTime].append(r.index)
+                if r.nextAvailableTime_actual in nextAvailTimeForAll_dict.keys():
+                    nextAvailTimeForAll_dict[r.nextAvailableTime_actual].append(r.index)
                 else:
-                    nextAvailTimeForAll_dict[r.nextAvailableTime] = [r.index]
+                    nextAvailTimeForAll_dict[r.nextAvailableTime_actual] = [r.index]
             
             earliestStartingTime = min(nextAvailTimeForAll_dict.keys()) 
             

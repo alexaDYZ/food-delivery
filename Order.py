@@ -31,6 +31,10 @@ class Order():
         self.reassign_time = -1 # for AssignLaterMethod. When FPT is too long and order needs to be reassigned
         self.ifReassigned = False # for AssignLaterMethod. debug
         self.assigned_to_walking_rider = False # debug
+        self.FPT_predicted = None
+        self.t_riderReachedRestaurant_pred = -1
+        self.t_delivered_pred = -1
+        self.FRT_pred = -1
 
     def getOrderStatus(self):
         return Order.status[self.status]
@@ -44,16 +48,29 @@ class Order():
         # time that the assigned rider reaches the restaurant
         # called in find_best_rider() in AssignMethod child classes
         self.t_riderReachedRestaurant = t
+        
+    def addRiderReachReatsurantTime_pred(self, t_pred):
+        self.t_riderReachedRestaurant_pred = t_pred
     
     def addDeliveredTime(self):
         # called after addRiderReachReatsurantTime()
+        '''Actual'''
         t_rest = self.t_riderReachedRestaurant
         rest2cust = math.dist(self.rest.loc, self.cust.loc)/args["riderSpeed"]
-        FPT = self.rest.order_FPT_dict[self.index]
-        FRT = FPT + self.t
-        t_delivered = max(t_rest, FRT) + rest2cust
-        self.t_delivered = t_delivered
+        FPT_real = self.rest.order_FPT_dict[self.index]
+        FRT = FPT_real + self.t
+        self.t_delivered = max(t_rest, FRT) + rest2cust
         self.wt = self.t_delivered - self.t
+        self.rider.nextAvailableTime_actual = self.t_delivered
+
+        '''Predicted'''
+        # update the predicted rider's next_available_time
+        
+        self.FRT_pred  = self.FPT_predicted + self.t
+        self.t_delivered_pred = max(self.t_riderReachedRestaurant_pred, self.FRT_pred ) + rest2cust
+        self.rider.nextAvailableTime_predicted = self.t_delivered_pred
+            
+            
         
 
     def delivered(self, t_delivered):

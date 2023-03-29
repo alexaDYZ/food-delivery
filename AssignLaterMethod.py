@@ -22,7 +22,8 @@ class AssignLaterMethod(AssignmentMethod):
         self.FRT = None
         # self.timeArrivalDict_rider_time = {} # for analysis
         self.to_be_assigned = [] # list of order index, to be asssigned later, due to large FPT
-        self.threshold = None # for debug
+        self.FPT_knowledge =  None
+        self.threshold = None
 
     def addOrder(self, newOrder):
         return super().addOrder(newOrder)
@@ -31,9 +32,9 @@ class AssignLaterMethod(AssignmentMethod):
         return super().addCurrTime(currTime)
     def addRiderList(self, rider_list):
         return super().addRiderList(rider_list)
-    def addThreshold(self, x):
-        args["threshold_assignment_time"] = x*60 # x is in min
-        self.threshold = x
+    # def addThreshold(self, x):
+    #     args["threshold_assignment_time"] = x*60 # x is in min
+    #     self.threshold = x
 
     def findR2RforAll(self):
 
@@ -51,7 +52,7 @@ class AssignLaterMethod(AssignmentMethod):
         def getTimeReachedRestaurant(rider:Rider, currTime): 
             '''get the time when this rider reaches the restaurant'''
             R2R = math.dist(rider.lastStop if rider.lastStop else rider.loc, rest_loc) / args["riderSpeed"]
-            t_start = max(currTime, rider.nextAvailableTime)
+            t_start = max(currTime, rider.nextAvailableTime_actual)
             return round(t_start + R2R,3)
 
 
@@ -69,33 +70,47 @@ class AssignLaterMethod(AssignmentMethod):
     # driver function, called in Event.py
     def find_best_rider(self):
 
-        best_rider = None
+        
+
+        # 1. set predicted FPT given knowledge:
+        if self.FPT_knowledge == 1:
+            self.order.FPT_predicted = self.order.rest.order_FPT_dict[self.order.index]
+        elif self.FPT_knowledge == 0.5:
+            self.order.FPT_predicted = 30*60
+        elif self.FPT_knowledge == 0:
+            self.order.FPT_predicted = 10*60
+        elif self.FPT_knowledge == 2:
+            self.order.FPT_predicted = 50*60
 
         # Case 1. check if the order belongs to delayed assignment -> need to assign now
         if self.order.index in self.to_be_assigned:
             self.to_be_assigned.remove(self.order.index)
             best_rider = self.assignNow()
-            # print(" ===== Reassign:", self.order.index, "to rider", best_rider.index, "at time", self.currTime, )
+            print(" ===== Reassign:", self.order.index, "to rider", best_rider.index, "at time", self.currTime, )
             return best_rider
 
 
         # Case 2. otherwise, it is a new order
         else:
             # 1. check if FPT > threshold
-            diff = self.find_FPT_minus_threshold()
+            diff = self.find_pred_FPT_minus_threshold()
             # 2.1 if FPT <= threshold, assign now, using AnticipationMethodd <=> pick first rider who arrives at the restaurant
             if diff <= 0:
                 "FPT is short, assign now."
+                print("FPT is short, assign now.: FPT pred is ", self.order.FPT_predicted, "threshold is ", self.threshold, "actual FPT is ", self.order.rest.order_FPT_dict[self.order.index])
                 best_rider = self.assignNow()
-                # print("Assign:", self.order.index, "to rider", best_rider.index, "at time", self.currTime,)
+                if best_rider == None:
+                    print("No rider found for order", self.order.index, "at time", self.currTime)
+                print("Assign:", self.order.index, "to rider", best_rider.index, "at time", self.currTime,)
             # 2.2 FPT is large, assign later
             else: 
                 self.to_be_assigned.append(self.order.index)
                 self.order.reassign_time = self.currTime + diff
                 self.order.status  = 5 #  order is waiting for reassignment
                 self.order.ifReassigned = True
+        
 
-            return best_rider
+            
 
 
 
@@ -104,33 +119,38 @@ class AssignLaterMethod(AssignmentMethod):
 
         self.R2RforAll = self.findR2RforAll() # key: time arrived at the restaurant, value: list of riders who arrive at that time
 
-        earliestRestaurantArrivalTime = self.find_ealiest_arrival() # find min in self.R2RforAll
+        t_arrive_restaurant_pred = self.find_ealiest_arrival() # find min in self.R2RforAll
 
-        bestRiders = self.R2RforAll[earliestRestaurantArrivalTime] # find best rider using the min
+        bestRiders = self.R2RforAll[t_arrive_restaurant_pred] # find best rider using the min
         bestRider = random.choice(bestRiders) # randomly choose one from the best riders
 
-        t_start = bestRider.nextAvailableTime # time when he finish the last order, before start this order
+        t_start_actual = bestRider.nextAvailableTime_actual # time when he finish the last order, before start this order
+        t_start_actual = bestRider.nextAvailableTime_actual
+
+        if self.FPT_knowledge == 1: t_arrive_restaurant_actual = t_arrive_restaurant_pred
+        else: t_arrive_restaurant_actual = t_start_actual + (t_arrive_restaurant_pred - bestRider.nextAvailableTime_predicted)
 
         # update order status
         self.order.foundRider(bestRider)
-        self.order.addRiderReachReatsurantTime(earliestRestaurantArrivalTime)
+        self.order.addRiderReachReatsurantTime(t_arrive_restaurant_actual)
+        self.order.addRiderReachReatsurantTime_pred( t_arrive_restaurant_pred)
         self.order.addDeliveredTime() # order.t_delivered
 
         # update rider status
-        bestRider.deliver(self.order, t_start)
+        bestRider.deliver(self.order, t_start_actual)
 
         self.bestRider = bestRider
 
         return bestRider
 
-    def find_FPT_minus_threshold(self):
+    def find_pred_FPT_minus_threshold(self):
         # output = FPT - threshold
         # output > 0 means FPT is later than the threshold, hence assign later
         # output <= 0 means FPT is fast enough to be assigned now
-        order_index = self.order.index
-        FPT = self.order.rest.order_FPT_dict[order_index]
-        threshold = args["threshold_assignment_time"]
-        res = round(FPT - threshold, 3)
+        
+        FPT_pred = self.order.FPT_predicted
+        self.threshold = args["threshold_assignment_time"]
+        res = round(FPT_pred - self.threshold, 3)
         return res
 
     def find_ealiest_arrival(self):
@@ -168,7 +188,7 @@ class AssignLaterMethod_UsefulWork(AssignLaterMethod):
         # Case 2. otherwise, it is a new order
         else:
             # 1. check if FPT > threshold
-            diff = self.find_FPT_minus_threshold()
+            diff = self.find_pred_FPT_minus_threshold()
             # 2.1 if FPT <= threshold, assign now, using AnticipationMethodd <=> pick first rider who arrives at the restaurant
             if diff <= 0:
                 "FPT is short, assign now."
@@ -210,7 +230,7 @@ class AssignLaterMethod_UsefulWork(AssignLaterMethod):
             bestRider_id = -1
             for r in filtered_riders:
                 max_next_available_time = 0
-                if r.nextAvailableTime >= max_next_available_time:
+                if r.nextAvailableTime_actual >= max_next_available_time:
                     max_next_available_time = r.nextAvailableTime
                     bestRider_id = r.index
             bestRider = self.rider_list[bestRider_id]
@@ -259,8 +279,8 @@ class AssignLaterMethod_UsefulWork(AssignLaterMethod):
         return time_before_FRT
     # from AssignLaterMethoe class
     
-    def find_FPT_minus_threshold(self):
-        return super().find_FPT_minus_threshold()
+    def find_pred_FPT_minus_threshold(self):
+        return super().find_pred_FPT_minus_threshold()
     
 
 

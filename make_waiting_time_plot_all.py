@@ -20,7 +20,9 @@ from RunSimulation import runEpisode, runEpisode_single_medthod
 from ClosestToFPTMethod import ClosestToFPTMethod
 from DefaultMethod_1b import DefaultMethod_1b
 from PatientAnticipativeMethod_Bulk import PatientAnticipativeMethod_Bulk
-from  AnticipationMethod import AnticipationMethod
+from AnticipationMethod import AnticipationMethod
+# from AnticipationMethod_imperfect_knowlegde import AnticipationMethod_PartialKnowledge
+# from AssignLaterMethod_imperfect_knowledge import AssignLaterMethod_ImperfectKnowledge
 from UsefulWorkMethod import UsefulWorkMethod
 from AssignLaterMethod import AssignLaterMethod, AssignLaterMethod_UsefulWork  
 
@@ -39,10 +41,12 @@ class WaitingTimePLot():
     method_colors = {
         "DefaultMethod_1b":  ["red", "lightcoral", "pink", "pink", "pink"],
         "AnticipationMethod": ["cornflowerblue", "royalblue", "lightblue", "lightblue", "lightblue"],
+        # "AnticipationMethod_PartialKnowledge": ["blue", "darkblue", "aliceblue", "aliceblue", "aliceblue"],
         "ClosestToFPTMethod": ["green", "mediumseagreen", "lightgreen", "lightgreen", "lightgreen"],
         "PatientAnticipativeMethod_Bulk": ["sandybrown", "orange", "bisque", "bisque", "bisque"],
         "UsefulWorkMethod": ["yellow", "gold",  "lightyellow", "lightyellow", "lightyellow"],
         "AssignLaterMethod": ["purple", "mediumpurple", "thistle", "thistle", "thistle"],
+        # "AssignLaterMethod_ImperfectKnowledge": ["pink", "hotpink", "lightpink", "lightpink", "lightpink"],
         "Optimal": ["black", "grey", "grey", "grey", "grey"],
         "AssignLaterMethod_UsefulWork":["pink", "hotpink", "lightpink", "lightpink", "lightpink"],
     }
@@ -76,6 +80,8 @@ class WaitingTimePLot():
         dataGeneration() # generate initial data
         sim_res_dict = {}
         for m in self.methods:
+            if m.name == "AssignLaterMethod_ImperfectKnowledge":
+                print("Predicted FPT is ", m.FPT_predicted)
             sim = runEpisode_single_medthod(m)
             sim_res_dict[m.name] = sim
         return sim_res_dict
@@ -112,6 +118,8 @@ class WaitingTimePLot():
                 # 2. "Order-in Time"
                 row.append(o.t)
                 # 3. Rider Index
+                if o.rider is None:
+                    raise Exception("Rider is None, for order ", o.index)
                 row.append(o.rider.index)
                 # 4. "Rider Arrives at Restaurant"
                 row.append(o.t_riderReachedRestaurant)
@@ -156,7 +164,7 @@ class WaitingTimePLot():
             interval = args["IA_interval"]
             df['interval_number'] = df["Order-in Time"] // interval + 1
             N = int(t_end // args["IA_interval"] + 1) # number of intervals
-            print("N = ", N)
+            # print("N = ", N)
             
             # compute average waiting time for each interval to 2 decimal places
             wt_ia = list( df.groupby("interval_number")["Waiting Time"].mean())
@@ -180,15 +188,17 @@ class WaitingTimePLot():
         wt_ia_dict = {} # ket = method name, value = list of df, each df is from 1 simulation 
         regret_ia_dict = {}
         for m_name in m_names:
+            
             wt_ia_dict[m_name] = []
             regret_ia_dict[m_name] = []
         if self.add_optimal_wt: wt_ia_dict["Optimal"] = []
 
 
         # ==  start multiple simulations ==
+       
         for i in range(args["numSimulations"]):
             # === for each simulation, get the results for all method === 
-            print("Simulation ", i, )
+            # print("Simulation ", i, )
             sim_res_dict = self.simulateOnce_all_methods()
             
             # for each methods, get the interval average
@@ -199,7 +209,7 @@ class WaitingTimePLot():
                 wt_ia_dict[m_name].append(wt_ia)
                 if self.plot_regret:
                     regret_ia_dict[m_name].append(regret_ia)
-                print("✅ Method ", m_name, " done")
+                # print("✅ Method ", m_name, " done")
             
             # add theoretical optimal 
             if self.add_optimal_wt:
@@ -272,6 +282,8 @@ class WaitingTimePLot():
             # fill between uq and lq
             plt.fill_between(valid_col_names, uq, lq, color = shade_color, alpha = 0.5)
 
+            print(method_name, "Mean WT = " , str(round(sum(mean)/len(mean),2)))
+
         
 
         
@@ -284,8 +296,11 @@ class WaitingTimePLot():
                 + "_gridSize" + str(args['gridSize'])
                 + "_FPT" + str(args["FPT_avg"])
                 + "window" + str(args["stallingTime"]/60) + "min_"
-                + "_ts"+ str(int(args["threshold_assignment_time"]/60)))
+                + "_ts"+ str(int(args["threshold_assignment_time"]/60))
+                )
         if args["useMcData"]: params += "_Mc"
+        
+
 
         figname = args["path"] + "IA_distribution"+ params
         
@@ -302,6 +317,11 @@ class WaitingTimePLot():
                     #  change the background color
                     ax = plt.axes()
                     ax.set_facecolor("aliceblue")
+            elif args["weibull"]:
+                    figname+='_weibull'
+                    #  change the background color
+                    ax = plt.axes()
+                    ax.set_facecolor("honeydew")
 
             # plot for each method
             for m_name, df in ia_dict.items(): # keys are all method + "Optimal"
@@ -323,6 +343,8 @@ class WaitingTimePLot():
                 plt.title(title + "\nTruncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
             elif args["if_TNM"]:
                 plt.title(title + "\n TNM for FPT, " + str(args["numRiders"]) + " Riders")
+            elif args["weibull"]:
+                plt.title(title + "\n Weibull Distribution for FPT, " + str(args["numRiders"]) + " Riders")
             else:
                 plt.title(title + "\n Deterministic FPT, " + str(args["numRiders"]) + " Riders")
             
@@ -344,6 +366,7 @@ class WaitingTimePLot():
                     + "_window" + str(round(args["stallingTime"]/60,1))+"min_"
                     + "all_methods")
             if args["useMcData"]: params += "_Mc"
+            
             figname = args["path"] + "IA_distribution"+ params+ "_enlarged"
             if args["if_truncated_normal"]:
                 figname+='_tnormal'
@@ -355,6 +378,11 @@ class WaitingTimePLot():
                 #  change the background color
                 ax = plt.axes()
                 ax.set_facecolor("aliceblue")
+            elif args["weibull"]:
+                    figname+='_weibull'
+                    #  change the background color
+                    ax = plt.axes()
+                    ax.set_facecolor("honeydew")
 
             for m_name, df in ia_dict.items():
                 plot(df, m_name)
@@ -376,6 +404,8 @@ class WaitingTimePLot():
                 plt.title(title + "\nTruncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
             elif args["if_TNM"]:
                 plt.title(title + "\n TNM for FPT, " + str(args["numRiders"]) + " Riders")
+            elif args["weibull"]:
+                plt.title(title + "\n Weibull Distribution for FPT, " + str(args["numRiders"]) + " Riders")
             else:
                 plt.title(title + "\n Deterministic FPT, " + str(args["numRiders"]) + " Riders")
             plt.tight_layout()
@@ -428,7 +458,8 @@ class WaitingTimePLot():
                 + "_gridSize" + str(args['gridSize'])
                 + "_FPT" + str(args["FPT_avg"])
                 + "_window" + str(round(args["stallingTime"]/60,1))+"min_"
-                + "_ts"+ str(int(args["threshold_assignment_time"]/60)))
+                + "_ts"+ str(int(args["threshold_assignment_time"]/60))
+                )
         figname = args["path"] + "Regret"+ params
 
         # plot another one on for numRiders = 40
@@ -465,6 +496,8 @@ class WaitingTimePLot():
             plt.title(title + "\nTruncated Normal Distribution for FPT, " + str(args["numRiders"]) + " Riders")
         elif args["if_TNM"]:
             plt.title(title + "\n TNM for FPT, " + str(args["numRiders"]) + " Riders")
+        elif args["weibull"]:
+            plt.title(title + "\n Weibull Distribution for FPT, " + str(args["numRiders"]) + " Riders")
         else:
             plt.title(title + "\n Deterministic FPT, " + str(args["numRiders"]) + " Riders")
         plt.tight_layout()
@@ -472,6 +505,40 @@ class WaitingTimePLot():
         # plt.show()
         plt.close()
 
+    
+    def get_avg_wt(self, ia_dict):
+        '''
+        input
+        =====
+        sim_res_dict: dict, key = method name, value = simulation object
+        m_name: str, method name
+        
+        output:
+        =======
+        df: cols: [method name, avg wt]
+        '''
+        def compute_mean(df):
+            mean = []
+            for col in df:                
+                mean.append(df[col].mean(skipna=True))
+            mean = [round(i/60, 2) for i in mean] # convert to minutes, to 2 decimal places
+            return mean
+        def get_method_mean(df, method_name):
+            mean = compute_mean(df)
+            method_mean = round(sum(mean)/len(mean),2)
+            return method_mean
+        
+        # plot for each method
+        name_mean_dict = {}
+        for m_name, df in ia_dict.items(): # keys are all method + "Optimal"
+            method_mean  = get_method_mean(df, m_name)
+            name_mean_dict[m_name] = method_mean
+        df = pd.DataFrame.from_dict(name_mean_dict, orient='index', columns = ["Avg Wait Time (min)"])
+        filename = args["path"] + "MeanWT_" + str(args["numRiders"]) + "riders"
+        if args["weibull"]: filename += "_weibull"
+        if args["if_TNM"]: filename += "_TNM"
+
+        df.to_csv(filename + ".csv")
 
     # main function
     def plot(self):
@@ -480,16 +547,34 @@ class WaitingTimePLot():
         self.plot_regret = False
         
         # for i in [i*5 for i in range(4,9)]: # TNM, synthetic data
+        # for i in [i*5 for i in range(5,10)]: # weibull
         # for i in [i*100 for i in range(10,12)]:
         # for i in [40]:
         # for i in [i*5 for i in range(4, 10)]: # deterministic FPT, synthetic data
         # for j in [i*60*5 for i in range(1,2)]: # TNM, real data
-        for i in [50,60]:
+        for i in [25,30]:
+        # for t in [10,20,30,40,50]:
         
             args["numRiders"] = i
+        
             # args["threshold_assignment_time"] = j
             # print("threshold_assignment_time: ", str(int(j/60))+"min")
             
             wt_ia_dict_res, regret_ia_dict_res = self.get_ia_df()
             if self.plot_wt: self.plot_wt_ia(wt_ia_dict_res)
             if self.plot_regret: self.plot_regreat_ia(regret_ia_dict_res)
+    
+    # another main function
+    def compute_avg_wt(self):
+        self.add_optimal_wt = True
+        self.plot_wt = True
+        self.plot_regret = False
+    
+        for i in [25,30]:
+        
+            args["numRiders"] = i
+            wt_ia_dict_res, _ = self.get_ia_df()
+            
+            self.get_avg_wt(wt_ia_dict_res)
+
+    

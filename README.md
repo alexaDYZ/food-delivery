@@ -27,6 +27,27 @@ When an order comes in at time t, this method will firstly figure out who's avai
 
 When there's no one available right now, assign the order to whoever can finish his/her current order(s) the ealiest.
 
+### Patient Anticipatory Method:
+
+Stalling time = k seconds
+pending orders: orders received, stored in the batch, not assigned yet
+
+When an order arrives in the system at time t, check if there are pending orders:
+Case 1: no pending order 
+- start a new batch
+- set cutoff time of assignment = t + k
+Case 2 there are pending orders, but t < the cutoff time of assignment set earlier
+- append the order to the current batch
+
+When t = cutoff time of assignment, assign all orders.
+
+Assignment method:
+- Convert the problem to min_cost_max_flow problem, with source node as the sink node as dummy node, a bipartite graph of orders set and riders set, and apply the algorithm for the min_cost_max_flow to solve this problem.
+
+
+
+
+
 
 ## Analysis of Performance:
 
@@ -82,3 +103,17 @@ When there's no one available right now, assign the order to whoever can finish 
    - Otherwise, call **generate_mc_order_arrivals.py** to generate the list
 2. Set args["useMcData"]=1
 3. Perform as per normal
+
+
+
+
+
+
+# A list of Algorithms:
+1. Greedy(drop) - Default_1a
+2. Greedy(keep) - Default_1b
+3. Greedy Anticipative Method
+4. Patient Anticipative - batching
+5. Greedy Anticipative Method(Assign Later)
+6. ClosestToFPT
+

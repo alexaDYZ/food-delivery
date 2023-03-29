@@ -1,0 +1,9 @@
+---- Weibull ----
+Traceback (most recent call last):
+  File "/Users/alexadong/Documents/GitHub/food-delivery/Experiment_FPT.py", line 199, in <module>
+    vanilla_w_diff_bias_diff_FPT()
+  File "/Users/alexadong/Documents/GitHub/food-delivery/Experiment_FPT.py", line 191, in vanilla_w_diff_bias_diff_FPT
+    vanilla_w_diff_bias()
+  File "/Users/alexadong/Documents/GitHub/food-delivery/Experiment_FPT.py", line 180, in vanilla_w_diff_bias
+    for b in bias:
+TypeError: 'NoneType' object is not iterable
